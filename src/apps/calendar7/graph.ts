@@ -86,8 +86,8 @@ export interface DisplayTable {
   readonly firstMonth?: number;
 }
 
-/** First year a window table, a node or a root may name (the long chain starts in January 2019); the shipped 888-month table starts in 2026. */
-export const WINDOW_FIRST_YEAR = 2019;
+/** First year a window table, a node or a root may name (the long chain starts in January 1980); the shipped 888-month table starts in 2026. */
+export const WINDOW_FIRST_YEAR = 1980;
 /** A window table has one display per month (at most 1201 months); the shipped table has 91 displays. */
 const MAX_DISPLAYS = 1201;
 

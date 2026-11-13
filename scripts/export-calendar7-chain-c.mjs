@@ -1,25 +1,32 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Export the verified Calendar7 long chain on Print C (January 2019 to January 2036, 205 states, 204 edges; research
+// Export the verified Calendar7 long chain on print D (January 1980 to January 2036, 673 states, 672 edges; research
 // candidate, not certified) into the app's v1 data format, as a folder of its own: public/calendar7/chain-c.
-// The shipped names data and the names demo are not touched.
+// Print D is print C relabeled so that the solved cube shows the root month January 1980 (research: root_change.jl, README
+// section "Root change"). The shipped names data and the names demo are not touched.
 //
-//   node scripts/export-calendar7-chain-c.mjs <artifact-dir> <research-root> [--out public/calendar7/chain-c]
-//   node scripts/export-calendar7-chain-c.mjs --check [<artifact-dir> <research-root>]
+//   node scripts/export-calendar7-chain-c.mjs <states-dir> <research-root> [--out public/calendar7/chain-c]
+//   node scripts/export-calendar7-chain-c.mjs --check [<states-dir> <research-root>]
 //       Without sources: manifest digests, source digests against the pins, app parsers and a full replay of the committed
 //       files (npm run verify:calendar7-chain-c). With sources: also regenerate and compare byte for byte.
 //
-// <artifact-dir> is the unpacked chain artifact (workflow run 43307881914): edges.tsv, chain.moves.tsv, months.tsv,
-// VERIFIED.txt, julia.tsv, flix.tsv, SHA256SUMS, states/state-NN.tsv. <research-root> is a checkout (or archive) of
-// research/cube-display-feasibility at 549c07b0ee843d2e07eed2b71ad9b7418e965a8d; the script reads
-// research/calendar-7x7/row1-window-chain/evidence/print-c/{layout,printing}.tsv.
+// <research-root> is a checkout (or archive) of research/cube-display-feasibility at CHAIN.ref; the script reads
+// research/calendar-7x7/row1-window-chain/evidence/{print-d,chain-1980-2036}/ (print, layout, chain, month list, best-effort list,
+// receipts, state manifest). <states-dir> holds states/state-NN.tsv: the snapshots of the chain, reproduced by
+//   julia --startup-file=no research/calendar-7x7/row1-window-chain/root_change.jl <print-c printing.tsv> <states-dir> --states <chain.moves.tsv of every stage in time order>
+// (the stage artifacts are listed in provenance.tsv; they are not in the repository). Every snapshot is checked against the
+// states.sha256 of the research evidence.
 //
-// Format (documented in docs/CALENDAR7_CHAIN_C.md): the states are not stored one by one (205 snapshots are 2.9 MB). The
+// Extending the chain (1900-01 backward, 2100-01 forward): run root_change.jl over all stage chains again, commit its output
+// in research, and describe the new chain in CHAIN below (ref, directories, first and last month, best-effort months and the pinned
+// digests, PINNED); the format, the checks and the app need no other change except WINDOW_FIRST_YEAR in graph.ts.
+//
+// Format (documented in docs/CALENDAR7_CHAIN_C.md): the states are not stored one by one (673 snapshots are 8.9 MB). The
 // root pose (state.v1.json) plus one move word per edge (graph.v1.json, 1 character per move) and the SHA-256 of every
 // state (graph nodes) determine all of them by replay; the page replays them anyway.
 //
-// The script stops on any mismatch: input digests, the digest lines of the artifact's SHA256SUMS, month list, declared
-// metrics, replay of every word against its snapshot and end hash, and the front of every state against its display.
-// The one best-effort month must differ from its display in exactly the cell the research verdict names, and in no other.
+// The script stops on any mismatch: input digests, the month list, declared metrics, replay of every word against its
+// snapshot and end hash, and the front of every state against its display. A best-effort month must differ from its display
+// in exactly the cell the research names, and in no other.
 import { createHash } from "node:crypto";
 import { mkdirSync, readFileSync, writeFileSync } from "node:fs";
 import { join, resolve } from "node:path";
@@ -31,31 +38,48 @@ import { parseChain, parsePrint, parseRoot } from "./prepare-calendar7.mjs";
 import { parseLayout, windowCells } from "./export-calendar7-names.mjs";
 
 const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
-const PRINT_C = "research/calendar-7x7/row1-window-chain/evidence/print-c/";
-const RESEARCH_INPUTS = { layout: `${PRINT_C}layout.tsv`, printing: `${PRINT_C}printing.tsv` };
-const ARTIFACT_INPUTS = ["chain.moves.tsv", "edges.tsv", "months.tsv", "VERIFIED.txt", "julia.tsv", "flix.tsv"];
+const EVIDENCE = "research/calendar-7x7/row1-window-chain/evidence/";
+/** The chain: where it lives in research and what it is. Everything else is derived from the files or checked against them. */
+export const CHAIN = {
+  ref: "e4ae0493e09396dd6ca4dd528a643db4e4244e83",
+  printDir: `${EVIDENCE}print-d/`,
+  chainDir: `${EVIDENCE}chain-1980-2036/`,
+  first: { year: 1980, month: 1 },
+  last: { year: 2036, month: 1 },
+  /** Stage artifacts the chain was composed from (workflow runs), in time order; the state files are reproduced from them. */
+  segments: ["43414242499 (1980-01 .. 2019-01, backward, free start)", "43307881914 (2019-01 .. 2036-01)"],
+  /** Months print D shows with the wrong cells below (February, Sunday, 28 days: the red 29 at row 7, column 1). */
+  bestEffort: ["1981-02", "1987-02", "1998-02", "2009-02", "2015-02", "2026-02"],
+  wrong: [[7, 1]],
+  text: "29",
+  ink: "red",
+};
+const RESEARCH_INPUTS = { layout: `${CHAIN.printDir}layout.tsv`, printing: `${CHAIN.printDir}printing.tsv` };
+const CHAIN_FILES = ["chain.moves.tsv", "months.tsv", "best-effort.tsv", "VERIFIED.txt", "julia.tsv", "flix.tsv", "independent.tsv", "provenance.tsv", "states.sha256"];
 const stateName = (k) => `state-${String(k + 1).padStart(2, "0")}.tsv`;
-/** Digests of the sources: research ref 549c07b0ee843d2e07eed2b71ad9b7418e965a8d, workflow run 43307881914. */
+/** Digests of the sources (research ref CHAIN.ref). */
 export const PINNED = {
   layout: "e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a",
-  printing: "0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc",
-  "chain.moves.tsv": "b6cb3c525f12e8e2511cc04e5adc84e013e9f052ffd2ff8b454742ab44e5e2e6",
-  "edges.tsv": "fde4a876d22fef628ea2fd8eed8171a30f9d210b6b79e987422ff06e4fe75cd0",
-  "months.tsv": "91a3652a331bdbb908aa5145f2e4018ea1ff411e4a5f8c3276104dbbe6db1dd6",
-  "VERIFIED.txt": "4cd55e320b60b5f16e126d4a693f328e31246a195356d95bca4598b589039afe",
+  printing: "48ff9c8bc60c10908762573c02429fc258c1afc54b431c8c5e3049f11b4b475c",
+  "chain.moves.tsv": "399de6a13e21dd6e182fee0ae52964cc07826f32050d9718a134d0c627d47e46",
+  "months.tsv": "e2fa147790d411eec602feba82ef41efefa07e35d5b5799467beda63ca7f1484",
+  "best-effort.tsv": "2ffff92dbfc36f0a9ac677bd078e239241b5cf827453221e2e928e60f9e097c6",
+  "VERIFIED.txt": "6f0636a344fe30e5b06b1a2a348f3b38d827fe3ed0ca49befa33caa5582c05ba",
   // julia.tsv and flix.tsv are byte-identical: both checkers wrote the same receipt.
-  "julia.tsv": "37f190774f3367156941545603091db5a3b5886df1c68deba252075278931daf",
-  "flix.tsv": "37f190774f3367156941545603091db5a3b5886df1c68deba252075278931daf",
-  /** SHA-256 of the 205 lines `<sha256>  states/state-NN.tsv` (the digests of the snapshots, header included). */
-  states: "c153a2d3df0fd46f0f0c71dce99a999e17cecc64f3b27a30488a2b51af090365",
+  "julia.tsv": "5d2fc89c11bdb3b8cf130d3652bb66111c6dbc6a1a92bb2c2bf33ffe09d98872",
+  "flix.tsv": "5d2fc89c11bdb3b8cf130d3652bb66111c6dbc6a1a92bb2c2bf33ffe09d98872",
+  "independent.tsv": "fc5556f19717db71f0927c27abaf9ce7e549e167e0c6e8e886690847b63fe35f",
+  "provenance.tsv": "76a08710f87db4747d42483dc761d5ca40b8bd7ab50bd3bbca18e7834dbe9e60",
+  /** SHA-256 of states.sha256: the 673 lines `<sha256>  states/state-NN.tsv` (the digests of the snapshots, header included). */
+  "states.sha256": "56d0daa860ee8892c0713daa34118482c92cfabb36e3cc5241e6c0e5b71b5be4",
 };
-export const FIRST = { year: 2019, month: 1 };
-export const STATES = 205;
-export const LAST = { year: 2036, month: 1 };
-/** The one best-effort month: February 2026; the front differs in cell (row 7, column 1), which shows the red 29. */
-export const BEST_EFFORT = { year: 2026, month: 2, wrong: [[7, 1]], text: "29", ink: "red", reason: "best_effort_edge_unconfirmed" };
+export const FIRST = CHAIN.first;
+export const LAST = CHAIN.last;
+export const STATES = (LAST.year - FIRST.year) * 12 + LAST.month - FIRST.month + 1;
+/** The best-effort months with the wrong cells and the text shown there. */
+export const BEST_EFFORT = CHAIN.bestEffort.map((s) => ({ year: Number(s.slice(0, 4)), month: Number(s.slice(5)), wrong: CHAIN.wrong, text: CHAIN.text, ink: CHAIN.ink }));
 const STATUS = "research candidate, not certified, not for release";
-const TITLE = "Names (long chain, print C, January 2019 - January 2036)";
+const TITLE = "Names (long chain, print D, January 1980 - January 2036)";
 const LICENSE =
   "Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.";
 
@@ -78,49 +102,46 @@ const month = (k) => {
 };
 const ymKey = (m) => `${m.year}-${String(m.month).padStart(2, "0")}`;
 
+const BEST_KEYS = new Set(CHAIN.bestEffort);
+
 /** `options.testOnlySkipDigestPins` skips the pinned digests so that tests reach the checks behind them. */
-export function build(artifactDir, researchRoot, options = {}) {
+export function build(statesDir, researchRoot, options = {}) {
   const pins = !options.testOnlySkipDigestPins;
   const raw = {};
   for (const [name, rel] of Object.entries(RESEARCH_INPUTS)) {
     raw[name] = readFileSync(join(researchRoot, rel));
     if (pins && sha256(raw[name]) !== PINNED[name]) throw Error(`${rel}: digest differs from the pin`);
   }
-  const artifact = (rel) => readFileSync(join(artifactDir, rel));
-  for (const name of ARTIFACT_INPUTS) {
-    raw[name] = artifact(name);
+  for (const name of CHAIN_FILES) {
+    raw[name] = readFileSync(join(researchRoot, CHAIN.chainDir, name));
     if (pins && sha256(raw[name]) !== PINNED[name]) throw Error(`${name}: digest differs from the pin`);
   }
   if (!raw["julia.tsv"].equals(raw["flix.tsv"])) throw Error("julia.tsv and flix.tsv differ");
-  const snapshots = Array.from({ length: STATES }, (_, k) => artifact(`states/${stateName(k)}`));
-  const statesManifest = snapshots.map((b, k) => `${sha256(b)}  states/${stateName(k)}\n`).join("");
-  if (pins && sha256(statesManifest) !== PINNED.states) throw Error("state snapshots differ from the pin");
-  // The artifact's own SHA256SUMS must list exactly these digests.
-  const sums = new Map(lines(artifact("SHA256SUMS").toString("utf8"), "SHA256SUMS").map((l) => { const [d, n] = l.split("  "); return [n.replace(/^\.\//, ""), d]; }));
-  for (const name of ARTIFACT_INPUTS) if (sums.get(name) !== sha256(raw[name])) throw Error(`SHA256SUMS: ${name} differs`);
-  snapshots.forEach((b, k) => { if (sums.get(`states/${stateName(k)}`) !== sha256(b)) throw Error(`SHA256SUMS: ${stateName(k)} differs`); });
+  // The state manifest of the research evidence lists every snapshot; the snapshots reproduced by root_change.jl must match it.
+  const manifest = lines(raw["states.sha256"].toString("utf8"), "states.sha256");
+  if (manifest.length !== STATES) throw Error(`states.sha256 lists ${manifest.length} snapshots, ${STATES} required`);
+  const snapshots = Array.from({ length: STATES }, (_, k) => readFileSync(join(statesDir, "states", stateName(k))));
+  snapshots.forEach((b, k) => { if (manifest[k] !== `${sha256(b)}  states/${stateName(k)}`) throw Error(`${stateName(k)} differs from states.sha256`); });
 
   const verified = Object.fromEntries(lines(raw["VERIFIED.txt"].toString("utf8"), "VERIFIED.txt").map((l) => l.split(/=(.*)/s).slice(0, 2)));
-  if (verified.complete !== "true" || verified.edges_total !== String(STATES - 1) || verified.chain_end !== ymKey(LAST) || verified.print_sha256 !== PINNED.printing || verified.layout_sha256 !== PINNED.layout || verified.best_effort_29 !== "true")
-    throw Error("VERIFIED.txt does not state the complete long chain on print C");
+  if (verified.print_d_sha256 !== PINNED.printing || verified.layout_sha256 !== PINNED.layout || verified.chain_sha256 !== PINNED["chain.moves.tsv"] || verified.months_sha256 !== PINNED["months.tsv"] ||
+      !verified.chain.startsWith(`${ymKey(FIRST)} .. ${ymKey(LAST)} (${STATES} months, ${STATES - 1} edges)`) || verified.best_effort_edges?.split(" ")[0] !== String(CHAIN.bestEffort.length))
+    throw Error("VERIFIED.txt does not state the complete chain on print D");
 
   const layout = parseLayout(raw.layout.toString("utf8"));
   const print = parsePrint(raw.printing.toString("utf8"));
   const chain = parseChain(raw["chain.moves.tsv"].toString("utf8"));
-  if (chain.edges.length !== STATES - 1) throw Error("205 states and 204 edges required");
-  if (chain.source.year !== FIRST.year || chain.source.month !== FIRST.month) throw Error("chain must start in January 2019");
+  if (chain.edges.length !== STATES - 1) throw Error(`${STATES} states and ${STATES - 1} edges required`);
+  if (chain.source.year !== FIRST.year || chain.source.month !== FIRST.month) throw Error(`chain must start in ${ymKey(FIRST)}`);
 
-  // months.tsv: one row per month, all valid except the one best-effort month.
+  // months.tsv: one month per line, consecutive from the first month. best-effort.tsv: the months of the wrong cells.
   const monthRows = lines(raw["months.tsv"].toString("utf8"), "months.tsv");
-  if (monthRows[0] !== "month\tstatus\treason\tedge\tmethod\tevidence" || monthRows.length !== STATES + 1) throw Error("months.tsv: header or row count");
-  const flagged = [];
-  monthRows.slice(1).forEach((row, k) => {
-    const f = row.split("\t");
-    if (f[0] !== ymKey(month(k)) || f[3] !== String(k)) throw Error(`months.tsv row ${k + 1}: month or edge out of order`);
-    if (f[1] !== "valid") flagged.push({ k, status: f[1], reason: f[2] });
-  });
-  if (flagged.length !== 1 || ymKey(month(flagged[0].k)) !== ymKey(BEST_EFFORT) || flagged[0].status !== "unknown" || flagged[0].reason !== BEST_EFFORT.reason)
-    throw Error("months.tsv: exactly February 2026 must be best effort");
+  if (monthRows.length !== STATES) throw Error("months.tsv: row count");
+  monthRows.forEach((row, k) => { if (row !== ymKey(month(k))) throw Error(`months.tsv row ${k + 1}: month out of order`); });
+  const bestRows = lines(raw["best-effort.tsv"].toString("utf8"), "best-effort.tsv");
+  const wrongText = CHAIN.wrong.map(([r, c]) => `${r},${c}`).join(";");
+  if (bestRows[0] !== "month\tstatus\twrong_cells\tevidence" || JSON.stringify(bestRows.slice(1).map((r) => r.split("\t").slice(0, 3).join("\t"))) !== JSON.stringify(CHAIN.bestEffort.map((m) => `${m}\tbest_effort_unverified\t${wrongText}`)))
+    throw Error("best-effort.tsv: exactly the six February months must be best effort");
 
   const snapshot = (k) => {
     const text = snapshots[k].toString("utf8");
@@ -149,12 +170,12 @@ export function build(artifactDir, researchRoot, options = {}) {
   let state = pose;
   const front = (k) => {
     const miss = frontFailures(printing, state, displays[k].cells);
-    const best = ymKey(month(k)) === ymKey(BEST_EFFORT);
+    const best = BEST_KEYS.has(ymKey(month(k)));
     if (!best && miss.length) throw Error(`state ${k + 1}: front differs from its display at ${miss[0].row},${miss[0].column} (${miss[0].why})`);
     if (best) {
-      if (miss.map((m) => `${m.row},${m.column}`).join(" ") !== BEST_EFFORT.wrong.map(([r, c]) => `${r},${c}`).join(" ")) throw Error(`state ${k + 1}: the best-effort month must differ in exactly the cell ${BEST_EFFORT.wrong}`);
+      if (miss.map((m) => `${m.row},${m.column}`).join(" ") !== CHAIN.wrong.map(([r, c]) => `${r},${c}`).join(" ")) throw Error(`state ${k + 1}: the best-effort month must differ in exactly the cell ${CHAIN.wrong}`);
       const i = miss[0].sticker - 1;
-      if (print[i].text !== BEST_EFFORT.text || print[i].ink !== BEST_EFFORT.ink) throw Error("the wrong cell must show the red 29");
+      if (print[i].text !== CHAIN.text || print[i].ink !== CHAIN.ink) throw Error("the wrong cell must show the red 29");
     }
   };
   front(0);
@@ -171,11 +192,10 @@ export function build(artifactDir, researchRoot, options = {}) {
     nodes.push({ hash: e.endHash, display: i + 2, ...m });
     edges.push({ from: i, to: i + 1, metrics: [e.htm, e.qtm, e.rot, e.rotq], moves: encodeMoves(e.moves) });
   });
-  // The chain file itself records the best-effort edge: the cells that differ (wrong) and the Hall violation (hall).
+  // The chain file itself records the best-effort edges: the cells that differ (wrong) and the Hall violation (hall).
   const flaggedEdges = chain.edges.flatMap((e, i) => (e.wrong ? [i] : []));
-  if (flaggedEdges.length !== 1 || ymKey(month(flaggedEdges[0] + 1)) !== ymKey(BEST_EFFORT) || JSON.stringify(chain.edges[flaggedEdges[0]].wrong) !== JSON.stringify(BEST_EFFORT.wrong))
-    throw Error("chain.moves.tsv: exactly the February 2026 edge must carry the wrong cell 7,1");
-  if (nodes.at(-1).hash !== lines(raw["edges.tsv"].toString("utf8"), "edges.tsv").at(-1).split("\t")[8]) throw Error("end hash differs from edges.tsv");
+  if (JSON.stringify(flaggedEdges.map((i) => ymKey(month(i + 1)))) !== JSON.stringify(CHAIN.bestEffort) || flaggedEdges.some((i) => JSON.stringify(chain.edges[i].wrong) !== JSON.stringify(CHAIN.wrong)))
+    throw Error("chain.moves.tsv: exactly the six February edges must carry the wrong cell 7,1");
 
   const files = {
     "state.v1.json": serialize(
@@ -183,7 +203,7 @@ export function build(artifactDir, researchRoot, options = {}) {
         schema: "cubistry.calendar7.state",
         version: 1,
         status: STATUS,
-        print: `${TITLE}; names layout, print C (printing-C1980 with the April tiles AP and RIL), ink classes band and blank, English only`,
+        print: `${TITLE}; names layout, print D (print C relabeled to the root January 1980; printing-C1980 with the April tiles AP and RIL), ink classes band and blank, English only`,
         surface: "face",
         license: LICENSE,
         spdx: "CC-BY-SA-4.0",
@@ -226,50 +246,50 @@ export function build(artifactDir, researchRoot, options = {}) {
         license: LICENSE,
         spdx: "CC-BY-SA-4.0",
         wrong: "[row, column], 1-based, row-major: the front cells that differ from the display of the month (the fewest the print allows); the red digit shown there is the sticker text",
-        evidence: "months.tsv of the artifact: status unknown, reason best_effort_edge_unconfirmed (the edge is replay-checked here; the Julia and Flix chain checkers report it as best effort, not as a confirmed edge)",
+        evidence: "best-effort.tsv of the research evidence chain-1980-2036: February, Sunday, 28 days (the edge is replay-checked here; the Julia and Flix chain checkers report these edges as best effort, not as confirmed exact edges)",
       },
-      { months: [{ year: BEST_EFFORT.year, month: BEST_EFFORT.month, wrong: BEST_EFFORT.wrong, text: BEST_EFFORT.text, ink: BEST_EFFORT.ink }] },
+      { months: BEST_EFFORT.map((b) => ({ year: b.year, month: b.month, wrong: b.wrong, text: b.text, ink: b.ink })) },
     ),
   };
   files["NOTICE.txt"] =
     `${TITLE}\n` +
-    `Long chain from the solved cube (January 2019, "Magic Date") to January 2036: 205 states, 204 edges, ${edges.reduce((a, e) => a + e.metrics[0], 0)} HTM, ${edges.reduce((a, e) => a + e.metrics[1], 0)} QTM. One best-effort month, February 2026: the front differs from its display in row 7, column 1 (the red 29).\n` +
-    `Status: ${STATUS}. Print C is not frozen. The best-effort edge is not confirmed by the checkers (months.tsv: unknown). No shortest-route, global-print or build-certification claim.\n` +
+    `Long chain from the solved cube (January 1980, "Magic Date") to January 2036: ${STATES} states, ${STATES - 1} edges, ${edges.reduce((a, e) => a + e.metrics[0], 0)} HTM, ${edges.reduce((a, e) => a + e.metrics[1], 0)} QTM. Six best-effort months (${CHAIN.bestEffort.join(", ")}): the front differs from its display in row 7, column 1 (the red 29).\n` +
+    `Status: ${STATUS}. Print D (print C relabeled to the root January 1980) is not frozen. The best-effort edges are not confirmed as exact by the checkers. No shortest-route, global-print or build-certification claim.\n` +
     `${LICENSE}\n\nSPDX-License-Identifier: CC-BY-SA-4.0\n\n` +
-    `Source: research/calendar-7x7/row1-window-chain evidence/print-c on research/cube-display-feasibility (549c07b0ee843d2e07eed2b71ad9b7418e965a8d); chain artifact of workflow run 43307881914.\n` +
+    `Source: research/calendar-7x7/row1-window-chain evidence/print-d and evidence/chain-1980-2036 on research/cube-display-feasibility (${CHAIN.ref}); stage artifacts of workflow runs ${CHAIN.segments.join("; ")}.\n` +
     `Regenerate with scripts/export-calendar7-chain-c.mjs. The shipped files public/calendar7/names/*, names-demo/*, state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.\n`;
   const hashes = (names) => names.map((n) => `${sha256(files[n])}  ${n}\n`).join("");
   files["manifest.sha256"] = hashes(["NOTICE.txt", "best-effort.v1.json", "displays.v1.json", "graph.v1.json", "state.v1.json"]);
   files["source.sha256"] =
     Object.entries(RESEARCH_INPUTS).map(([name, rel]) => `${sha256(raw[name])}  ${rel}\n`).join("") +
-    ARTIFACT_INPUTS.map((n) => `${sha256(raw[n])}  artifact/${n}\n`).join("") +
-    statesManifest.split("\n").filter(Boolean).map((l) => l.replace("  ", "  artifact/") + "\n").join("");
+    CHAIN_FILES.map((n) => `${sha256(raw[n])}  ${CHAIN.chainDir}${n}\n`).join("") +
+    manifest.map((l) => l + "\n").join("");
   return files;
 }
 
 /** Check the committed folder: manifest, source digests against the pins, app parsers, replay; optionally against the sources. */
-export function check(dir, artifactDir, researchRoot) {
+export function check(dir, statesDir, researchRoot) {
   const text = (n) => readFileSync(join(dir, n), "utf8");
   for (const line of lines(text("manifest.sha256"), "manifest")) {
     const [digest, name] = line.split("  ");
     if (sha256(readFileSync(join(dir, name))) !== digest) throw Error(`${name} does not match manifest.sha256`);
   }
   const src = new Map(lines(text("source.sha256"), "source.sha256").map((l) => { const [d, n] = l.split("  "); return [n, d]; }));
-  if (src.size !== 2 + ARTIFACT_INPUTS.length + STATES) throw Error("source.sha256 has the wrong number of entries");
+  if (src.size !== 2 + CHAIN_FILES.length + STATES) throw Error("source.sha256 has the wrong number of entries");
   for (const [name, rel] of Object.entries(RESEARCH_INPUTS)) if (src.get(rel) !== PINNED[name]) throw Error(`source.sha256 differs from the pin of ${name}`);
-  for (const name of ARTIFACT_INPUTS) if (src.get(`artifact/${name}`) !== PINNED[name]) throw Error(`source.sha256 differs from the pin of ${name}`);
-  const states = Array.from({ length: STATES }, (_, k) => `${src.get(`artifact/states/${stateName(k)}`)}  states/${stateName(k)}\n`).join("");
-  if (sha256(states) !== PINNED.states) throw Error("source.sha256 differs from the pin of the state snapshots");
+  for (const name of CHAIN_FILES) if (src.get(`${CHAIN.chainDir}${name}`) !== PINNED[name]) throw Error(`source.sha256 differs from the pin of ${name}`);
+  const states = Array.from({ length: STATES }, (_, k) => `${src.get(`states/${stateName(k)}`)}  states/${stateName(k)}\n`).join("");
+  if (sha256(states) !== PINNED["states.sha256"]) throw Error("source.sha256 differs from the pin of the state snapshots");
   const start = parseState(JSON.parse(text("state.v1.json")));
   if (start.surface !== "face") throw Error('state surface must be "face"');
   const table = parseDisplays(JSON.parse(text("displays.v1.json")));
   const graph = parseGraph(JSON.parse(text("graph.v1.json")));
   const best = parseBestEffort(JSON.parse(text("best-effort.v1.json")));
-  if (JSON.stringify(best) !== JSON.stringify([{ year: BEST_EFFORT.year, month: BEST_EFFORT.month, wrong: BEST_EFFORT.wrong }])) throw Error("best-effort.v1.json names another month or cell");
+  if (JSON.stringify(best) !== JSON.stringify(BEST_EFFORT.map((b) => ({ year: b.year, month: b.month, wrong: b.wrong })))) throw Error("best-effort.v1.json names other months or cells");
   const result = verifyChain(start.printing, start.pose, table, graph, best);
-  if (graph.nodes.length !== STATES || result.edges.length !== STATES - 1) throw Error("205 nodes and 204 edges required");
+  if (graph.nodes.length !== STATES || result.edges.length !== STATES - 1) throw Error(`${STATES} nodes and ${STATES - 1} edges required`);
   const sum = graph.edges.reduce((a, e) => [a[0] + e.htm, a[1] + e.qtm, a[2] + e.rot], [0, 0, 0]);
-  if (artifactDir && researchRoot) for (const [name, body] of Object.entries(build(artifactDir, researchRoot))) if (text(name) !== body) throw Error(`${name} differs from the export`);
+  if (statesDir && researchRoot) for (const [name, body] of Object.entries(build(statesDir, researchRoot))) if (text(name) !== body) throw Error(`${name} differs from the export`);
   console.log(`calendar7 chain C data OK (${graph.nodes.length} states, ${graph.edges.length} edges, ${sum[0]} HTM, ${sum[1]} QTM, ${sum[2]} rotations)`);
 }
 
@@ -281,7 +301,7 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     const o = args.indexOf("--out");
     const out = o >= 0 ? args[o + 1] : dir;
     const rest = o >= 0 ? args.filter((_, i) => i !== o && i !== o + 1) : args;
-    if (rest.length !== 2 || !out) throw Error("usage: export-calendar7-chain-c.mjs <artifact-dir> <research-root> [--out <dir>] | --check [<artifact-dir> <research-root>]");
+    if (rest.length !== 2 || !out) throw Error("usage: export-calendar7-chain-c.mjs <states-dir> <research-root> [--out <dir>] | --check [<states-dir> <research-root>]");
     const files = build(rest[0], rest[1], {});
     mkdirSync(out, { recursive: true });
     for (const [name, text] of Object.entries(files)) {
