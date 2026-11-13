@@ -3,7 +3,7 @@
 The Calendar mode (`index.html?app=calendar`, chooser entry "Calendar") implements #63 with two
 separate fixed 3×3 prints. The former page `calendar.html` is removed; its URL answers 404 and has no redirect.
 URL parameters: `date` (`YYYY-MM-DD`; absent or `today` follows the local date), `lang` (`de` or
-`en`; aliases `language`, `design`), `pad` (`0` removes the leading zero in English; alias `padding`).
+`en`; aliases `language`, `design`), `pad` (`0` removes the leading zero in both prints; alias `padding`).
 The mode loads its planner and solver bundle only when it opens, and `design` does not follow an app switch.
 The mode mounts the existing calendar viewer; moving it onto the shared view is separate work. The two prints are not a bilingual print, and the mode does not replace the existing counters,
 timers, or live clock.
@@ -13,9 +13,8 @@ timers, or live clock.
 | Deutsch A | Two-letter weekday, left-aligned               | Blank, day tens, day units | Three month letters        |
 | English 3 | Whole three-letter weekday on the left sticker | Three month letters        | Blank, day tens, day units |
 
-English supports a leading zero or a real unprinted tens sticker for single-digit
-days. Both modes use exactly the same physical print. German retains its leading
-zero. Changing language explicitly installs a different print during setup.
+Both prints support a leading zero or a real unprinted tens sticker for single-digit
+days (the "Leading zero" box, default on). Both modes of a print use exactly the same physical print. Changing language explicitly installs a different print during setup.
 There is no year printed on the cube. English SAT and both SUN stickers carry
 permanent red, extra-bold (800) artwork; regular weekday stickers retain 600.
 This is source artwork, not a date-driven rendering override. German A retains
