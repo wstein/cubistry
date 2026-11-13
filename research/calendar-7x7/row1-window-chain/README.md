@@ -353,6 +353,30 @@ stages. Each stage is its own run with its own list, root and print: 2026-01 .. 
 stages that start at a free state (chain.v3 `start` block) or join by digest (`CAL7_JOIN_START`, `CAL7_JOIN_END`). Best-effort edges
 (chain.v2: wrong cells and Hall witnesses) are supported, see the rule above. A window-local layout such as the April tiles AP|RIL of Print B is supported (see Layout input). The coverage summary (`month_coverage.jl`) is not run by the verify job. The workflow was never run.
 
+## Root change (owner decision 2026-11-13)
+
+The root of a composed chain becomes its first month: the solved cube of the new print shows that month. Chains for 1980-01 .. 2019-01 (backward, run 43414242499) and
+2019-01 .. 2036-01 (run 43307881914) are computed for print C, whose solved cube is January 2019. No search is repeated: `root_change.jl` is a transformation.
+
+Proof. A state is a map `s` from stickers to poses, a move turns slots, so every edge word acts from the left: `s_next = M * s`. For the root state `s_root`
+(the pose of the first month in the frame of print C) set `s'_k = s_k * s_root^-1`. Then `s'_(k+1) = M * s_k * s_root^-1 = M * s'_k` (the words stay unchanged) and
+`s'_root = id`. The display in slot `j` is `L(s^-1(j))`; it stays equal for all states exactly when `L' = L * s_root^-1`: the sticker of print' at a home slot carries text, ink
+and up direction of the sticker that sits in that slot in the root state. The slot is the pair (position, normal); the up direction belongs to the label and is taken over
+(a slot key with the up direction fails). Ids and pieces stay those of print C. The wrong side (`s_root^-1 * s`) does not give the identity at the root. Reachable displays do not
+change because `g -> g * s_root` permutes the group.
+
+Run: `julia --startup-file=no root_change.jl PRINT_C OUTDIR [--states] CHAIN [CHAIN ...]` with the stage chains in chronological order, any number of backward segments (free start,
+chain.v3) and forward segments (chain.v2/v3). Each chain is replayed in the frame of print C with its declared digests checked; consecutive chains must join in the month and in the full
+state. Output: `printing.tsv` (print'), `chain.moves.tsv` (chain.v2, no start block, no root edge, unchanged moves, new digests), `months.tsv` (each join month once),
+`best-effort.tsv`, `provenance.tsv` (SHA-256 of print C, inputs and outputs), with `--states` also `states/` and `states.sha256`. When the chain is extended (1900-01 backward, 2100-01
+forward), the same command runs again over all stage chains.
+
+Committed: `evidence/print-d/` (print' = print D, working name; layout unchanged) and `evidence/chain-1980-2036/` (672 edges 1980-01 .. 2036-01, 666 exact and 6 best-effort edges: 1981-02, 1987-02,
+1998-02, 2009-02, 2015-02, 2026-02; Julia, Flix and independent receipts, `VERIFIED.txt`). The 673 state files (9 MB) are not committed; `states.sha256` lists their SHA-256. Reproduce (stage artifacts
+are the sources; `chain.moves.tsv` SHA-256 `fe9f9fac...fe3`, `b6cb3c52...e6`, see `provenance.tsv`): `root_change.jl evidence/print-c/printing.tsv OUT --states <run 43414242499>/chain.moves.tsv <run 43307881914>/chain.moves.tsv`.
+Checks: `test_root_change.jl` (synthetic chains with two backward and one forward segment, 5 s), `run_root_change_mutants.sh` (16 source mutants), `test_root_change_evidence.jl` (consistency of the committed files).
+Not run: print checker, Hall table and coverage files for print D (the 90-configuration matching file lists pieces of print C and would have to be transformed), a workflow run on the composed chain.
+
 ## Scope and limits
 
 This is a window witness, not a print for every calendar shape. The separate
