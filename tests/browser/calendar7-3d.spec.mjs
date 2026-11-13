@@ -25,7 +25,7 @@ async function pickDate(page, year, month) {
 const ROOT = "#calendar7-root";
 // What the page plays for November to December 2026 (rule c, rotations deferred), from the unit-level function: the number
 // of layer blocks and the end alignment. The numbers are pinned as well, so that a change of either is noticed.
-const FEB = playedBlocks(parseGraph(JSON.parse(readFileSync("public/calendar7/chain-c/graph.v1.json", "utf8"))).edges[94].moves, { slice: true, defer: true });
+const FEB = playedBlocks(parseGraph(JSON.parse(readFileSync("public/calendar7/chain-c/graph.v1.json", "utf8"))).edges[(2026 - 1980) * 12 + 10].moves, { slice: true, defer: true });
 const FEB_BLOCKS = FEB.blocks.length;
 const FEB_ALIGNMENT = alignmentText(FEB.alignment);
 const watch = (page) => {
