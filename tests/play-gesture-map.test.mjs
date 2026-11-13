@@ -26,10 +26,10 @@ const E = [[1, 0, 0], [0, 1, 0], [0, 0, 1]];
 const cross = (a, b) => [a[1] * b[2] - a[2] * b[1], a[2] * b[0] - a[0] * b[2], a[0] * b[1] - a[1] * b[0]];
 const FACES = { R: [0, 1], L: [0, -1], U: [1, 1], D: [1, -1], F: [2, 1], B: [2, -1] };
 
-test("cellIndex covers N = 2..7: every layer centre maps to its layer, every inner boundary to the higher layer", () => {
+test("cellIndex covers N = 2..7: every layer center maps to its layer, every inner boundary to the higher layer", () => {
   for (let n = 2; n <= 7; n++) {
     for (let i = 0; i < n; i++) {
-      assert.equal(cellIndex(-1 + (2 * i + 1) / n, n), i, `centre n=${n} i=${i}`);
+      assert.equal(cellIndex(-1 + (2 * i + 1) / n, n), i, `center n=${n} i=${i}`);
       assert.equal(cellIndex(-1 + (2 * i) / n, n), i, `lower boundary n=${n} i=${i}`);
     }
     assert.equal(cellIndex(1, n), n - 1, "upper cube edge belongs to the last layer");

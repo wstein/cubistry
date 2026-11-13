@@ -38,7 +38,7 @@ export function cellIndex(coordinate: number, n: number): number {
   return Math.min(n - 1, Math.max(0, Math.floor(((c + 1) * n) / 2 + BOUNDARY_TOLERANCE)));
 }
 
-/** Cubie index triple [ix, iy, iz] of the touched sticker, or null when the hit is not on the face. */
+/** Cubie index triple (x, y, z order) [i0, i1, i2] of the touched sticker, or null when the hit is not on the face. */
 export function hitCell(hit: Hit, n: number): [number, number, number] | null {
   checkSize(n);
   const [fa, fs] = FACE_AXIS[hit.face];
