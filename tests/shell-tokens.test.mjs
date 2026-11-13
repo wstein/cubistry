@@ -119,3 +119,13 @@ test("IBM Plex files are woff2, carry the OFL texts and are listed in the notice
   const licenses = read("licenses.html");
   assert(licenses.includes("IBM Plex Sans") && licenses.includes("IBM Plex Mono") && licenses.includes("fonts/ibm-plex/OFL-Sans.txt"));
 });
+
+test("the state-chip fills (--st-*) read 4.5:1 against their text color in both themes and match the cube print colors", () => {
+  const print = { open: "#56616a", running: "#145a91", ok: "#187044", error: "#b12c2c", blocked: "#855600" };
+  for (const [name, tokens] of Object.entries({ light, dark }))
+    for (const [state, hex] of Object.entries(print)) {
+      assert.equal(tokens[`--st-${state}`], hex, `${name} --st-${state}`);
+      const ratio = contrast(tokens[`--st-${state}`], tokens["--on-st"]);
+      assert(ratio >= 4.5, `${name} ${state} ${ratio.toFixed(2)}`);
+    }
+});
