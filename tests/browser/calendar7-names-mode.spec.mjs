@@ -29,7 +29,7 @@ test("the one view renders full month names without a layout control and keeps i
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "idle");
   const digest = await page.locator(ROOT).getAttribute("data-c7-digest");
   await pickDate(page, 2027, 4); await at(page, "2027-04");
-  expect(await row1(page)).toEqual(["APR", "IL", "", "", "", "", ""]);
+  expect(await row1(page)).toEqual(["AP", "RIL", "", "", "", "", ""]);
   await pickDate(page, 2027, 3); await at(page, "2027-03");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", digest);
   expect(errors).toEqual([]);

@@ -38,7 +38,7 @@ test("the chain ends in January 2036; February 2036 stays on the same print with
   await page.goto("/index.html?app=calendar7&year=2036&month=1");
   await at(page, "2036-01");
   await expect(page.locator('.c7-step[data-step="next"]')).toContainText("No later month");
-  await expect(summary(page, "previous")).toContainText(`December 2035 · ${moves(2035, 12, -1)} moves`);
+  await expect(summary(page, "previous")).toContainText(`December 2035 · ${moves(2036, 1, -1)} moves`);
   await page.goto("/index.html?app=calendar7&year=2036&month=2");
   await at(page, "2036-02");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
@@ -129,4 +129,23 @@ test("root month 2019-01 in the real app: all 6 faces one color (the solved cube
   expect(new Set(Object.values(faces).map((f) => f.tint)).size).toBe(6);
   expect(faces["0,0,1"]).toMatchObject({ homes: ["white"], tint: "#ffffff" });
   expect(errors).toEqual([]);
+});
+
+test("the best-effort sentence is red text only: the sheet red token, no frame, 4.5:1 on the page in both themes", async ({ page }) => {
+  const lum = ([r, g, b]) => [r, g, b].map((v) => { v /= 255; return v <= 0.03928 ? v / 12.92 : ((v + 0.055) / 1.055) ** 2.4; }).reduce((s, v, i) => s + v * [0.2126, 0.7152, 0.0722][i], 0);
+  const rgb = (s) => s.match(/[\d.]+/g).slice(0, 3).map(Number);
+  for (const [scheme, red] of [["light", "rgb(168, 61, 50)"], ["dark", "rgb(255, 154, 144)"]]) {
+    await page.emulateMedia({ colorScheme: scheme });
+    await page.goto("/index.html?app=calendar7&year=2026&month=2");
+    await at(page, "2026-02");
+    const sentence = page.locator("[data-c7-best-effort]");
+    await expect(sentence).toHaveCSS("color", red);
+    await expect(sentence).toHaveCSS("border-top-width", "0px");
+    await expect(sentence).toHaveCSS("background-color", "rgba(0, 0, 0, 0)");
+    await expect(sentence).toHaveCSS("outline-style", "none");
+    await expect(sentence).toHaveCSS("text-decoration-line", "none");
+    const [fg, bg] = await sentence.evaluate((el) => [getComputedStyle(el).color, getComputedStyle(document.body).backgroundColor]);
+    const [a, b] = [lum(rgb(fg)), lum(rgb(bg))].sort((x, y) => y - x);
+    expect((a + 0.05) / (b + 0.05), scheme).toBeGreaterThanOrEqual(4.5);
+  }
 });

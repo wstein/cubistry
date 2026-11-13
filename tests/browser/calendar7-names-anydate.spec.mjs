@@ -68,7 +68,7 @@ test("February 2037 (off the chain) marks its actual mismatch without claiming U
   await expect(page.getByRole("status").filter({ hasText: NOTICE })).toBeVisible();
 });
 
-test("February 2000, 2024 and 2100 keep their leap-year boards; the date picker commits without Show", async ({ page }) => {
+test("February 2000, 2040 and 2100 keep their leap-year boards; the date picker commits without Show", async ({ page }) => {
   const errors = []; page.on("pageerror", (error) => errors.push(error.message));
   await page.goto("/index.html?app=calendar7&layout=names&year=2100&month=2&scheme=paper-blue&font=quicksand&extra=keep");
   await at(page, "2100-02"); await idle(page);
@@ -77,7 +77,7 @@ test("February 2000, 2024 and 2100 keep their leap-year boards; the date picker 
   await expect(page.getByRole("button", { name: "Show", exact: true })).toHaveCount(0);
   const digests = new Set([await page.locator(ROOT).getAttribute("data-c7-digest")]);
   expect(digests.has((await faceOf(page, 2100, 2)).digest)).toBe(true);
-  for (const year of [2000, 2024]) {
+  for (const year of [2000, 2040]) {
     await pickDate(page, year, 2);
     await at(page, `${year}-02`); await idle(page);
     await expect(pickerTrigger(page)).toBeFocused();

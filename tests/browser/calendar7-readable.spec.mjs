@@ -81,9 +81,10 @@ test("raw expansions map legal generators to the actual animated block and exclu
   await expect(page.locator('[data-c7="progress"]')).toContainText("move 1 of");
   await page.locator('[data-c7="skip"]').click();await idle(page,"2026-12");
 });
+// The longest word of the chain C is March to April 2023 (124 block moves); October to November 2026 is 100 and does not scroll.
 test("long prefix words follow only inside their container, preserve focus and clear highlights after interruption",async({page})=>{
   await page.setViewportSize({width:390,height:844});
-  await controlled(page,"2026&month=10");
+  await controlled(page,"2023&month=3");
   await page.locator('a[data-nav="next"]').click();await enterBlocks(page);
   await page.locator('[data-c7="play"]').click(); // pause while a block is in flight
   await page.evaluate(()=>window.c7release());
@@ -106,8 +107,8 @@ test("long prefix words follow only inside their container, preserve focus and c
   await expect(page.locator('[data-c7="play"]')).toBeFocused();
   expect(await page.locator('[data-c7="active-word"] .c7-past').count()).toBeGreaterThan(100);
   await page.locator('a[data-nav="previous"]').click(); // completes the old plan and replaces it
-  await expect(page.locator('[data-c7="active-title"]')).toContainText("November 2026 → October 2026");
-  await page.locator('[data-c7="skip"]').click();await idle(page,"2026-10");
+  await expect(page.locator('[data-c7="active-title"]')).toContainText("April 2023 → March 2023");
+  await page.locator('[data-c7="skip"]').click();await idle(page,"2023-03");
   await expect(page.locator('[data-c7="active-word"] [aria-current]')).toHaveCount(0);
 });
 

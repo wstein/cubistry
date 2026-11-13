@@ -220,11 +220,11 @@ test("an exact month removes the hatch and its mismatch metadata", async ({ page
   await open(page, 2037);
   await page.getByRole("button", { name: /^Choose month and year/ }).click();
   await page.getByRole("button", { name: "Choose year", exact: true }).click();
-  await page.getByRole("spinbutton", { name: "Jump to year" }).fill("2024");
+  await page.getByRole("spinbutton", { name: "Jump to year" }).fill("2040");
   await page.getByRole("spinbutton", { name: "Jump to year" }).press("Enter");
-  await page.getByRole("gridcell", { name: "2024", exact: true }).click();
-  await page.getByRole("gridcell", { name: "February 2024", exact: true }).click();
-  await at(page, "2024-02"); await idle(page);
+  await page.getByRole("gridcell", { name: "2040", exact: true }).click();
+  await page.getByRole("gridcell", { name: "February 2040", exact: true }).click();
+  await at(page, "2040-02"); await idle(page);
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await expect(canvas(page)).not.toHaveAttribute("data-c7-wrong", /.+/);
   await expect(page.locator("[data-c7-best-effort]")).toHaveCount(0);
