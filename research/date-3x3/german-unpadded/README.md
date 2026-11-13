@@ -12,9 +12,9 @@ Can the same physical print also show days 1 to 9 without the zero?
 1. **Yes, directly.** The existing generator, run with its `unpadded` mode on the unchanged print,
    produces 2,562 targets ([witnesses/de-2-unpadded.json](witnesses/de-2-unpadded.json)). The
    print (54 stickers, all fields) is identical to `witnesses/de-2.json`. A blank center is put on
-   the front, so no center correction is needed: outer HTM 16 to 41, sum 76,321 (mean 29.79),
-   against 86,362 (mean 33.71) for the padded witness. Nobody had generated it; nothing in the
-   print prevents it.
+   the front. For days 1 to 9 (756 targets) no center correction is needed (0 of 756 carry one); of all
+   2,562 targets, 1,346 keep a center correction. Outer HTM 16 to 41, sum 76,321 (mean 29.79),
+   against 86,362 (mean 33.71) for the padded witness. Nothing in the print prevents the unpadded display.
 2. **The owner's idea works.** In the padded state of days 1 to 9 (all 756 targets use the prelude
    `y y y`) the centers are F=`0` (upright), D=`1`, L=`2`, R=`3`, **U and B blank**. A pure center
    word turns U or B to the front and leaves every corner and edge sticker unchanged (position,
@@ -34,7 +34,8 @@ Can the same physical print also show days 1 to 9 without the zero?
      slice is 0 mod 4. A slice used once has a nonzero sum, so every used slice appears at least
      twice, and at least two different slices are needed to move centers: at least 4 turns.
 4. **Outer turns plus whole-cube rotations.** Shortest word: **8 outer HTM + 1 rotation**
-   (`B2 R L' D2 U2 R L' B2 x2`; also `y2` variants). With a diagonal 120 degree rotation: 8 outer HTM
+   (`B2 R L' D2 U2 R L' B2 x2`; with `y2`: `B2 U D' L2 R2 U D' B2 y2`, 756/756, glyph `0` at B with up `(0, 1, 0)`; the same
+   V with `y2` fails, 0/756). With a diagonal 120 degree rotation: 8 outer HTM
    + 2 rotation moves (`B U' D L' R F' B U' z y`). Minimality of 8: exhaustive meet in the middle
    over all face-turn words up to length 10, for all 11 even rotations (56, 56, 56 and 8 x 21
    shortest words). 154 of those words bring a blank to the front.
