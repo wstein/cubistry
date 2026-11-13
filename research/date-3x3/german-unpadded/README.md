@@ -22,8 +22,9 @@ Can the same physical print also show days 1 to 9 without the zero?
 3. **Slice words** (M, E, S; metric: number of slice turns / quarter turns):
    - none with at most 3 slice turns, in either metric (exhaustive: 9, 81, 729 words; and BFS to
      cost 6 and 8);
-   - **4 is the minimum** in both metrics. Quarter-turn words: `M E M' E'` and `M E' M' E`
-     (cycle (U F L)(R B D)), `E S E' S'`, `E' S' E S`, `S M' S' M`, `S' M' S M`. With half turns:
+   - **4 is the minimum** in both metrics. Quarter-turn words (center action in cycle notation, see
+     Mathematical check): `M E M' E'` and `E' S' E S` and `S M' S' M` give (U F L)(D B R); `M E' M' E`, `E S E' S'` and
+     `S' M' S M` give (U F R)(D B L). With half turns:
      `M2 E M2 E'`, `E2 M E2 M'` and others (4 slice turns, 6 quarter turns). 48 of the 6,561
      four-turn words are pure center words, 22 of them bring a blank center to the front
      ([results/w-check.report](results/w-check.report), lines `SLICEWORD`). The owner's 4 and the
@@ -43,13 +44,14 @@ Can the same physical print also show days 1 to 9 without the zero?
 
 ## Mathematical check
 
-Model: 48 corner/edge stickers and 6 oriented centers; generators: 18 outer turns, 9 slice turns,
+Cycle notation: `(a b c)` means the center currently at face a moves to face b, the one at b to c, the one at c to a
+(faces named by position). Model: 48 corner/edge stickers and 6 oriented centers; generators: 18 outer turns, 9 slice turns,
 9 rotations. `V r` (face-turn word V, then rotation r) leaves all corners and edges unchanged iff
 V acts on corners/edges as `r^-1`.
 
 - Parity: corner parity + edge parity + center-permutation parity is even for each of the 36
   generators ([results/invariants.txt](results/invariants.txt), test `invariants`). Hence a pure
-  center element has an even center permutation: (U F L)(R B D) and (F B)(L R) qualify, a single
+  center element has an even center permutation: (U F L)(D B R) and (F B)(L R) qualify, a single
   swap does not.
 - Outer turns alone give equal corner and edge parity. Of the 24 rotations, 12 have equal parity
   (identity, 3 half turns, 8 diagonal 120 degree turns); `x`, `y`, `z` quarter turns do not
