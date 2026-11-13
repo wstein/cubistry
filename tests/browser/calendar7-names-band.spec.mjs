@@ -43,8 +43,8 @@ async function joints(page, pitch, yaw, mode = "banner") {
       return [(p.x * 0.5 + 0.5) * cv.width, (1 - (p.y * 0.5 + 0.5)) * cv.height];
     };
     const px = (x, y) => { const d = ctx.getImageData(Math.round(x), Math.round(y), 1, 1).data; return [d[0], d[1], d[2]]; };
-    // the banner is 2.9 .. 3.9 high (units, y up from the cube center); the strips 3.9 .. 4.3 and 2.5 .. 2.9
-    const bands = { red: [3.0, 3.4, 3.8], white: [2.55, 2.75, 4.0, 4.2] };
+    // the banner is 2.9 .. 3.9 high (units, y up from the cube center); the strips 3.9 .. 4.1 and 2.5 .. 2.9
+    const bands = { red: [3.0, 3.4, 3.8], white: [2.55, 2.75, 4.0, 4.05] };
     const rows = [];
     if (mode === "line") { // the weekday line (row 2): find its height on the middle of each cell, then sample across every joint
       const isRed = ([r, g]) => r - g > 60;

@@ -131,7 +131,7 @@ for (const scheme of ["paper-red", "paper-blue", "dracula", "high-contrast"]) te
   expect(by("blank")).toHaveLength(32);
   for (const r of [...by("band"), ...by("month")]) { expect(r.want).toBe(sch.band); expect(r.lineWant).toBe(sch.line); expect(r.lines).toBe(sch.line !== null); }
   for (const r of by("blank")) { expect(r.want).toBe(sch.empty); expect(r.lines).toBe(false); }
-  // The fill color covers at least a fifth of the canvas of every banner tile (the banner is 1.2 high of at most 1.8, minus the lettering); a white-fill scheme has the white ground as its fill.
+  // The fill color covers at least a fifth of the canvas of every banner tile (the banner is 1.2 high of at most 1.6, minus the lettering); a white-fill scheme has the white ground as its fill.
   if (sch.band !== W) for (const r of [...by("band"), ...by("month")]) expect(r.fillShare, `${r.cls} ${r.text}`).toBeGreaterThanOrEqual(0.25);
   if (scheme === "paper-red") expect(by("band")[0].want).not.toBe(by("blank")[0].want);
 });
@@ -255,15 +255,15 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
   expect(seen.half.shade.spec[0]).toBeGreaterThan(seen.red.shade.spec[0]);
   expect(Object.keys(seen.std.cut)).toEqual(["ffffff"]); // standard: one body color, the raw day fill
   expect(seen.std.widths).toEqual([0.99]);
-  // The layer-width profile is on in the names layout only: 1.8 outer layers (bodies 1.8 - gap and 1 - gap wide), centers up to 3.4, a larger core and camera.
+  // The layer-width profile is on in the names layout only: 1.6 outer layers (bodies 1.6 - gap and 1 - gap wide), centers up to 3.3, a larger core and camera.
   const r6 = (x) => Math.round(x * 1e6) / 1e6;
-  expect(seen.red.widths).toEqual([r6(1 - seen.gap), r6(1.8 - seen.gap)]);
+  expect(seen.red.widths).toEqual([r6(1 - seen.gap), r6(1.6 - seen.gap)]);
   expect(seen.std.center).toBe(3);
-  expect(seen.red.center).toBe(3.4);
+  expect(seen.red.center).toBe(3.3);
   expect(seen.std.canvases).toEqual(["192x192"]);
-  expect(seen.red.canvases).toEqual(["192x192", "192x346", "346x192", "346x346"]);
-  expect(seen.red.core / seen.std.core).toBeCloseTo(4.3 / 3.5, 6);
-  expect(seen.red.cameraZ / seen.std.cameraZ).toBeCloseTo((4.3 + 0.001) / (3.5 + 0.001), 6); // framing follows the total edge (N - 2) + 2 f
+  expect(seen.red.canvases).toEqual(["192x192", "192x307", "307x192", "307x307"]);
+  expect(seen.red.core / seen.std.core).toBeCloseTo(4.1 / 3.5, 6);
+  expect(seen.red.cameraZ / seen.std.cameraZ).toBeCloseTo((4.1 + 0.001) / (3.5 + 0.001), 6); // framing follows the total edge (N - 2) + 2 f
   expect(seen.back.widths).toEqual([0.99]); // switching back restores the unit pitch, the textures and the framing
   expect(seen.back.center).toBe(3);
   expect(seen.back.canvases).toEqual(["192x192"]);
@@ -312,7 +312,7 @@ test("names layout: every face texture is the size of its own tile (192 px per u
   });
   expect(seen.names.faces).toBe(294);
   expect(seen.names.wrong).toBe(0);
-  expect(seen.names.kinds).toEqual(["192x192", "192x346", "346x192", "346x346"]);
+  expect(seen.names.kinds).toEqual(["192x192", "192x307", "307x192", "307x307"]);
   expect(seen.standard).toEqual({ faces: 294, wrong: 0, kinds: ["192x192"] });
 });
 
