@@ -41,5 +41,5 @@ jl indep-limit         verify_chain.jl 's/^const MAX_START_MOVES=1_000_000/const
 jl indep-start-nolimit verify_chain.jl 's/0<=n<=MAX_START_MOVES "start move count"/0<=n "start move count"/'          '^FAIL start-reject: indep'
 flix flix-limit         's/^def maxChainMoves(): Int32 = 1000000/def maxChainMoves(): Int32 = 100000/'                '^FAIL (start|total)-accept: flix rejects'
 flix flix-start-nolimit 's/n>=0 and n<=maxChainMoves(),"bounded start moves"/n>=0,"bounded start moves"/'            '^FAIL start-reject: flix'
-flix flix-total-nolimit 's/require(total<=maxChainMoves(),"bounded total moves")/require(true,"bounded total moves")/' '^FAIL total-reject: flix'
+flix flix-total-nolimit 's/require(total<=maxChainMoves(),"bounded total moves")/require(total>=0,"bounded total moves")/' '^FAIL total-reject: flix'
 exit $bad
