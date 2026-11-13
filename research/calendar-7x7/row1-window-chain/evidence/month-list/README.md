@@ -252,13 +252,14 @@ Edges: 972 in total (973 members, no root edge), 204 done, 768 new. Measured tim
 
 13 runs (stages 6 to 18). Stage 6 is the first real continuation and is kept: its artifact is the prior of stage 7 (a run needs the artifact of the previous run, one run at a time).
 
-Workflow contract (`window-chain.yml` on main, checked at the state of 2026-11-12). The inputs of the first chain's runs: root_month empty (the first member of the list is 2019-01; the prior artifact records `root_month=-`, so
+Workflow contract (`window-chain.yml` on origin/main, read on 2026-11-13). The inputs of the first chain's runs: root_month empty (the first member of the list is 2019-01; the prior artifact records `root_month=-`, so
 `root_month=2019-01` would be rejected as another root), `layout_path` and `layout_sha256` of print C, `best_effort_29` true, `fail_on_greedy` true, `library` L5, `width` 40, `lambda` 3.
 The producer (`window_chain.jl`) accepts the longer list: it requires the months of the prior chain to equal the first months of the plan (`prior chain months do not match the plan`) and writes the month list pin of every segment into `segments.tsv`.
-The workflow does not accept this continuation as it is: the job `produce`, step "Prepare work directory", requires in the prior `VERIFIED.txt` (1) `months_sha256` equal to the `months_sha256` input (the prior is `4ad43a59...`, the new list `05691e20...`),
-(2) `best_effort_sha256` equal to the hash of the new best-effort file (prior `00b721b1...`, new `8acf0308...`) and (3) `complete=false` (the prior ends at the last month of its list, `complete=true`). A change of the workflow on main is needed before stage 6;
-it is not part of this change. Smallest change: optional inputs `prior_months_sha256` and `prior_best_effort_sha256` that replace the comparison values of (1) and (2) when set, and the check (3) skipped when `prior_months_sha256` is set (the producer's prefix check and the verify job re-check the whole chain).
-With the workflow unchanged only a fresh chain from the root fits the contract (972 new edges, about 16 runs of 64), which recomputes the 204 verified edges.
+The step "Prepare work directory" of the job `produce` compares the prior `VERIFIED.txt` with the inputs: `months_sha256` (the prior is `4ad43a59...`, the new list `05691e20...`), `best_effort_sha256` (prior `00b721b1...`, new `8acf0308...`) and `complete=false` (the prior ends at the last month of its list, `complete=true`).
+Read from `window-chain.yml` on origin/main (#462, #468): the optional inputs `prior_months_sha256` and `prior_best_effort_sha256` replace the comparison values of the first two checks when set, and a `prior_months_sha256` that differs from `months_sha256` lifts the `complete=false` check.
+The inputs `direction` (default forward) and `join_end` (default empty) exist as well; the prior must match both (an older artifact counts as forward, no join_end), so the continuation uses the defaults. The producer's prefix check and the verify job still check the whole chain.
+Nothing here ran the workflow with these inputs (UNKNOWN as run evidence). Stage 6 would be the first run with `prior_months_sha256` and `prior_best_effort_sha256`.
+Limit stated in the workflow header: with `prior_best_effort_sha256` nothing checks the old edges against the new best-effort file (UNKNOWN).
 
 Inputs common to every run (paths at the research commit that contains this change; `research_ref` must be that commit on `research/cube-display-feasibility`):
 
@@ -272,13 +273,13 @@ Inputs common to every run (paths at the research commit that contains this chan
 | best_effort_path | `research/calendar-7x7/row1-window-chain/evidence/month-list/best-effort-chain-2019-01-2100-01.tsv` |
 | library, width, lambda, best_effort_29, fail_on_greedy | L5, 40, 3, true, true (defaults) |
 
-Smoke runs (not executed here). (a) With the workflow unchanged: `smoke_mode=true` (3 edges from the root, ignores the prior; about 15 min) checks the list pin, the best-effort file, the layout and the research commit through prepare, produce and verify:
+Smoke runs (not executed here). (a) Without a prior: `smoke_mode=true` (3 edges from the root, ignores the prior; about 15 min) checks the list pin, the best-effort file, the layout and the research commit through prepare, produce and verify:
 
 ```
 gh workflow run window-chain.yml --ref main -f research_ref=<SHA> -f months_path=research/calendar-7x7/row1-window-chain/evidence/month-list/months-chain-2019-01-2100-01.tsv -f months_sha256=05691e207922d28669b9eb12ee99c666a13d076312eff1a049fc9b4430504ad1 -f print_path=research/calendar-7x7/row1-window-chain/evidence/print-c/printing.tsv -f print_sha256=0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc -f layout_path=research/calendar-7x7/row1-window-chain/evidence/print-c/layout.tsv -f layout_sha256=e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a -f best_effort_path=research/calendar-7x7/row1-window-chain/evidence/month-list/best-effort-chain-2019-01-2100-01.tsv -f smoke_mode=true
 ```
 
-(b) Stage 6, the continuation smoke, after the workflow change (input names of the change as proposed above; the three edges 2036-02, 2036-03, 2036-04 are exact months):
+(b) Stage 6, the continuation smoke, with the prior inputs of the workflow on main (the three edges 2036-02, 2036-03, 2036-04 are exact months):
 the same command with `-f smoke_mode=false -f prior_run_id=43307881914 -f expect_prior_edges=204 -f max_edges=3 -f prior_months_sha256=4ad43a5997ec019fd0383d7d853589213d09c2bb4e20179e1cdb94df5c6a66c3 -f prior_best_effort_sha256=00b721b107cb7ad64c5b1d2ae90c0f7cbda6930f8d306492b5f98b2c3b33fbbe`.
 Stage 7: `-f prior_run_id=<run id of stage 6> -f expect_prior_edges=207 -f max_edges=64` and without the two `prior_*_sha256` inputs (the prior of stage 7 on has the new list and file); then only `prior_run_id`, `expect_prior_edges` and `max_edges` change, as in the table above.
 
