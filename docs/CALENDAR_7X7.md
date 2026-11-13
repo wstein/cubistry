@@ -14,9 +14,9 @@ the next month.
 
 - URL parameters: `year` and `month` (1 to 12), only together. Without them the
   current month is used.
-- The view uses one fixed names printing, print C, `public/calendar7/chain-c/`, for every date.
-  The checked move chain covers **January 2019 to January 2036** (205 states, 204 edges; the root,
-  January 2019, is the solved cube). February 2026 is the one best-effort month: the cube
+- The view uses one fixed names printing, print D (print C relabeled to the root January 1980), `public/calendar7/chain-c/`, for every date.
+  The checked move chain covers **January 1980 to January 2036** (673 states, 672 edges; the root,
+  January 1980, is the solved cube). Six months are best effort (1981-02, 1987-02, 1998-02, 2009-02, 2015-02, 2026-02): the cube
   shows the red 29 in row 7, column 1, marked as a differing cell. Format, size and source
   digests: [CALENDAR7_CHAIN_C.md](CALENDAR7_CHAIN_C.md). The former names demo folder
   (`public/calendar7/names-demo/`, May 2026 to June 2027) is no longer read by the app; it

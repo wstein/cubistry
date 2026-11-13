@@ -1,27 +1,49 @@
-# Calendar7 long chain on print C (data)
+# Calendar7 long chain on print D (data)
 
-Research candidate, not certified; print C is not frozen. Folder: `public/calendar7/chain-c/`. January 2019 to January 2036:
-205 states, 204 edges, 23,315 HTM, 27,548 QTM, 315 rotations. The root is the solved cube and shows January 2019 ("Magic
-Date"). One month is best effort: February 2026 differs from its display in row 7, column 1 (the red 29). The edge into it is
-reported as `unknown` (`best_effort_edge_unconfirmed`) by the research month list: the replay here checks it, the Julia and
-Flix chain checkers do not confirm it as an exact edge.
+Research candidate, not certified; print D (print C relabeled to the root January 1980) is not frozen. Folder:
+`public/calendar7/chain-c/` (the folder name is kept). January 1980 to January 2036: 673 states, 672 edges, 76,262 HTM,
+90,379 QTM, 1,018 rotations. The root is the solved cube and shows January 1980 ("Magic Date"); 2019-01 is an ordinary
+chain state. Six months are best effort (1981-02, 1987-02, 1998-02, 2009-02, 2015-02, 2026-02: February, Sunday, 28 days):
+each differs from its display in row 7, column 1 (the red 29). The edges into them are best effort in the research
+chain: the replay here checks them, the Julia and Flix chain checkers do not confirm them as exact edges.
+
+## Where the chain comes from
+
+Print D and the chain are the output of `root_change.jl` of the research branch (README section "Root change"): the two
+stage chains for print C (run 43414242499, 1980-01 to 2019-01 backward; run 43307881914, 2019-01 to 2036-01) are
+transformed so that the first month is the solved cube. The edge words are those of the stage chains; only the sticker
+identities (print D) and the digests are new. The committed research evidence is `evidence/print-d/` and
+`evidence/chain-1980-2036/` at research ref `e4ae0493e09396dd6ca4dd528a643db4e4244e83` (Julia, Flix and independent receipts).
+The 673 state files are not in a repository: `root_change.jl --states` reproduces them from the stage artifacts, and
+`states.sha256` of the evidence lists their SHA-256.
 
 ## Format and size
 
-The 205 states are not stored one by one (the research snapshots are 2.9 MB). The existing `cubistry.calendar7.*` v1 files
-carry them: the root pose (`state.v1.json`, 294 stickers, 26.8 KB), one move word per edge and the SHA-256 of every state
-(`graph.v1.json`, 59.7 KB, one character per move), one display per month (`displays.v1.json`, 109.6 KB). The page replays
-the words; each node hash is checked on the way. All files together 217 KB, about 37 KB compressed. They are fetched at
-runtime from `public/`, never imported, so they are not part of the main chunk.
+The states are not stored one by one (673 snapshots are 8.9 MB). The existing `cubistry.calendar7.*` v1 files carry
+them: the root pose (`state.v1.json`, 294 stickers, 26,892 bytes), one move word per edge and the SHA-256 of every
+state (`graph.v1.json`, 195,231 bytes, one character per move), one display per month (`displays.v1.json`, 359,301
+bytes). The page replays the words; each node hash is checked on the way. The four data files and `best-effort.v1.json`
+(1,186 bytes) together 583,926 bytes with NOTICE.txt (the previous chain: 217 KB); gzip -9 per file: 3,761 + 89,769 + 10,232 +
+594 = 104,356 bytes (previous: about 37 KB). They are fetched at runtime from `public/`, never imported, so they are not part
+of the main chunk.
 
 Additions to the v1 format: `best-effort.v1.json` (`cubistry.calendar7.best-effort`: months whose front differs from the display
 in the listed `[row, column]` cells, 1-based, same convention as the any-date data); window tables, nodes and the root may name
-years from 2019 (the shipped 888-month table still starts in 2026); node display ids go up to 1201 (one display per month).
-`verifyChain` takes the best-effort list and then requires exactly those cells to differ, no more and no fewer.
+years from 1980 (`WINDOW_FIRST_YEAR`; the shipped 888-month table still starts in 2026); node display ids go up to 1201 (one display
+per month). `verifyChain` takes the best-effort list and then requires exactly those cells to differ, no more and no fewer.
 
-`manifest.sha256` pins the five data files, `source.sha256` the digests of the sources: the print and layout of the research
-branch (`549c07b0ee843d2e07eed2b71ad9b7418e965a8d`, `evidence/print-c`), `chain.moves.tsv`, `edges.tsv`, `months.tsv`,
-`VERIFIED.txt`, `julia.tsv` and `flix.tsv` (byte-identical) of chain artifact run 43307881914, and the 205 snapshots.
+`manifest.sha256` pins the five data files, `source.sha256` the digests of the sources: print D and its layout and the nine files
+of `chain-1980-2036` in the research evidence (`chain.moves.tsv`, `months.tsv`, `best-effort.tsv`, `VERIFIED.txt`, `julia.tsv`,
+`flix.tsv`, `independent.tsv`, `provenance.tsv`, `states.sha256`) and the 673 snapshots.
+
+## Extending the chain (1900-01 backward, 2100-01 forward)
+
+The export is parametrized by one object, `CHAIN` in `scripts/export-calendar7-chain-c.mjs` (research ref, evidence
+directories, first and last month, best-effort months, stage runs), and the pins `PINNED`. First month, number of states and the
+best-effort list are derived from it; nothing else names 2019 or 1980 except `WINDOW_FIRST_YEAR` in `src/apps/calendar7/graph.ts`
+(first year a chain may name). To extend: run `root_change.jl` over all stage chains in time order (the segment list of
+`provenance.tsv`; any number of backward and forward segments), commit its output in research, then change `CHAIN` and `PINNED`,
+run the export and update the tests that name the first month.
 
 ## Mapping to PuzlWerk wire-v1 (note, no codec)
 
@@ -34,8 +56,12 @@ adapters is step 7 of the shared-model plan and is not part of this change.
 ## Checks
 
 ```sh
-npm run verify:calendar7-chain-c        # committed files: manifest, source pins, parsers, replay of 204 edges
+npm run verify:calendar7-chain-c        # committed files: manifest, source pins, parsers, replay of 672 edges
 node --test tests/calendar7-chain-c.test.mjs
 # with the sources (not in the repository) the files are regenerated byte for byte:
-node scripts/export-calendar7-chain-c.mjs --check <artifact-dir> <research-root>
+node scripts/export-calendar7-chain-c.mjs --check <states-dir> <research-root>
 ```
+
+`<research-root>` is a checkout of research/cube-display-feasibility at the pinned ref (a `git archive` of
+`research/calendar-7x7/row1-window-chain/evidence/{print-d,chain-1980-2036}` is enough); `<states-dir>` is the `--states` output
+directory of `root_change.jl`. The test with the sources reads `CAL7_CHAIN_C_ARTIFACT` (states directory) and `CAL7_CHAIN_C_RESEARCH`.
