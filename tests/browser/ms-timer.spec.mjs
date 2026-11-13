@@ -199,7 +199,7 @@ test("the other applications keep their entries and still open", async ({
   await page.goto("/counter.html");
   await expect(page.locator("#application")).toBeEnabled();
   for (const text of [
-    "Picture Puzzle Playground",
+    "3×3 Super Picture Cube",
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
     "H/M/S Counter 00–59",
@@ -214,6 +214,9 @@ test("the other applications keep their entries and still open", async ({
       page.locator("#application").getByRole("option", { name: text, exact: true }),
     ).toBeAttached();
   }
+  await expect(
+    page.locator("#application").getByRole("option", { name: "Picture Puzzle Playground", exact: true }),
+  ).toHaveCount(0);
   await page.selectOption("#application", "ms-counter");
   await expect(page.locator("#cube")).toHaveAttribute(
     "data-application",
