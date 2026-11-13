@@ -83,7 +83,7 @@ test("a step plays block by block; pause, play, speed and skip to the end reach 
   const progress = page.locator('[data-c7="progress"]');
   await page.locator('a[data-nav="next"]').click();
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "playing");
-  expect([FEB_BLOCKS, FEB_ALIGNMENT]).toEqual([51, "x-"]);
+  expect([FEB_BLOCKS, FEB_ALIGNMENT]).toEqual([73, "x2, y-"]);
   await expect(progress).toHaveText(new RegExp(`^Turning to December 2026: move \\d+ of ${FEB_BLOCKS}$`));
   // The alignment is a separate, free indicator: it is found at the end of the layer blocks.
   await expect(page.locator('[data-c7="alignment"]')).toHaveText(`Orientation at the end (free): ${FEB_ALIGNMENT}.`);

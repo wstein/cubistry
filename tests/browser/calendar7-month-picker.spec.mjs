@@ -49,13 +49,22 @@ test("year browsing reaches years 1 and 9999 and rejects invalid edits without n
     await at(page, "2026-11");
   }
   // A click after editing the year must survive its blur/change event without losing the selected cell.
-  await jump.fill("2037");
-  await page.getByRole("gridcell", { name: "2037", exact: true }).click();
-  await expect(page.getByRole("grid", { name: "Months in 2037", exact: true })).toBeVisible();
+  await jump.fill("2028");
+  await page.getByRole("gridcell", { name: "2028", exact: true }).click();
+  await expect(page.getByRole("grid", { name: "Months in 2028", exact: true })).toBeVisible();
   await at(page, "2026-11");
-  await page.getByRole("gridcell", { name: "January 2037", exact: true }).click();
-  await at(page, "2037-01");
-  // The chain ends in January 2036: later months show a display-only preview (kind "state"), not a chain month ("off").
+  await page.getByRole("gridcell", { name: "January 2028", exact: true }).click();
+  await at(page, "2028-01");
+  // 2028 is inside the chain (January 2019 to January 2036): a chain month ("off"), not a display-only preview.
+  await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off");
+  // The first month after the chain, February 2036, is in the next decade: a display-only preview (kind "state").
+  await trigger(page).click();
+  await page.getByRole("button", { name: "Choose year", exact: true }).click();
+  await jump.fill("2036");
+  await jump.press("Enter");
+  await page.getByRole("gridcell", { name: "2036", exact: true }).click();
+  await page.getByRole("gridcell", { name: "February 2036", exact: true }).click();
+  await at(page, "2036-02");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "state");
   await expect(page.locator("[data-c7-any-range]")).toContainText("Display only: no move sequence for this date");
   await trigger(page).click();

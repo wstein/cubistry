@@ -16,7 +16,6 @@ import { buildModel, chainRange, chooseMonth, pageHtml, stepFrom } from "../src/
 import { parseLayout, parseLayoutMode } from "../src/apps/calendar7/layout.ts";
 import { namesCells, wrongStickerIndices } from "../src/apps/calendar7/anydate.ts";
 import { frontFailures } from "../src/apps/calendar7/display.ts";
-import { mountCalendar7 } from "../src/apps/calendar7/mount.ts";
 
 const DIR = "public/calendar7/names-demo";
 const json = (p) => JSON.parse(readFileSync(p, "utf8"));

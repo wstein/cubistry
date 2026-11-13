@@ -186,7 +186,7 @@ test("the theme default follows representative scheme styles, including the hard
   expect(errors).toEqual([]);
 });
 
-test("April uses the active print's APR and IL at banner height before and after restyling, also off-chain", async ({
+test("April uses the active print's AP and RIL at banner height before and after restyling, also off-chain", async ({
   page,
 }) => {
   const errors = [];
@@ -247,7 +247,7 @@ test("April uses the active print's APR and IL at banner height before and after
     });
   await banner.selectOption("theme");
   const before = await measure();
-  expect(before.map((row) => row.text)).toEqual(["APR", "IL"]);
+  expect(before.map((row) => row.text)).toEqual(["AP", "RIL"]);
   for (const row of before) {
     const height = row.banner.y1 - row.banner.y0;
     expect(row.bbox.y1 - row.bbox.y0 + 1, `${row.text}: visible cap height`).toBeGreaterThan(
@@ -268,15 +268,16 @@ test("April uses the active print's APR and IL at banner height before and after
   await pickDate(page, 2099, 4);
   await at(page, "2099-04");
   expect(await page.locator(".c7-sheet tr:first-child td .c7-cell-text").allTextContents()).toEqual([
-    "APR",
-    "IL",
+    "AP",
+    "RIL",
     "",
     "",
     "",
     "",
     "",
   ]);
-  await expect(page.locator("[data-c7-best-effort]")).not.toContainText("row 1");
+  // April 2099 is an exact board on print C (AP and RIL fit row 1): no mismatch is reported at all, so none in row 1.
+  await expect(page.locator("[data-c7-best-effort]")).toHaveCount(0);
   await expect(page.locator(".c7-step")).toHaveCount(0);
   expect(errors).toEqual([]);
 });
