@@ -5,5 +5,5 @@ Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthrop
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 
-Source: research/calendar-7x7/row1-window-chain evidence/print-d and evidence/chain-1980-2036 on research/cube-display-feasibility (e4ae0493e09396dd6ca4dd528a643db4e4244e83); stage artifacts of workflow runs 43414242499 (1980-01 .. 2019-01, backward, free start); 43307881914 (2019-01 .. 2036-01).
+Source: research/calendar-7x7/row1-window-chain evidence/print-d and evidence/chain-1980-2036 (research PR #470 (print D, root change), research/cube-display-feasibility); stage artifacts of workflow runs 43414242499 (1980-01 .. 2019-01, backward, free start); 43307881914 (2019-01 .. 2036-01).
 Regenerate with scripts/export-calendar7-chain-c.mjs. The shipped files public/calendar7/names/*, names-demo/*, state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.
