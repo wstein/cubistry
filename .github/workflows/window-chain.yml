@@ -271,6 +271,8 @@ jobs:
           BEST_PATH: ${{ inputs.best_effort_path }}
           CLAIMS_PATH: ${{ inputs.claims_path }}
           BEST29: ${{ inputs.best_effort_29 }}
+          DIRECTION: ${{ inputs.direction }}
+          JOIN_END: ${{ inputs.join_end }}
           SUMMARY_PRIOR: ${{ steps.validate.outputs.prior_run_id }}
           SUMMARY_ROOT: ${{ inputs.root_month }}
           SUMMARY_SMOKE: ${{ inputs.smoke_mode }}
@@ -296,6 +298,12 @@ jobs:
           [ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/run_checks.sh" || fail "best_effort_29 is set, but run_checks.sh at research_ref does not read CAL7_BEST_EFFORT_29"
           [ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/check.jl" || fail "best_effort_29 is set, but check.jl at research_ref does not read CAL7_BEST_EFFORT_29"
           [ "$BEST29" != true ] || git grep -qw CAL7_BEST_EFFORT_29 "$SHA" -- "$WC/verify_chain.jl" || fail "best_effort_29 is set, but verify_chain.jl at research_ref does not read CAL7_BEST_EFFORT_29"
+          # A backward run and a join_end need the code at research_ref to know them: an older producer would ignore direction and search forward for up to 70 minutes,
+          # and a run_checks.sh that does not pass CAL7_JOIN_END on would let Julia check the join end while Flix does not (the receipts then differ after the whole check).
+          [ "$DIRECTION" != backward ] || git grep -qw chain_start "$SHA" -- "$WC/window_chain.jl" || fail "direction is backward, but window_chain.jl at research_ref does not read chain_start (no backward mode)"
+          [ -z "$JOIN_END" ] || git grep -qw CAL7_JOIN_END "$SHA" -- "$WC/run_checks.sh" || fail "join_end is set, but run_checks.sh at research_ref does not read CAL7_JOIN_END"
+          [ -z "$JOIN_END" ] || git grep -qw CAL7_JOIN_END "$SHA" -- "$WC/check.jl" || fail "join_end is set, but check.jl at research_ref does not read CAL7_JOIN_END"
+          [ -z "$JOIN_END" ] || git grep -qw CAL7_JOIN_END "$SHA" -- "$WC/verify_chain.jl" || fail "join_end is set, but verify_chain.jl at research_ref does not read CAL7_JOIN_END"
           [ "$missing" = 0 ] || fail "research commit lacks required files"
           [ "$(git show "$SHA:$MONTHS_PATH" | sha256sum | cut -d' ' -f1)" = "$MONTHS_SHA" ] || fail "month list differs from months_sha256"
           {
