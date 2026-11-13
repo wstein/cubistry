@@ -287,13 +287,13 @@ test("names print: the cut face under every month row ring cubie is one flat whi
   const edges = faceEdgeFills(printing, scheme, "names", tiles);
   assert.ok(edges.size >= 7, `edge colors for ${edges.size} banner stickers`);
   assert.equal(faceEdgeFills(printing, scheme, "standard", tiles).size, 0);
-  for (let i = 0; i < n; i++) { // beside the banner: white strip 0.4 / red 1.0 / white strip 0.4 of the 1.8 tall cubie, from the bottom up
+  for (let i = 0; i < n; i++) { // beside the banner: white strip 0.4 / red 1.0 / white strip 0.2 of the 1.6 tall cubie, from the bottom up
     if (printing.ink[i] !== "month" && printing.ink[i] !== "band") continue;
     const e = edges.get(i + 1);
     if (!Array.isArray(e.left) && !Array.isArray(e.right)) continue; // a month tile on another face of the print: no thick row, no strips beside it
     for (const side of [e.left, e.right].filter(Array.isArray)) { // the outer edge of a corner tile is the white band: a plain color
       assert.deepEqual(side.map((x) => x.color), [namesGround(scheme.dayFill), scheme.bandFill, namesGround(scheme.dayFill)]);
-      near(side[0].to, 0.4 / 1.8, 0.03); near(side[1].to, 1 - 0.4 / 1.8, 0.03); assert.equal(side[2].to, 1);
+      near(side[0].to, 0.4 / 1.6, 0.03); near(side[1].to, 1 - 0.2 / 1.6, 0.03); assert.equal(side[2].to, 1);
     }
     assert.equal(e.top, namesGround(scheme.dayFill)); assert.equal(e.bottom, namesGround(scheme.dayFill));
   }});

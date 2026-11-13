@@ -1,8 +1,8 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout, unit grid (owner decision of 2026-11-11): the printed content is a uniform 7 x 7 grid of unit cells
-// (the size of an inner cubie). A cubie on a thick outer layer (f = 1.8) carries exactly one unit cell on its INNER side and a
-// band of f - 1 on its outer side (white margin); the month row is a red banner (1.0 tall) in a white frame: 0.4 above and below,
-// 0.5 from the left and right cube edges; the month name sits in
+// (the size of an inner cubie). A cubie on a thick outer layer (f = 1.6) carries exactly one unit cell on its INNER side and a
+// band of f - 1 on its outer side (white margin); the month row is a red banner (1.0 tall) in a white frame: 0.2 above (f - 1 - 0.4) and 0.4 below,
+// 0.3 from the left and right cube edges; the month name sits in
 // the upper part of the banner. Everything is checked on the recorded drawing of the real print (public/calendar7/names/state.v1.json)
 // and mapped to scene units, no mock geometry.
 import { test } from "node:test";
@@ -58,11 +58,11 @@ const scene = (f, px, py) => { const g = tileGrid(f.tile); return { x: f.center.
 const runAt = (name, f, t) => (name === "font" ? scene(f, t.cx, t.cy) : scene(f, t.ax, t.ay));
 const cellCenter = (f) => ({ x: f.c - 3, y: 3 - f.r }); // the 7 x 7 unit grid is centered on the cube
 
-test("the front face has 49 stickers on the 7 x 7 grid; the unit grid is 7 wide inside the 8.6 cube (two bands of f - 1)", () => {
+test("the front face has 49 stickers on the 7 x 7 grid; the unit grid is 7 wide inside the 8.2 cube (two bands of f - 1)", () => {
   assert.equal(FRONT.length, 49);
   assert.deepEqual(new Set(FRONT.map((f) => `${f.c},${f.r}`)).size, 49);
   near(WIDTHS.reduce((a, b) => a + b, 0) - 2 * BAND, 7, 1e-12);
-  near(BAND, 0.8, 1e-12);
+  near(BAND, 0.6, 1e-12);
 });
 
 test("faceBandsOf: the band is f - 1 on the outer side of every outer cubie (left, right, top, bottom), derived from the profile, none on inner layers; all 294 faces", () => {
@@ -123,20 +123,20 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       if (f.tile.band.t > 0) near(lt.y, want.y + 0.5, 1e-9, `${tag} fill top`); else assert.equal(cell.y0, 0);
       if (f.tile.band.b > 0) near(rb.y, want.y - 0.5, 1e-9, `${tag} fill bottom`); else assert.equal(cell.y1, g.H);
     } else {
-      // month row: 0.4 white at the top of the cubie, banner 1.0 tall, 0.4 white below it (strips of the row: cubie top and bottom)
-      near(f.center.y + F / 2 - lt.y, 0.4, 1e-9, `${tag} top strip`);
+      // month row: 0.2 white at the top of the cubie (band f - 1 = 0.6 less 0.4 of the banner above the cell row), banner 1.0 tall, 0.4 white below it
+      near(f.center.y + F / 2 - lt.y, 0.2, 1e-9, `${tag} top strip`);
       near(rb.y - (f.center.y - F / 2), 0.4, 1e-9, `${tag} bottom strip`);
       near(lt.y - rb.y, NAMES_BANNER_HEIGHT, 1e-9, `${tag} banner height 1.2`);
       near(lt.y - rb.y, 1.0, 1e-9, `${tag} banner height 1.0 (literal)`);
       near(lt.y, 3.9, 1e-9, `${tag} banner top`); near(rb.y, 2.9, 1e-9, `${tag} banner bottom`);
-      // the banner is inset by 0.5 (f - 1 - overhang 0.3 at f = 1.8) from the cube edges, not by the 0.8 band of the other rows
-      if (f.c === 0) near(lt.x, -4.3 + (F - 1 - NAMES_BANNER_OVERHANG), 1e-9, `${tag} red starts 0.5 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.8, 1e-9, `${tag} red starts at x = -3.8 (literal)`); else assert.equal(cell.x0, 0);
-      if (f.c === 6) near(rb.x, 4.3 - (F - 1 - NAMES_BANNER_OVERHANG), 1e-9, `${tag} red ends 0.5 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.8, 1e-9, `${tag} red ends at x = 3.8 (literal)`); else assert.equal(cell.x1, g.W);
+      // the banner is inset by 0.3 (f - 1 - overhang 0.3 at f = 1.6) from the cube edges, not by the 0.6 band of the other rows
+      if (f.c === 0) near(lt.x, -4.1 + (F - 1 - NAMES_BANNER_OVERHANG), 1e-9, `${tag} red starts 0.3 inside the left cube edge`); if (f.c === 0) near(lt.x, -3.8, 1e-9, `${tag} red starts at x = -3.8 (literal)`); else assert.equal(cell.x0, 0);
+      if (f.c === 6) near(rb.x, 4.1 - (F - 1 - NAMES_BANNER_OVERHANG), 1e-9, `${tag} red ends 0.3 inside the right cube edge`); if (f.c === 6) near(rb.x, 3.8, 1e-9, `${tag} red ends at x = 3.8 (literal)`); else assert.equal(cell.x1, g.W);
     }
   }
 });
 
-test("the left and right margins: 0.8 white in every row (cube edge -4.3 .. -3.5 and 3.5 .. 4.3), 0.5 in the month row (the banner sticks out 0.3 beyond the grid)", () => {
+test("the left and right margins: 0.6 white in every row (cube edge -4.1 .. -3.5 and 3.5 .. 4.1), 0.3 in the month row (the banner sticks out 0.3 beyond the grid)", () => {
   for (const f of FRONT.filter((x) => x.c === 0 || x.c === 6)) {
     const g = tileGrid(f.tile), cell = DRAWINGS.font(f).rects[1]; // [0] is the white ground, [1] the fill of the cell or banner
     const edge = f.c === 0 ? f.center.x - F / 2 : f.center.x + F / 2;

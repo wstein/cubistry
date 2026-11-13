@@ -159,11 +159,11 @@ test("names layout on the sheet: the letter run of every name tile except April 
 test("names layout: the gap between cubies is 0.01 mm, stated in scene units (inner cubie = 66.5 mm / (5 + 2 f))", () => {
   assert.equal(NAMES_GAP_MM, 0.01);
   assert.equal(CUBE_EDGE_MM_7X7, 66.5); // assumption: middle of the 61.5 to 70 mm range of common 7x7 cubes (not measured)
-  assert.ok(Math.abs(INNER_CUBIE_EDGE_MM - 66.5 / 8.6) < 1e-9, "5 + 2 * 1.8 = 8.6 inner widths: 7.7326 mm");
-  assert.ok(Math.abs(NAMES_GAP - 0.01 / (66.5 / 8.6)) < 1e-12, "0.01 mm / 7.7326 mm = 0.0012932 scene units");
+  assert.ok(Math.abs(INNER_CUBIE_EDGE_MM - 66.5 / 8.2) < 1e-9, "5 + 2 * 1.6 = 8.2 inner widths: 8.1098 mm");
+  assert.ok(Math.abs(NAMES_GAP - 0.01 / (66.5 / 8.2)) < 1e-12, "0.01 mm / 8.1098 mm = 0.0012331 scene units");
   assert.ok(NAMES_GAP > 0, "never zero");
   assert.equal(bodyWidthFor("names"), NAMES_BODY_WIDTH);
-  assert.ok(Math.abs(NAMES_BODY_WIDTH - (1 - 0.0012932)) < 1e-6);
+  assert.ok(Math.abs(NAMES_BODY_WIDTH - (1 - 0.0012331)) < 1e-6);
   // Real geometry: two neighboring bodies at pitch 1 are NAMES_GAP apart.
   const g = new RoundedBoxGeometry(NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, 1, PRESENTATION_PRESET.bodyRadius);
   g.computeBoundingBox();

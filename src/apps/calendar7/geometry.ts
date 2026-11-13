@@ -11,13 +11,13 @@ export const STANDARD_BODY_WIDTH = 0.99;
 
 /**
  * Width of the two outer layers of an N-cube relative to an inner layer (1): real big cubes have thicker outer layers
- * (the corners must keep contact at 45 degree turns). ESTIMATES, to be replaced by caliper measurements of real cubes:
- * N = 2, 3, 4: 1.0 (owner decision 2026-11-10); N = 5: 1.2 and N = 7: 1.8 (owner estimates); N = 6: 1.5 is a PROPOSAL
- * (UNKNOWN, between the 5 and the 7). This is the one table; change a value here only.
+ * (the corners must keep contact at 45 degree turns). Estimates, to be replaced by caliper measurements of real cubes:
+ * N = 2, 3, 4: 1.0 (owner decision 2026-11-10); N = 5: 1.1, N = 6: 1.3 and N = 7: 1.6 (owner decision 2026-11-11).
+ * This is the one table; change a value here only.
  */
-export const OUTER_LAYER_WIDTH: Readonly<Record<number, number>> = Object.freeze({ 2: 1, 3: 1, 4: 1, 5: 1.2, 6: 1.5, 7: 1.8 });
+export const OUTER_LAYER_WIDTH: Readonly<Record<number, number>> = Object.freeze({ 2: 1, 3: 1, 4: 1, 5: 1.1, 6: 1.3, 7: 1.6 });
 /**
- * Local look at another outer layer factor of the 7x7: the URL parameter `outer` (for example `?outer=1.6`, from 1.2 to 2.4) replaces
+ * Local look at another outer layer factor of the 7x7: the URL parameter `outer` (for example `?outer=1.8`, from 1.2 to 2.4) replaces
  * the table value of N = 7 for this page load; without it, and outside a browser, the table is used. The names layout derives
  * the cube edge and the cell grid from it; the month banner stays at its fixed unit-grid constants.
  */
@@ -42,18 +42,18 @@ export const layerWidthsFor = (n: number): number[] =>
 export const BODY_RADIUS = 0.055;
 /** The Calendar7 cube is a 7x7. */
 export const CALENDAR7_SIZE = 7;
-/** Total edge of the 7x7 in units of an inner layer: (N - 2) + 2 f = 5 + 2 * 1.8 = 8.6. */
+/** Total edge of the 7x7 in units of an inner layer: (N - 2) + 2 f = 5 + 2 * 1.6 = 8.2. */
 export const NAMES_CUBE_EDGE = layerWidthsFor(CALENDAR7_SIZE).reduce((sum, w) => sum + w, 0);
 /**
  * Physical edge of the 7x7 in mm: the middle of the 61.5 to 70 mm range of common 7x7 cubes (an assumption, not measured on
  * the owner's cube). The names layout states its gap in mm with it.
  */
 export const CUBE_EDGE_MM_7X7 = 66.5;
-/** Edge of an inner cubie in mm: 66.5 / (5 + 2 f) = 66.5 / 8.6 = 7.7326 mm. */
+/** Edge of an inner cubie in mm: 66.5 / (5 + 2 f) = 66.5 / 8.2 = 8.1098 mm. */
 export const INNER_CUBIE_EDGE_MM = CUBE_EDGE_MM_7X7 / NAMES_CUBE_EDGE;
 /** Gap between neighboring cubies of the names layout in mm. */
 export const NAMES_GAP_MM = 0.01;
-/** The same gap in scene units (inner layer = 1): 0.01 mm / 7.7326 mm = 0.0012932. */
+/** The same gap in scene units (inner layer = 1): 0.01 mm / 8.1098 mm = 0.0012331. */
 export const NAMES_GAP = NAMES_GAP_MM / INNER_CUBIE_EDGE_MM;
 /** Body width of an inner cubie of the names layout: the width 1 minus the gap. */
 export const NAMES_BODY_WIDTH = 1 - NAMES_GAP;
@@ -155,7 +155,7 @@ export function monthBanner(): { bottom: number; top: number; height: number } {
 export const bodyWidthFor = (layout: Layout): number => (layout === "names" ? NAMES_BODY_WIDTH : STANDARD_BODY_WIDTH);
 /** Layer widths of the Calendar7 cube per layout: the standard layout has none (unit pitch), the names layout the thick outer layers. */
 export const layerWidthsOf = (layout: Layout): number[] | null => (layout === "names" ? layerWidthsFor(CALENDAR7_SIZE) : null);
-/** Half the edge of the cube in scene units (camera, studio): 3.5 in the standard layout, 4.3 in the names layout. */
+/** Half the edge of the cube in scene units (camera, studio): 3.5 in the standard layout, 4.1 in the names layout. */
 export const halfEdgeOf = (layout: Layout): number => (layout === "names" ? NAMES_CUBE_EDGE / 2 : CALENDAR7_SIZE / 2);
 
 /**

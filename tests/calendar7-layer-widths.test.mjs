@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout with thick outer layers (owner decision 2026-11-10, A+B): the f table, the physical edge and the
-// gap, the tile of every face (1.8 x 1.8 corners, 1 x 1.8 ring pieces, 1 x 1 inner), the art drawn per tile at 192 px per unit
+// gap, the tile of every face (1.6 x 1.6 corners, 1 x 1.6 ring pieces, 1 x 1 inner), the art drawn per tile at 192 px per unit
 // (letters on the uniform 1/3-unit pitch, centered in the taller tile, the weekday line across the whole tile), and the layer
 // turns on the real print. The viewer wiring (profile on for the names layout only) is tests/browser/calendar7-names-mode.spec.mjs.
 import { test } from "node:test";
@@ -22,55 +22,55 @@ import { parseState } from "../src/apps/calendar7/graph.ts";
 import { layerProfileFor } from "../src/apps/calendar7/viewer.ts";
 
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what} ${a} != ${b}`);
-const F = 1.8;
+const F = 1.6;
 const PAPER_RED = SCHEMES.find((s) => s.id === "paper-red");
 
 // ---- the table, the edge and the gap ----
 test("outer layer widths: the one table (N = 2, 3, 4: 1; N = 5: 1.1; N = 6: 1.3; N = 7: 1.6, owner decision 2026-11-11) and the widths [f, 1, ..., 1, f]", () => {
   assert.deepEqual({ ...OUTER_LAYER_WIDTH }, { 2: 1, 3: 1, 4: 1, 5: 1.1, 6: 1.3, 7: 1.6 });
   for (let n = 2; n <= 7; n++) assert.deepEqual(layerWidthsFor(n), thickOuterLayerWidths(n, outerLayerWidth(n)), `N = ${n}`);
-  assert.deepEqual(layerWidthsFor(7), [1.8, 1, 1, 1, 1, 1, 1.8]);
+  assert.deepEqual(layerWidthsFor(7), [1.6, 1, 1, 1, 1, 1, 1.6]);
   assert.deepEqual(layerWidthsFor(3), [1, 1, 1]);
   assert.throws(() => outerLayerWidth(8));
   assert.equal(CALENDAR7_SIZE, 7);
   assert.equal(BODY_RADIUS, PRESENTATION_PRESET.bodyRadius);
 });
-test("names layout: edge (N - 2) + 2 f = 8.6 units = 66.5 mm, inner cubie 7.7326 mm, gap 0.01 mm = 0.0012932 units; the standard layout has no profile and the 3.5 half edge", () => {
-  near(NAMES_CUBE_EDGE, 8.6, 1e-12);
+test("names layout: edge (N - 2) + 2 f = 8.2 units = 66.5 mm, inner cubie 8.1098 mm, gap 0.01 mm = 0.0012331 units; the standard layout has no profile and the 3.5 half edge", () => {
+  near(NAMES_CUBE_EDGE, 8.2, 1e-12);
   assert.equal(CUBE_EDGE_MM_7X7, 66.5);
-  near(INNER_CUBIE_EDGE_MM, 66.5 / 8.6, 1e-12);
-  near(INNER_CUBIE_EDGE_MM, 7.7326, 1e-4);
+  near(INNER_CUBIE_EDGE_MM, 66.5 / 8.2, 1e-12);
+  near(INNER_CUBIE_EDGE_MM, 8.1098, 1e-4);
   assert.equal(NAMES_GAP_MM, 0.01);
-  near(NAMES_GAP, 0.01 / (66.5 / 8.6), 1e-15);
-  near(NAMES_GAP, 0.0012932, 1e-7);
-  assert.deepEqual(layerWidthsOf("names"), [1.8, 1, 1, 1, 1, 1, 1.8]);
+  near(NAMES_GAP, 0.01 / (66.5 / 8.2), 1e-15);
+  near(NAMES_GAP, 0.0012331, 1e-7);
+  assert.deepEqual(layerWidthsOf("names"), [1.6, 1, 1, 1, 1, 1, 1.6]);
   assert.equal(layerWidthsOf("standard"), null);
   assert.equal(halfEdgeOf("standard"), 3.5);
-  near(halfEdgeOf("names"), 4.3, 1e-12);
+  near(halfEdgeOf("names"), 4.1, 1e-12);
   assert.equal(bodyWidthFor("standard"), 0.99);
   near(bodyWidthFor("names"), 1 - NAMES_GAP, 1e-15);
-  const [x, y, z] = namesBodySize([1.8, 1, 1.8]);
-  near(x, 1.8 - NAMES_GAP, 1e-15); near(y, 1 - NAMES_GAP, 1e-15); near(z, x, 1e-15);
+  const [x, y, z] = namesBodySize([1.6, 1, 1.6]);
+  near(x, 1.6 - NAMES_GAP, 1e-15); near(y, 1 - NAMES_GAP, 1e-15); near(z, x, 1e-15);
 });
 
 // ---- the tile of a face ----
-test("faceTileOf: corner 1.8 x 1.8, ring piece on a face 1 x 1.8 (width along sticker right, height along up), inner 1 x 1, from any face", () => {
+test("faceTileOf: corner 1.6 x 1.6, ring piece on a face 1 x 1.6 (width along sticker right, height along up), inner 1 x 1, from any face", () => {
   const FRONT = { n: [0, 0, 1], up: [0, 1, 0] }, TOP = { n: [0, 1, 0], up: [0, 0, -1] }, RIGHT = { n: [1, 0, 0], up: [0, 1, 0] };
   const w = layerWidthsFor(7);
   const tile = (p, f) => faceTileOf(p, f.n, f.up, w);
   assert.deepEqual(tile([-3, 3, 3], FRONT), { w: F, h: F }, "front corner");
-  assert.deepEqual(tile([0, 3, 3], FRONT), { w: 1, h: F }, "row 1 ring piece: 1 wide, 1.8 tall");
-  assert.deepEqual(tile([3, 1, 3], FRONT), { w: F, h: 1 }, "column 7 ring piece: 1.8 wide, 1 tall");
+  assert.deepEqual(tile([0, 3, 3], FRONT), { w: 1, h: F }, "row 1 ring piece: 1 wide, 1.6 tall");
+  assert.deepEqual(tile([3, 1, 3], FRONT), { w: F, h: 1 }, "column 7 ring piece: 1.6 wide, 1 tall");
   assert.deepEqual(tile([1, -1, 3], FRONT), { w: 1, h: 1 }, "inner");
-  assert.deepEqual(tile([0, 3, 3], TOP), { w: 1, h: F }, "the same piece on its top face: right = x (1), up = -z (outer layer 1.8)");
+  assert.deepEqual(tile([0, 3, 3], TOP), { w: 1, h: F }, "the same piece on its top face: right = x (1), up = -z (outer layer 1.6)");
   assert.deepEqual(tile([3, 0, 3], RIGHT), { w: F, h: 1 }, "right face: right = -z (outer), up = y (inner)");
   assert.throws(() => faceTileOf([4, 0, 0], FRONT.n, FRONT.up, w));
 });
 test("nameAnchor: the first tile of a word is anchored right, the last left, the middle (and none) at the center; it follows the width of a thick tile", () => {
   for (const word of NAME_WORDS) word.forEach((tile, k) => assert.equal(nameAnchor(tile), k === 0 ? 1 : k === word.length - 1 ? -1 : 0, `${word} ${tile}`));
   assert.equal(nameTileShift("SEP", 1), 0);
-  near(nameTileShift("SEP", F), 0.4, 1e-12);
-  near(nameTileShift("ARY", F), -0.4, 1e-12);
+  near(nameTileShift("SEP", F), 0.3, 1e-12);
+  near(nameTileShift("ARY", F), -0.3, 1e-12);
   assert.equal(nameTileShift("EMB", F), 0);
   assert.equal(nameTileShift("", F), 0);
 });
@@ -125,9 +125,9 @@ const TILES = { corner: { w: F, h: F }, ring: { w: 1, h: F }, side: { w: F, h: 1
 test("texture sizes: 192 px per unit of width, a (192 w) x (192 h) canvas per tile (corner, ring, side, inner); no tile is the historical 192 x 192", () => {
   assert.deepEqual(tileCanvasSize(), [192, 192]);
   assert.deepEqual(tileCanvasSize(TILES.inner), [192, 192]);
-  assert.deepEqual(tileCanvasSize(TILES.corner), [346, 346]);
-  assert.deepEqual(tileCanvasSize(TILES.ring), [192, 346]);
-  assert.deepEqual(tileCanvasSize(TILES.side), [346, 192]);
+  assert.deepEqual(tileCanvasSize(TILES.corner), [307, 307]);
+  assert.deepEqual(tileCanvasSize(TILES.ring), [192, 307]);
+  assert.deepEqual(tileCanvasSize(TILES.side), [307, 192]);
   for (const [name, tile] of Object.entries(TILES)) {
     const [W, H] = tileCanvasSize(tile);
     const face = track((c) => drawFace(c, "28", "red", "strict", PAPER_RED, "names", tile));
@@ -163,7 +163,7 @@ test("the weekday line spans the full width of every tile, 1.5 times as thick, a
   // drawn through drawFace of a weekday tile: the last rect is the line
   const w = track((c) => drawFace(c, "MON", "weekday", "strict", PAPER_RED, "names", TILES.side));
   const last = w.rects[w.rects.length - 1];
-  assert.equal(last.w, 346);
+  assert.equal(last.w, 307);
   assert.equal(last.x, 0);
   // The sheet and the 1x1 default are unchanged
   assert.deepEqual(lineRect(line, "names", true), { x: 0, y: 192 * (1 + 0.9106) / 2 - 12 * 1.5, w: 192, h: 18 });
@@ -181,7 +181,7 @@ function letterCenters(word, draw) {
   });
   return centers;
 }
-test("names letters keep the uniform 1/3-unit pitch over a word whose first tile is a corner of width 1.8 (its unit cell on the right, right-flush against its right edge), also across the tile boundaries", () => {
+test("names letters keep the uniform 1/3-unit pitch over a word whose first tile is a corner of width 1.6 (its unit cell on the right, right-flush against its right edge), also across the tile boundaries", () => {
   for (const word of NAME_WORDS) {
     if (word.length < 2) continue;
     for (const draw of [
