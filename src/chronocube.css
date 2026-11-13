@@ -278,7 +278,8 @@
   .c7-page > .c7-steps { grid-column: 2; grid-row: 1 / span 2; grid-template-columns: minmax(0, 1fr); }
 }
 .c7-unavailable { background: var(--surface); color: var(--ink); border: 1px solid var(--s-warn); border-radius: 8px; padding: 8px 12px; margin: 0; }
-.c7-best-effort { background: var(--surface); color: var(--ink); border: 1px solid var(--s-warn); border-radius: 8px; padding: 8px 12px; margin: 0; font-weight: 600; }
+/* The sentence of a best-effort month: red text only (the sheet red token, 6.1:1 on the light and 7.7:1 on the dark surface), no frame. */
+.c7-best-effort { margin: 0; color: var(--c7-red); font-weight: 600; }
 .c7-sr-only { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .c7-status, .c7-range { font-size: 0.85rem; margin: 0; color: var(--ink); }
 .c7-nav { font-weight: 700; color: var(--mark-ink); text-decoration: underline; }

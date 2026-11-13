@@ -351,7 +351,8 @@ export async function mountCalendar7(
     setInactive(q("reset"), !player);
     if (target) stage?.setLabel(`7x7 calendar cube showing ${monthLabel(target)}`);
     if (!active && player) {
-      setWrong(snap.index);
+      // The wrong cell is set only when the cube rests in the month it was asked for; a pass through it on the way to another month clears it.
+      setWrong(snap.index, snap.index !== wanted);
       root.setAttribute("data-c7-state", "idle");
       // Test hook and proof for readers: the digest of the pose the view shows, computed here, not copied from the graph.
       root.setAttribute("data-c7-digest", stateDigest((played.start as { printing: Printing }).printing, player.shownPose));

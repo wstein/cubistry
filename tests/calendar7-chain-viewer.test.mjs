@@ -110,3 +110,20 @@ test("a failed best-effort download stops the mount like any other canonical fil
   env.fetchJson = async (url) => { if (url.endsWith("best-effort.v1.json")) throw new Error("HTTP 404"); return fetchJson(url); };
   await assert.rejects(mountCalendar7(root, new URLSearchParams("year=2019&month=1"), env), /HTTP 404/);
 });
+
+test("the best-effort sentence is red text only: the sheet red token, no frame, no background, 4.5:1 on the surface and canvas of both themes", async () => {
+  const { contrast } = await import("./calendar7-contrast.mjs");
+  const css = readFileSync("src/chronocube.css", "utf8");
+  const rule = /^\.c7-best-effort \{([^}]*)\}/m.exec(css)?.[1] ?? "";
+  assert.match(rule, /color: var\(--c7-red\)/);
+  assert.doesNotMatch(rule, /border|background|outline|box-shadow|text-decoration/);
+  const token = (scope) => new RegExp(`${scope}[^{]*\\{[^}]*--c7-red: (#[0-9a-f]{6})`).exec(css)?.[1];
+  const light = token("\\.c7-root"), dark = token(':root\\[data-theme="dark"\\] \\.c7-root');
+  const tokens = readFileSync("src/shell/tokens.css", "utf8");
+  const pick = (name, from) => new RegExp(`--${name}: (#[0-9a-f]{6})`).exec(tokens.slice(from))?.[1];
+  const darkAt = tokens.indexOf('@media (prefers-color-scheme: dark)');
+  for (const name of ["surface", "bg"]) {
+    assert.ok(contrast(light, pick(name, 0)) >= 4.5, `light ${name}`);
+    assert.ok(contrast(dark, pick(name, darkAt)) >= 4.5, `dark ${name}`);
+  }
+});
