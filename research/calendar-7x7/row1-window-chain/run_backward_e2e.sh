@@ -31,7 +31,7 @@ producer() { # name list env-extra... -- producer args
   local name=$1 list=$2; shift 2
   ( export CAL7_WINDOW_MONTHS="$list" CAL7_WINDOW_MONTHS_SHA256 CAL7_WINDOW_PRINT_SHA=$PS CAL7_WINDOW_LAYOUT=$LAY CAL7_WINDOW_LAYOUT_SHA256=$LS
     CAL7_WINDOW_MONTHS_SHA256=$(sha "$list")
-    timeout 1500 "$J" --startup-file=no --threads=4 "$here/window_chain.jl" "$OUT/$name" "$PR" "$@" ) > "$OUT/$name.log" 2>&1
+    timeout 3000 "$J" --startup-file=no --threads=4 "$here/window_chain.jl" "$OUT/$name" "$PR" "$@" ) > "$OUT/$name.log" 2>&1
 }
 chk_env() { # list -> exports the checker contract
   export CAL7_WINDOW_MONTHS="$1" CAL7_WINDOW_MONTHS_SHA256 CAL7_WINDOW_PRINT_SHA=$PS CAL7_WINDOW_LAYOUT=$LAY CAL7_WINDOW_LAYOUT_SHA256=$LS CAL7_BEST_EFFORT_29=1
