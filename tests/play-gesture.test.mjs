@@ -14,7 +14,7 @@ function prng(seed) {
   return () => { seed = (seed + 0x6d2b79f5) | 0; let t = Math.imul(seed ^ (seed >>> 15), 1 | seed); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
-test("sticker is signalled from pointer-down, before any decision", () => {
+test("sticker is highlighted from pointer-down, before any decision", () => {
   const g = start();
   assert.equal(g.phase, "pending");
   assert.deepEqual(g.highlight, { face: "F", cell: [1, 2, 2] });
@@ -204,4 +204,32 @@ test("lifting one finger: release of the pair commits the net once", () => {
   const r = releasePair(p);
   assert.deepEqual(r.commit, { axis: "y", from: 2, to: 4, quarters: 2 });
   assert.equal(releasePair(r.gesture).commit, null);
+});
+
+test("release and cancel clear the highlight; cancel does not change a released gesture", () => {
+  const g = at(start(), 100);
+  assert.notEqual(g.highlight, null);
+  const r = releaseGesture(g);
+  assert.equal(r.gesture.highlight, null);
+  assert.equal(cancelGesture(r.gesture), r.gesture);
+  assert.equal(cancelGesture(r.gesture).phase, "released");
+  const c = cancelGesture(g);
+  assert.equal(cancelGesture(c), c);
+});
+
+test("beginGesture rejects an invalid pxPerQuarter and an invalid size", () => {
+  const o = { n: 3, hit: hit("F", [0, 0, 1]), point: [0, 0], axes: FRONT };
+  assert.throws(() => beginGesture({ ...o, pxPerQuarter: 0 }), /pxPerQuarter/);
+  assert.throws(() => beginGesture({ ...o, pxPerQuarter: -5 }), /pxPerQuarter/);
+  assert.throws(() => beginGesture({ ...o, pxPerQuarter: NaN }), /pxPerQuarter/);
+  assert.throws(() => beginGesture({ ...o, n: 8, pxPerQuarter: 100 }), /size/);
+});
+
+test("a pair with one finger off the face is invalid and commits nothing", () => {
+  const off = { hit: hit("F", [0, 0, 0.2]), point: [300, 200] };
+  let p = pair(ROW(0.9), off);
+  assert.equal(p.phase, "invalid");
+  assert.deepEqual(p.highlights, []);
+  p = movePair(p, [400, 200], [500, 200]);
+  assert.equal(releasePair(p).commit, null);
 });
