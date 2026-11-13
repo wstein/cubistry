@@ -34,7 +34,10 @@ changing the displayed value, print, date or active motion.
 three complete source witnesses, and SHA-256 hashes of the derived runtime files.
 The export is reproducible with `research/date-3x3/export-runtime.mjs` at that
 commit. All three runtime files contain 2,562 weekday/month/day combinations,
-including February 29 for every weekday. These cover the complete Gregorian
+including February 29 for every weekday.
+A fourth runtime, `de-a-unpadded` (German A without the leading zero, same print as `de-a`), is derived by
+`scripts/export-calendar-de-a-unpadded.mjs` from the research witness pinned in `calendar-source.json`
+(`sourceCommits`); it is selected by clearing the "Leading zero" box. The default stays with the zero. These cover the complete Gregorian
 400-year cycle. The Research independent checkers validate the original routes;
 the application regression additionally replays all 7,686 runtime targets and
 their inverse routes, including upright centers and every nonblank glyph.
