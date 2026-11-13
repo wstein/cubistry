@@ -173,8 +173,8 @@ import { fakeRoot, setup, settle } from "./helpers/calendar7-mount.mjs";
 const canonicalStart = parseState(json("public/calendar7/chain-c/state.v1.json"));
 const canonicalGraph = parseGraph(json("public/calendar7/chain-c/graph.v1.json"));
 const q = s => new URLSearchParams(s);
-/** Node of March 2027 in the chain C graph (January 2019 is node 0). */
-const MAR_2027 = 98;
+/** Node of March 2027 in the chain C graph (January 1980 is node 0). */
+const MAR_2027 = (2027 - 1980) * 12 + 2;
 const flushed = async()=>{for(let i=0;i<200;i++)await Promise.resolve();};
 
 test("all former layout parameters select one names print without a layout control",async()=>{
@@ -190,7 +190,7 @@ test("a failed canonical download cannot substitute an unrelated print",async()=
 test("instant date changes preserve font, scheme and unrelated URL parameters without exposing old modes",async()=>{const root=fakeRoot(),{env}=setup({search:"?app=calendar7&scheme=dracula&font=nunito&extra=keep"});const i=await mountCalendar7(root,q("year=2027&month=3"),env);await settle(root,"2027-03");root.date(2026,2);await settle(root,"2026-02");const p=q(env.search());for(const[k,v]of[["scheme","dracula"],["font","nunito"],["extra","keep"],["year","2026"],["month","2"]])assert.equal(p.get(k),v);assert.equal(p.has("layout"),false);i.dispose();});
 test("a retired layout control event cannot select an old print",async()=>{const root=fakeRoot(),{env,stage}=setup();const i=await mountCalendar7(root,q("year=2027&month=3"),env);await settle(root,"2027-03");root.choose("layout","standard");await flushed();assert.equal(stage.configs.length,1);assert.equal(root.getAttribute("data-c7-layout"),"names");i.dispose();});
 test("a preview-to-chain date change restores playback with the same printing",async()=>{const root=fakeRoot(),{env,stage}=setup();const i=await mountCalendar7(root,q("year=2040&month=2"),env);await settle(root,"2040-02");root.date(2027,3);await settle(root,"2027-03");assert.equal(root.getAttribute("data-c7-digest"),canonicalGraph.nodes[MAR_2027].hash);assert.equal(root.el("player").hidden,false);assert.ok(stage.configs.every(c=>c.printing===stage.configs[0].printing));i.dispose();});
-test("lower chain boundary January 2019 has no previous step and no display-only notice",async()=>{const root=fakeRoot(),{env}=setup();const i=await mountCalendar7(root,q("year=2019&month=1"),env);await settle(root,"2019-01");assert.equal(root.el("layout-notice").hidden,true);assert.match(root.view.innerHTML,/No earlier month: January 2019/);i.dispose();});
+test("lower chain boundary January 1980 has no previous step and no display-only notice",async()=>{const root=fakeRoot(),{env}=setup();const i=await mountCalendar7(root,q("year=1980&month=1"),env);await settle(root,"1980-01");assert.equal(root.el("layout-notice").hidden,true);assert.match(root.view.innerHTML,/No earlier month: January 1980/);i.dispose();});
 test("invalid URL dates build no cube and keep the instant date form available",async()=>{for(const query of["year=x&month=1","year=0&month=5","year=2026&month=13"]){const root=fakeRoot(),{env,stage}=setup();const i=await mountCalendar7(root,q(query),env);await flushed();assert.equal(stage.configs.length,0);assert.match(root.view.innerHTML,/Invalid month/);assert.match(root.html,/data-c7-month-picker/);assert.doesNotMatch(root.view.innerHTML,/data-c7-date-form/);assert.doesNotMatch(root.view.innerHTML,/>Show</);i.dispose();}});
 
 // ---- the font path of the name tiles (what the app draws) ----

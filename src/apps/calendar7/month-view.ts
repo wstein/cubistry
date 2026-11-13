@@ -291,7 +291,7 @@ export function pageHtml(model: PageModel, options: WordOptions = DEFAULT_WORD_O
     `${stepHtml(model.next, "Next", `No later month: ${monthLabel(range.last)} is the end of the chain.`, options)}` +
     `<p class="c7-legend" data-c7-legend>${LEGEND}</p></div>` +
     (model.longChain
-      ? `<p class="c7-range" data-c7-chain>${esc(CHAIN_C_LABEL)}. Chain: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; print C is not frozen.</p>`
+      ? `<p class="c7-range" data-c7-chain>${esc(CHAIN_C_LABEL)}. Chain: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; print D is not frozen.</p>`
       : model.layout === "names"
       ? `<p class="c7-range">Names layout window: ${esc(rangeText)}, ${range.edges} steps. Research candidate, not certified; not proven outside this window.</p>`
       : `<p class="c7-range">Proven chain: ${esc(rangeText)}, ${range.edges} steps.</p>`) + `${status}</div>`

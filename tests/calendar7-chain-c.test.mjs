@@ -69,7 +69,7 @@ test("source.sha256 holds the pinned digests of the 9 chain evidence files, the 
     assert.throws(() => check(dir), expected);
   };
   mutate((t) => t.replace(PINNED["months.tsv"], "0".repeat(64)), /source\.sha256 differs from the pin of months\.tsv/);
-  mutate((t) => t.replace(/^[0-9a-f]{64}(  states\/state-077\.tsv)/m, `${"0".repeat(64)}$1`), /snapshots/);
+  mutate((t) => t.replace(/^[0-9a-f]{64}(  states\/state-77\.tsv)/m, `${"0".repeat(64)}$1`), /snapshots/);
   mutate((t) => t.split("\n").filter((l) => !l.endsWith("state-673.tsv")).join("\n"), /wrong number of entries/);
 });
 
@@ -241,7 +241,7 @@ function faceColors(printing, pose) {
   return { homes, faces, mixed };
 }
 
-test("root month 1980-01: all 6 faces show one color, the front face is white in the Rubik-Tint scheme, and the front shows January 2019", () => {
+test("root month 1980-01: all 6 faces show one color, the front face is white in the Rubik-Tint scheme, and the front shows January 1980", () => {
   const scheme = SCHEMES.find((s) => s.id === "rubik-tint");
   const { homes, faces, mixed } = faceColors(start.printing, start.pose);
   assert.equal(faces.size, 6);

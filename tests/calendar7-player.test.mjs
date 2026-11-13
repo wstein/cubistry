@@ -374,8 +374,8 @@ class El {
   }
 }
 const mountedGraph = parseGraph(json("public/calendar7/chain-c/graph.v1.json"));
-/** Index of May 2026 in the chain C graph: the tests were written for a window that started there. */
-const MAY_2026 = 88;
+/** Index of May 2026 in the chain graph (January 1980 is node 0): the tests were written for a window that started there. */
+const MAY_2026 = (2026 - 1980) * 12 + 4;
 function fakeRoot() {
   const listeners = { click: new Set(), change: new Set(), submit: new Set() };
   const els = new Map();
@@ -652,7 +652,7 @@ test("mount under reduced motion: no animation, the controls say so, the state i
 test("mount: a month outside the chain builds a display-only preview on the same print; a chain month restores playback", async () => {
   const root = fakeRoot();
   const { env, host, calls } = mountEnv();
-  const inst = await mountCalendar7(root, q("year=2018&month=12"), env); // December 2018 is outside
+  const inst = await mountCalendar7(root, q("year=1979&month=12"), env); // December 1979 is outside
   await flush();
   assert.equal(calls.created, 1);
   assert.equal(host.hidden, false);
@@ -728,7 +728,7 @@ test("mount: a digest mismatch stops the 3D view for good: scene hidden, control
     root.clickLink(href({ year: 2027, month: 2 }));
     for (let i = 0; i < 100000 && root.getAttribute("data-c7-state") !== "failed"; i++) await Promise.resolve();
     assert.equal(root.getAttribute("data-c7-state"), "failed");
-    assert.match(root.el("error").textContent, /no whole-cube orientation turns the cube into the stored state of node 97/);
+    assert.match(root.el("error").textContent, new RegExp(`no whole-cube orientation turns the cube into the stored state of node ${9 + MAY_2026}`));
     assert.match(root.el("error").textContent, /sheet below/);
     assert.equal(root.el("error").hidden, false);
     assert.equal(host.hidden, true);
@@ -889,7 +889,7 @@ test("mount: a step into the best-effort month February 2026 interrupted by the 
   for (let i = 0; i < 40 && root.getAttribute("data-c7-state") !== "idle"; i++) { root.press("skip"); await flush(); }
   await idle(root);
   assert.equal(root.getAttribute("data-c7-month"), "2026-03");
-  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[(2026 - 2019) * 12 + 2].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[(2026 - 1980) * 12 + 2].hash);
   assert.ok(wrongAtTurn.length > 0);
   assert.deepEqual(wrongAtTurn.filter((n) => n !== 0), [], "no turn on a cube with the wrong cell");
   assert.deepEqual(wrong, [], "March 2026 has no wrong cell");

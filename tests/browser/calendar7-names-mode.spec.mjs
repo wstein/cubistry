@@ -17,7 +17,7 @@ async function pickDate(page, year, month) {
 const ROOT = "#calendar7-root";
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const row1 = (page) => page.locator(".c7-sheet tr:first-child td .c7-cell-text").allTextContents();
-const NOTICE = "Display only: no move sequence for this date (print C).";
+const NOTICE = "Display only: no move sequence for this date (print D).";
 
 test("the one view renders full month names without a layout control and keeps its print across date changes", async ({ page }) => {
   const errors = []; page.on("pageerror", (e) => errors.push(String(e)));

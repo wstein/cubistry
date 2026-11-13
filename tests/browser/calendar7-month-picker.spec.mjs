@@ -55,7 +55,7 @@ test("year browsing reaches years 1 and 9999 and rejects invalid edits without n
   await at(page, "2026-11");
   await page.getByRole("gridcell", { name: "January 2028", exact: true }).click();
   await at(page, "2028-01");
-  // 2028 is inside the chain (January 2019 to January 2036): a chain month ("off"), not a display-only preview.
+  // 2028 is inside the chain (January 1980 to January 2036): a chain month ("off"), not a display-only preview.
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-any", "off");
   // The first month after the chain, February 2036, is in the next decade: a display-only preview (kind "state").
   await trigger(page).click();

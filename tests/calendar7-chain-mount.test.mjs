@@ -16,8 +16,8 @@ const json = (p) => JSON.parse(readFileSync(p, "utf8"));
 const graph = parseGraph(json("public/calendar7/chain-c/graph.v1.json"));
 const start = parseState(json("public/calendar7/chain-c/state.v1.json"));
 const range = chainRange(graph);
-/** Node of November 2026 (January 2019 is node 0) and the block-move count of the step to December 2026. */
-const NOV_2026 = 7 * 12 + 10;
+/** Node of November 2026 (January 1980 is node 0) and the block-move count of the step to December 2026. */
+const NOV_2026 = (2026 - 1980) * 12 + 10;
 const NOV_DEC_MOVES = stepNotation(stepFrom(graph, range, { year: 2026, month: 11 }, 1).moves, DEFAULT_WORD_OPTIONS).moves;
 
 // ---- canonical mount: all former layout URLs select the same physical print ----
@@ -40,7 +40,7 @@ for (const layout of canonicalQueries) test(`one physical names print for the fo
   assert.deepEqual([...stage.configs[0].printing.text],[...start.printing.text]);
   assert.equal(root.getAttribute("data-c7-digest"),graph.nodes[NOV_2026].hash);
   assert.match(root.view.innerHTML,new RegExp(`December 2026<\\/a> · ${NOV_DEC_MOVES} moves`));
-  assert.match(root.view.innerHTML,/data-c7-chain>Names \(long chain, print C, January 2019 - January 2036\)\. Chain: January 2019 to January 2036, 204 steps\./);
+  assert.match(root.view.innerHTML,/data-c7-chain>Names \(long chain, print D, January 1980 - January 2036\)\. Chain: January 1980 to January 2036, 672 steps\./);
   const url = new URLSearchParams(env.search());
   assert.equal(url.has("layout"),false);
   for (const [key,value] of [["scheme","paper-blue"],["font","nunito"],["extra","keep"],["year","2026"],["month","11"]]) assert.equal(url.get(key),value);
@@ -71,7 +71,7 @@ for(const [y,m] of [[2037,2],[2099,12],[2036,2]]) test(`off-chain ${y}-${m} uses
  const wrong=frontFailures(c.printing,pose,namesCells(y,m)).map(f=>[f.row,f.column]);
  assert.deepEqual(c.wrong,wrongStickerIndices(pose,wrong));
  assert.equal(root.el("player").hidden,true);
- assert.match(root.view.innerHTML,/Display only: no move sequence for this date \(print C\)/);
+ assert.match(root.view.innerHTML,/Display only: no move sequence for this date \(print D\)/);
  assert.match(root.view.innerHTML,/Move reachability is unverified/);
  assert.doesNotMatch(root.view.innerHTML,/Print B|UNSAT|Not exactly possible|data-nav="next"|data-nav="previous"|Cube layout/);
  if(y===2037&&m===2){assert.deepEqual(wrong,[[7,7]]);assert.equal(c.printing.text[c.wrong[0]],"29");assert.match(root.view.innerHTML,/Preview mismatch: cell bottom right \(row 7, column 7\) differs/);}

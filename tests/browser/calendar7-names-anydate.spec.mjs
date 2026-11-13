@@ -17,7 +17,7 @@ async function pickDate(page, year, month) {
 const ROOT = "#calendar7-root";
 const at = (page, month) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-month", month, { timeout: 30000 });
 const idle = (page) => expect(page.locator(ROOT)).toHaveAttribute("data-c7-state", "idle", { timeout: 30000 });
-const NOTICE = "Display only: no move sequence for this date (print C).";
+const NOTICE = "Display only: no move sequence for this date (print D).";
 
 /** Recompute the displayed front from the canonical physical print, not from a second any-date dataset. */
 const faceOf = (page, year, month) => page.evaluate(async ([y, m]) => {
