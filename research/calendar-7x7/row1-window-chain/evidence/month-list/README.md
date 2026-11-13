@@ -286,3 +286,65 @@ Stage 7: `-f prior_run_id=<run id of stage 6> -f expect_prior_edges=207 -f max_e
 Local producer check (Julia 1.13.3, 4 threads, load about 30): `window_chain.jl` with the new list, print C, layout C, the new best-effort file, `prior=` the artifact of run 43307881914 (204 edges) and `max_edges=1` accepted the prior (replay, end digest, plan prefix), wrote edge 206 (2036-02, beam, 131 HTM, 172 s) and stopped at `max_edges`; 302 s in total, library build 126 s. No checker ran on that chain.
 
 Not run: the workflow, a chain of more than one new edge, the three checkers on a chain of the new list, Flix on the Hall table. Stage 6 is the first time the checkers see a chain of this list.
+
+## Backward chain, part 2: January 1900 .. January 1980 (preparation; no run yet)
+
+Research candidate, not certified. Julia only for the list, Hall table and coverage; no solver or workflow ran for this list (UNKNOWN as evidence).
+This part continues the verified backward chain 2019-01 .. 1980-01 (run 43414242499: 8 stages, 468 edges, 5 best-effort edges, artifact `wc-chain-43414242499`, `complete=true` for its list) to earlier months.
+The root stays the identity pose of print C (2019-01). The list is longer at the early end: the last 469 rows are `months-back-1980-01-2019-01.tsv` byte for byte, so the prior months are the LAST members of the new list and the FIRST months of the search plan (the new list reversed).
+
+| File | Content |
+|---|---|
+| `months-back-1900-01-2019-01.tsv` | 1429 months 1900-01 .. 2019-01, no gap; SHA-256 `6f858506f30a3b58ba4e4330234c280d5093908cae5f0e62d093933afa0447d0` |
+| `best-effort-back-1900-01-2019-01.tsv` | `best_effort_path` file: 13 months, wrong cell (7,1), evidence `february-hall-C-back-1900.tsv`; SHA-256 `0cbf16f68a507f98236da2d4a9fabda65d4b7bd8abcda9fb0f1c54bf2b74c428` |
+| `february-hall-C-back-1900.tsv` | Hall witness table of print C for the 13 months (Julia only, `february_hall.jl` with `@7,1`; class -3,-3,-3, deficiency 1, Hall set 7,1;7,7); the five rows of 1981-02 .. 2015-02 equal `february-hall-C-back.tsv` |
+| `stages-back-1900-01-2019-01.tsv` | stage plan 9 .. 23 (data only) |
+| `coverage-back-1900-01-2019-01.{tsv,json}` | `month_coverage.jl` (root = start 1900-01, last 2019-01); `verify_coverage.jl` accepts it |
+
+Months print C cannot show exactly: February, Sunday, 28 days. 13 months in 1900 .. 2019: 1903-02, 1914-02, 1925-02, 1931-02, 1942-02, 1953-02, 1959-02, 1970-02 (new) and the five of the verified chain 1981-02, 1987-02, 1998-02, 2009-02, 2015-02.
+The weekdays were computed twice (Zeller's congruence and `Dates`, equal for all 1440 months) and the board of every month was matched against print C (`ConfigTable.match_config`): exactly these 13 are unmatchable, all other 1416 are exact.
+1900 is no leap year (1900-02 has 28 days, February/Thursday/28, exact); 2000 is one. The first member 1900-01 is January/Monday/31 and exact, so the free start of the final exported chain shows its month exactly.
+Whether the solver reaches every state is UNKNOWN.
+
+Edges: 1428 in total (1429 members), 468 done, 960 new = 15 stages of 64 edges (no remainder stage). The time per edge is the measured basis of the earlier chains (27 to 37 s, 64 edges in 1700 to 2400 s of the 3000 s edge loop); the times of these edges are UNKNOWN.
+`expect_prior_edges` is the edge count of the exported chain before the stage. Every stage ends at an exact month (a free start shows its month exactly).
+
+| Stage | Search edges | max_edges | expect_prior_edges | Start month of the artifact |
+|---|---|---|---|---|
+| 9 | 469 .. 532 | 64 | 468 | 1974-09 |
+| 10 | 533 .. 596 | 64 | 532 | 1969-05 |
+| 11 | 597 .. 660 | 64 | 596 | 1964-01 |
+| 12 | 661 .. 724 | 64 | 660 | 1958-09 |
+| 13 | 725 .. 788 | 64 | 724 | 1953-05 |
+| 14 | 789 .. 852 | 64 | 788 | 1948-01 |
+| 15 | 853 .. 916 | 64 | 852 | 1942-09 |
+| 16 | 917 .. 980 | 64 | 916 | 1937-05 |
+| 17 | 981 .. 1044 | 64 | 980 | 1932-01 |
+| 18 | 1045 .. 1108 | 64 | 1044 | 1926-09 |
+| 19 | 1109 .. 1172 | 64 | 1108 | 1921-05 |
+| 20 | 1173 .. 1236 | 64 | 1172 | 1916-01 |
+| 21 | 1237 .. 1300 | 64 | 1236 | 1910-09 |
+| 22 | 1301 .. 1364 | 64 | 1300 | 1905-05 |
+| 23 | 1365 .. 1428 | 64 | 1364 | 1900-01 |
+
+Compatibility with the producer and the workflow (read from `window_chain.jl` here and `window-chain.yml` on origin/main, 99ef1733):
+- Producer, `direction=backward prior=DIR`: `backward_import` turns the prior chain.v3 into the search order; `chain_progress` requires the prior months to equal `plan[1:k+1]` with plan = the list reversed. With the new list the plan starts 2019-01, 2018-12, .., 1980-01 and then continues, so the 469 prior months are the plan prefix. A forward-style extension (prior months are the first members of the list) is refused (`chain source is not the root month`). The best-effort months of the prior chain are read from its `wrong` records (`prior_best_edges`) and need no entry in the new file; the new file lists them anyway.
+- Workflow, "Prepare work directory": the prior `VERIFIED.txt` of run 43414242499 has `months_sha256=d99f6681..`, `best_effort_sha256=dde09fef..`, `root_month=-`, `direction=backward`, `join_end=identity`, `edges_total=468`, `complete=true`. With `prior_months_sha256=d99f6681..` and `prior_best_effort_sha256=dde09fef..` the comparisons use the pins of the prior; the differing `prior_months_sha256` lifts the `complete=false` requirement; `expect_prior_edges=468` equals `edges_total`; direction and join_end match. Stages 10 to 23 continue the artifact of the previous stage of this chain, which has the new list: no `prior_*_sha256` inputs and `complete=false` until stage 23 (stage 23 ends at the list start: `complete=true`).
+- Prior run: `workflow_dispatch` on `main`, conclusion success, artifact `wc-chain-43414242499` not expired (expires 2027-02-11): the "Check prior run" step accepts it.
+- The verify job cuts the list at `chain_start` (the earliest month reached) and checks with `CAL7_JOIN_END=identity`; the month range 1900-01 .. 2100-01 of producer, checkers and the Flix root-month parser contains 1900-01.
+- `research_ref` must be a commit on `research/cube-display-feasibility` that contains these files (the workflow rejects other commits), so the first dispatch happens after this change is merged there.
+
+Dispatch of stage 9 (not executed; `<SHA>` is the head of `research/cube-display-feasibility` that contains this change; defaults: library L5, width 40, lambda 3, best_effort_29 true, fail_on_greedy true, root_month empty):
+
+```
+gh workflow run window-chain.yml --ref main -f research_ref=<SHA> -f months_path=research/calendar-7x7/row1-window-chain/evidence/month-list/months-back-1900-01-2019-01.tsv -f months_sha256=6f858506f30a3b58ba4e4330234c280d5093908cae5f0e62d093933afa0447d0 -f print_path=research/calendar-7x7/row1-window-chain/evidence/print-c/printing.tsv -f print_sha256=0119ca3ba1266f9c3e4d7c27753801aca30eb4af514f491615666dcd9f92a8fc -f layout_path=research/calendar-7x7/row1-window-chain/evidence/print-c/layout.tsv -f layout_sha256=e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a -f best_effort_path=research/calendar-7x7/row1-window-chain/evidence/month-list/best-effort-back-1900-01-2019-01.tsv -f direction=backward -f join_end=identity -f prior_run_id=43414242499 -f expect_prior_edges=468 -f max_edges=64 -f prior_months_sha256=d99f668118ecd2b094b188cb94d8bd9057a62f934e635e56bec8304b2a331041 -f prior_best_effort_sha256=dde09fef9c08575d4a6dbcbb10b2e016d066818b491f2899123816ad744ebdeb
+```
+
+Stage 10 and later: the same command with `-f prior_run_id=<run id of the previous stage> -f expect_prior_edges=<table> -f max_edges=64` and without the two `prior_*_sha256` inputs. One run at a time (a run needs the artifact of the previous one).
+
+Tests: `test_month_chain_back_1900.jl` (63 checks, data and the producer's prefix check; 65 with `CAL7_PRIOR_ARTIFACT=<copy of wc-chain-43414242499>`), `check_back1900_workflow_inputs.sh` (17 checks with a synthetic prior, 16 with the real artifact; it runs the real steps of the workflow on origin/main with yq) and
+`run_back1900_mutants.sh` (34 mutants in three groups, `ONLY=name` selects one).
+
+Local producer check (Julia 1.11.5, 4 threads, load about 25): `window_chain.jl direction=backward` with the new list, print C, layout C, the new best-effort file, `prior=` the artifact of run 43414242499 and `max_edges=1` accepted the prior (replay, end digest, plan prefix), wrote edge 469 (1980-01 to 1979-12, beam, 116 HTM, 113 s), exported a chain.v3 of 469 edges, kept `best_effort_edges=5` and stopped at `max_edges` (`complete=false`, `chain_start=1979-12`); 169 s in total. This is the producer step of stage 9 on one edge; its output is not a stage artifact (no run id, no checkers).
+
+Not run: the workflow, a chain of more than one new edge, the three checkers on a chain of this list (the verify job reads a list of up to 1429 months and 1428 edges, longer than any earlier run: its time is UNKNOWN), Flix on the Hall table and on a list that starts exactly at 1900-01, the real download of the prior artifact. A stage can stop at the deadline before its 64 edges (then `edges_total` of the artifact differs from the plan and the next `expect_prior_edges` follows it).
