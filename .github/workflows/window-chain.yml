@@ -19,6 +19,7 @@ name: Window chain
 # Optional layout_path + layout_sha256: the producer (window_chain.jl) and the verify job (run_checks.sh) get that layout through
 # CAL7_WINDOW_LAYOUT and CAL7_WINDOW_LAYOUT_SHA256. prepare refuses the run when window_chain.jl or run_checks.sh at research_ref
 # does not mention the word CAL7_WINDOW_LAYOUT (fail closed; a comment with the name is enough, the check is a gate, not a proof). Without the inputs nothing is exported and nothing changes.
+# direction=backward (join_end=identity, empty root_month): the producer searches from the identity pose to earlier months (window_chain.jl direction=backward); verify cuts the month list at chain_start and checks with CAL7_JOIN_END. VERIFIED.txt records direction and join_end; a continuation must match both (an older artifact counts as forward, no join_end). Default forward changes nothing.
 # No commits, no gitlinks, no PR comments; the output is an artifact only.
 # Stages: max_edges bounds the edges of one run (a stage of the first chain: 41 edges); start and end only bound the months of months.tsv.
 # A stage after the first continues the verified artifact of the previous run (prior_run_id); expect_prior_edges (required with prior_run_id) names the edge count that
@@ -123,6 +124,15 @@ on:
         description: Optional SHA-256 of the best-effort file of the prior chain, when it differs from the file of this run; empty means the file of this run
         type: string
         default: ""
+      direction:
+        description: forward (default) or backward. A backward run searches from the identity pose (the last month of the list; root_month must be empty) to earlier months; its artifact is a forward-reading chain.v3 that ends at the identity pose (join_end must be identity)
+        type: choice
+        options: [forward, backward]
+        default: forward
+      join_end:
+        description: Optional digest the end state of the chain must have, 64 hex digits or identity (the identity pose of the print); all three checkers read it (CAL7_JOIN_END). Required with direction backward, where it must be identity
+        type: string
+        default: ""
       best_effort_29:
         description: The 29 rule of the best-effort edge (one wrong cell, the digit 29 in red) in all three checkers; the research commit must contain it
         type: boolean
@@ -193,6 +203,8 @@ jobs:
           IN_EXPECT: ${{ inputs.expect_prior_edges }}
           IN_PRIOR_MONTHS_SHA: ${{ inputs.prior_months_sha256 }}
           IN_PRIOR_BEST_SHA: ${{ inputs.prior_best_effort_sha256 }}
+          IN_DIRECTION: ${{ inputs.direction }}
+          IN_JOIN_END: ${{ inputs.join_end }}
         run: |
           set -euo pipefail
           fail() { echo "::error::$1"; exit 1; }
@@ -223,6 +235,11 @@ jobs:
           [ -z "$IN_PRIOR_BEST_SHA" ] || [[ "$IN_PRIOR_BEST_SHA" =~ ^[0-9a-f]{64}$ ]] || fail "prior_best_effort_sha256 must be 64 lowercase hex digits"
           [ -z "$IN_PRIOR_MONTHS_SHA$IN_PRIOR_BEST_SHA" ] || [ -n "$IN_PRIOR" ] || fail "prior_*_sha256 need prior_run_id"
           [ "$IN_SMOKE" = "true" ] || [ -z "$IN_PRIOR" ] || [ -n "$IN_EXPECT" ] || fail "prior_run_id needs expect_prior_edges (the edge count of the prior chain)"
+          [ -z "$IN_JOIN_END" ] || [ "$IN_JOIN_END" = identity ] || [[ "$IN_JOIN_END" =~ ^[0-9a-f]{64}$ ]] || fail "join_end must be identity or 64 lowercase hex digits"
+          if [ "$IN_DIRECTION" = backward ]; then
+            [ -z "$IN_ROOT" ] || fail "direction backward needs an empty root_month (the identity pose is the last month of the list)"
+            [ "$IN_JOIN_END" = identity ] || fail "direction backward needs join_end=identity"
+          fi
           max=${IN_MAX:-100000}; prior=$IN_PRIOR
           if [ "$IN_SMOKE" = "true" ]; then max=3; prior=""; fi
           expect=$IN_EXPECT; [ -n "$prior" ] || expect=""
@@ -301,6 +318,8 @@ jobs:
       MONTHS_SHA: ${{ inputs.months_sha256 }}
       PRIOR_MONTHS_SHA: ${{ inputs.prior_months_sha256 }}
       PRIOR_BEST_SHA: ${{ inputs.prior_best_effort_sha256 }}
+      DIRECTION: ${{ inputs.direction }}
+      JOIN_END: ${{ inputs.join_end }}
       ROOT_MONTH: ${{ inputs.root_month }}
       BEST_PATH: ${{ inputs.best_effort_path }}
       CLAIMS_PATH: ${{ inputs.claims_path }}
@@ -360,6 +379,10 @@ jobs:
             grep -qx "months_sha256=${PRIOR_MONTHS_SHA:-$MONTHS_SHA}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another month list"; exit 1; }
             grep -qx "root_month=${ROOT_MONTH:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another root month"; exit 1; }
             grep -qx "layout_sha256=${LAYOUT_SHA:--}" "$best/VERIFIED.txt" || { echo "::error::the prior chain was produced with another layout"; exit 1; }
+            # An artifact of an older run has no direction and no join_end line: forward, none.
+            pd=$(sed -n 's/^direction=//p' "$best/VERIFIED.txt" | head -n 1); [ "${pd:-forward}" = "$DIRECTION" ] || { echo "::error::the prior chain was produced with another direction"; exit 1; }
+            pj=$(sed -n 's/^join_end=//p' "$best/VERIFIED.txt" | head -n 1); [ "${pj:--}" = "${JOIN_END:--}" ] || { echo "::error::the prior chain was checked with another join_end"; exit 1; }
+
             # A prior chain on another (shorter) month list is complete for that list; it is continued, so only an unchanged list needs complete=false.
             [ "${PRIOR_MONTHS_SHA:-$MONTHS_SHA}" != "$MONTHS_SHA" ] || grep -qx "complete=false" "$best/VERIFIED.txt" || { echo "::error::the prior chain is complete; there is nothing to continue"; exit 1; }
             [ -z "$EXPECT_PRIOR" ] || [ "$most" = "$EXPECT_PRIOR" ] || { echo "::error::the prior chain has $most edges, expect_prior_edges is $EXPECT_PRIOR"; exit 1; }
@@ -382,6 +405,7 @@ jobs:
           [ -z "${PRIOR_DIR:-}" ] || args+=(prior="$PRIOR_DIR")
           [ -z "$CLAIMS_PATH" ] || args+=(claims="$GITHUB_WORKSPACE/src/$CLAIMS_PATH")
           [ -z "$BEST_PATH" ] || args+=(best_effort="$GITHUB_WORKSPACE/src/$BEST_PATH")
+          [ "$DIRECTION" != backward ] || args+=(direction=backward)
           # The run contract of the checkers: month list S, its pin, the print pin and the root month.
           export CAL7_WINDOW_MONTHS="$GITHUB_WORKSPACE/src/$MONTHS_PATH" CAL7_WINDOW_MONTHS_SHA256="$MONTHS_SHA" CAL7_WINDOW_PRINT_SHA="$PRINT_SHA"
           [ -z "$ROOT_MONTH" ] || export CAL7_ROOT_MONTH="$ROOT_MONTH"
@@ -420,6 +444,8 @@ jobs:
       MONTHS_PATH: ${{ inputs.months_path }}
       MONTHS_SHA: ${{ inputs.months_sha256 }}
       ROOT_MONTH: ${{ inputs.root_month }}
+      DIRECTION: ${{ inputs.direction }}
+      JOIN_END: ${{ inputs.join_end }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
@@ -472,10 +498,21 @@ jobs:
           # The checkers want a month list that ends at the last chain edge (they assert it); a stopped segment is checked against the
           # members of S up to chain_end (YYYY-MM sorts as text). The root month stays the parameter of the run.
           cut=$GITHUB_WORKSPACE/out/months-cut.tsv
-          mkdir -p "$GITHUB_WORKSPACE/out"; awk -v end="$chain_end" '$0 <= end' "src/$MONTHS_PATH" > "$cut"
+          # A backward run reaches back from the end of the list: PROGRESS.txt has chain_start (the earliest month reached), and the members of S from chain_start
+          # on are the list of the exported chain.v3 (chain_end is the last member, the identity pose).
+          mkdir -p "$GITHUB_WORKSPACE/out"
+          if [ "$DIRECTION" = backward ]; then
+            chain_start=$(sed -n 's/^chain_start=\([0-9]\{4\}-[0-9]\{2\}\)$/\1/p' "$c/PROGRESS.txt")
+            if [ -z "$chain_start" ] || ! grep -qx "direction=backward" "$c/PROGRESS.txt"; then echo "::error::PROGRESS.txt of a backward run has no chain_start"; exit 1; fi
+            awk -v start="$chain_start" '$0 >= start' "src/$MONTHS_PATH" > "$cut"
+          else
+            awk -v end="$chain_end" '$0 <= end' "src/$MONTHS_PATH" > "$cut"
+          fi
           cut_sha=$(sha256sum "$cut" | cut -d' ' -f1)
           export CAL7_WINDOW_MONTHS=$cut CAL7_WINDOW_MONTHS_SHA256=$cut_sha CAL7_WINDOW_PRINT_SHA=$PRINT_SHA
           [ -z "$ROOT_MONTH" ] || export CAL7_ROOT_MONTH=$ROOT_MONTH
+          # The end state of the chain: identity for a backward chain (the checkers compare its digest with the identity pose of the print); run_checks.sh gives it to Flix too.
+          [ -z "$JOIN_END" ] || export CAL7_JOIN_END=$JOIN_END
           export PRINT_OVERRIDE=$GITHUB_WORKSPACE/src/$PRINT_PATH CHAIN_OVERRIDE=$c/chain.moves.tsv STATES_OVERRIDE=$c/states
           # An optional window-local layout: checked against its pin here, then read by all three checkers through run_checks.sh.
           [ -z "$LAYOUT_PATH" ] || { echo "$LAYOUT_SHA  src/$LAYOUT_PATH" | sha256sum --check --strict; export CAL7_WINDOW_LAYOUT="$GITHUB_WORKSPACE/src/$LAYOUT_PATH" CAL7_WINDOW_LAYOUT_SHA256="$LAYOUT_SHA"; }
@@ -512,6 +549,7 @@ jobs:
             echo "research_ref_sha=$SHA"; echo "run_id=$GITHUB_RUN_ID"; echo "print_sha256=$PRINT_SHA"
             echo "months_sha256=$MONTHS_SHA"; echo "root_month=${ROOT_MONTH:--}"
             echo "layout_sha256=${LAYOUT_SHA:--}"
+            echo "direction=$DIRECTION"; echo "join_end=${JOIN_END:--}"
             echo "best_effort_29=$BEST29"
             echo "best_effort_sha256=$BEST_SHA"
             echo "edges_total=$EDGES_TOTAL"; echo "chain_end=$CHAIN_END"; echo "complete=$COMPLETE"
