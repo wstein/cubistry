@@ -19,7 +19,7 @@ run() { # name, regex of the failure that must appear in the output, perl substi
 run wrong-side          "root state is the identity"        's/J=\[slot\[\(p\.pos,p\.normal\)\] for p in P\]/J0=[slot[(p.pos,p.normal)] for p in P]; J=invperm(J0)/'
 run slot-with-up        "KeyError"      's/slot=Dict\(\(s\.pos,s\.normal\)=>s\.id/slot=Dict((s.pos,s.normal,s.up)=>s.id/; s/slot\[\(p\.pos,p\.normal\)\]/slot[(p.pos,p.normal,p.up)]/'
 run print-up-kept       "root state is the identity"               's/up=root\[J\[p\.id\]\]\.up,text/up=p.up,text/'
-run state-up-from-print "root and fronts"        's/up=st\[J\[p\.id\]\]\.up,text/up=Pn[p.id].up,text/'
+run state-up-from-print "root and fronts"        's/up=st\[J\[p\.id\]\]\.up,text/up=Pd[p.id].up,text/'
 run edge-digest-old     "digests"                's/state_sha\(S\[k-1\]\),state_sha\(S\[k\]\)/e.sh,e.eh/'
 run source-digest-old   "digests"                's/\\t\$\(state_sha\(S\[1\]\)\)"\]/\\t\$(chains[1].src.hash)"]/'
 run join-month-twice    "root and fronts" 's/p\[2:end\] for p in parts\[2:end\]/p for p in parts[2:end]/'
