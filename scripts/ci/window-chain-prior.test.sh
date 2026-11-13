@@ -20,7 +20,8 @@ mk() {
   PRINT_SHA=$(sha256sum "$w/src/print.tsv" | cut -d' ' -f1); MONTHS_SHA=$(sha256sum "$w/src/months.tsv" | cut -d' ' -f1)
   for f in chain.moves.tsv edges.tsv segments.tsv; do echo x > "$w/prev/a/$f"; done; echo s > "$w/prev/a/states/s.tsv"
   { echo "print_sha256=${PRINT_OVERRIDE:-$PRINT_SHA}"; echo "months_sha256=$1"; echo "root_month=-"; echo "layout_sha256=-"
-    echo "best_effort_29=true"; echo "best_effort_sha256=$2"; echo "edges_total=41"; echo "chain_end=2022-01"; echo "complete=$3"; } > "$w/prev/a/VERIFIED.txt"
+    echo "best_effort_29=true"; echo "best_effort_sha256=$2"; echo "edges_total=41"; echo "chain_end=2022-01"; echo "complete=$3"
+    [ -z "${PRIOR_DIRECTION:-}" ] || echo "direction=$PRIOR_DIRECTION"; [ -z "${PRIOR_JOIN_END:-}" ] || echo "join_end=$PRIOR_JOIN_END"; } > "$w/prev/a/VERIFIED.txt"
   (cd "$w/prev/a" && find . -type f ! -name SHA256SUMS | sort | xargs sha256sum > ../SUMS.tmp; mv ../SUMS.tmp SHA256SUMS)
 }
 
@@ -28,7 +29,7 @@ mk() {
 run_prepare() {
   ( cd "$tmp/w" && env GITHUB_WORKSPACE="$tmp/w" GITHUB_ENV="$tmp/w/env" PRINT_SHA="$PRINT_SHA" PRINT_PATH=print.tsv \
       MONTHS_SHA="$MONTHS_SHA" MONTHS_PATH=months.tsv CLAIMS_PATH= BEST_PATH=best.tsv ROOT_MONTH= LAYOUT_SHA= EXPECT_PRIOR=41 BEST29=true \
-      PRIOR_MONTHS_SHA= PRIOR_BEST_SHA= "$@" bash "$tmp/prepare.sh" ) > "$tmp/out.txt" 2>&1
+      PRIOR_MONTHS_SHA= PRIOR_BEST_SHA= DIRECTION=forward JOIN_END= "$@" bash "$tmp/prepare.sh" ) > "$tmp/out.txt" 2>&1
   echo $?
 }
 
@@ -64,7 +65,7 @@ mk "$OLD_M" "$OLD_B" true;  expect "prior pins match, wrong expect_prior_edges: 
 vrun() {
   ( cd "$tmp" && env GITHUB_OUTPUT="$tmp/vout" IN_REF="$(printf 'a%.0s' $(seq 40))" IN_START= IN_END= IN_MONTHS_PATH=m.tsv IN_MONTHS_SHA="$NEW_M" IN_ROOT= \
       IN_PRINT_PATH=p.tsv IN_PRINT_SHA="$PRINT" IN_LAYOUT_PATH= IN_LAYOUT_SHA= IN_BEST= IN_CLAIMS= IN_LIBRARY=L4 IN_WIDTH=10 IN_LAMBDA=3 \
-      IN_PRIOR=123 IN_SMOKE=false IN_MAX= IN_EXPECT=41 IN_PRIOR_MONTHS_SHA= IN_PRIOR_BEST_SHA= "$@" bash "$tmp/validate.sh" ) > "$tmp/out.txt" 2>&1
+      IN_PRIOR=123 IN_SMOKE=false IN_MAX= IN_EXPECT=41 IN_PRIOR_MONTHS_SHA= IN_PRIOR_BEST_SHA= IN_DIRECTION=forward IN_JOIN_END= "$@" bash "$tmp/validate.sh" ) > "$tmp/out.txt" 2>&1
   echo $?
 }
 expect "validate: no prior pins" 0 "$(vrun)"
@@ -72,6 +73,27 @@ expect "validate: both prior pins" 0 "$(vrun IN_PRIOR_MONTHS_SHA="$OLD_M" IN_PRI
 expect "validate: prior months pin not hex" 1 "$(vrun IN_PRIOR_MONTHS_SHA=zz)" "prior_months_sha256"
 expect "validate: prior best pin upper case" 1 "$(vrun IN_PRIOR_BEST_SHA="$(echo "$OLD_B" | tr a-f A-F)A")" "prior_best_effort_sha256"
 expect "validate: prior pin without prior_run_id" 1 "$(vrun IN_PRIOR= IN_EXPECT= IN_PRIOR_MONTHS_SHA="$OLD_M")" "need prior_run_id"
+
+expect "validate: forward with a join_end hash" 0 "$(vrun IN_JOIN_END="$OLD_B")"
+expect "validate: forward with join_end identity" 0 "$(vrun IN_JOIN_END=identity)"
+expect "validate: join_end upper case hash" 1 "$(vrun IN_JOIN_END="$(echo "$OLD_B" | tr a-f A-F)")" "join_end must be identity"
+expect "validate: join_end short hash" 1 "$(vrun IN_JOIN_END=abc)" "join_end must be identity"
+expect "validate: backward, identity, empty root" 0 "$(vrun IN_DIRECTION=backward IN_JOIN_END=identity)"
+expect "validate: backward with a root month" 1 "$(vrun IN_DIRECTION=backward IN_JOIN_END=identity IN_ROOT=2019-01)" "needs an empty root_month"
+expect "validate: backward without join_end" 1 "$(vrun IN_DIRECTION=backward)" "needs join_end=identity"
+expect "validate: backward with a join_end hash" 1 "$(vrun IN_DIRECTION=backward IN_JOIN_END="$OLD_B")" "needs join_end=identity"
+
+# --- Prepare work directory: direction and join_end of the prior chain ---
+# An artifact of an older run has no direction and no join_end line: it counts as forward and none.
+mk "$MS" "$BN" false; expect "prior without direction line, forward run: continues" 0 "$(run_prepare)"
+mk "$MS" "$BN" false; expect "prior without direction line, backward run: fails" 1 "$(run_prepare DIRECTION=backward JOIN_END=identity)" "another direction"
+PRIOR_DIRECTION=forward mk "$MS" "$BN" false; expect "prior forward, forward run: continues" 0 "$(run_prepare)"
+PRIOR_DIRECTION=backward PRIOR_JOIN_END=identity mk "$MS" "$BN" false; expect "prior backward, forward run: fails" 1 "$(run_prepare)" "another direction"
+PRIOR_DIRECTION=backward PRIOR_JOIN_END=identity mk "$MS" "$BN" false; expect "prior backward, backward run: continues" 0 "$(run_prepare DIRECTION=backward JOIN_END=identity)"
+PRIOR_DIRECTION=backward PRIOR_JOIN_END=- mk "$MS" "$BN" false; expect "prior backward without join_end, backward run with identity: fails" 1 "$(run_prepare DIRECTION=backward JOIN_END=identity)" "another join_end"
+PRIOR_DIRECTION=forward PRIOR_JOIN_END="$OLD_B" mk "$MS" "$BN" false; expect "prior join_end hash, run without join_end: fails" 1 "$(run_prepare)" "another join_end"
+PRIOR_DIRECTION=forward PRIOR_JOIN_END="$OLD_B" mk "$MS" "$BN" false; expect "prior join_end hash, same hash: continues" 0 "$(run_prepare JOIN_END="$OLD_B")"
+PRIOR_DIRECTION=forward PRIOR_JOIN_END=- mk "$MS" "$BN" false; expect "prior join_end none, run without join_end: continues" 0 "$(run_prepare)"
 
 echo "passed $pass, failed $failn"
 [ "$failn" = 0 ]

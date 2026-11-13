@@ -100,7 +100,7 @@ const GATES = {
   "[ \"$edges_total\" -ge 1 ] || { echo \"::error::no edge to verify\"; exit 1; }",
   "echo \"$MONTHS_SHA  src/$MONTHS_PATH\" | sha256sum --check --strict",
   "[ -n \"$best_effort\" ] || { echo \"::error::PROGRESS.txt has no best_effort_edges\"; exit 1; }",
-  "mkdir -p \"$GITHUB_WORKSPACE/out\"; awk -v end=\"$chain_end\" '$0 <= end' \"src/$MONTHS_PATH\" > \"$cut\"",
+  "mkdir -p \"$GITHUB_WORKSPACE/out\"",
   "export CAL7_WINDOW_MONTHS=$cut CAL7_WINDOW_MONTHS_SHA256=$cut_sha CAL7_WINDOW_PRINT_SHA=$PRINT_SHA",
   "[ -z \"$ROOT_MONTH\" ] || export CAL7_ROOT_MONTH=$ROOT_MONTH",
   "if [ \"$best_effort\" = 0 ]; then jv=SAT; iv=ACCEPT_CHAIN; else jv=BEST_EFFORT; iv=ACCEPT_BEST_EFFORT_CHAIN; fi",
@@ -321,7 +321,7 @@ test("no workflow expression inside any run block (script injection)", () => {
 });
 test("every input reaches the scripts through env, with the exact mapping", () => {
   const v = step("prepare", "Validate inputs").env;
-  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode", IN_MAX: "max_edges", IN_EXPECT: "expect_prior_edges", IN_PRIOR_MONTHS_SHA: "prior_months_sha256", IN_PRIOR_BEST_SHA: "prior_best_effort_sha256" };
+  const want = { IN_REF: "research_ref", IN_START: "start", IN_END: "end", IN_MONTHS_PATH: "months_path", IN_MONTHS_SHA: "months_sha256", IN_ROOT: "root_month", IN_PRINT_PATH: "print_path", IN_PRINT_SHA: "print_sha256", IN_LAYOUT_PATH: "layout_path", IN_LAYOUT_SHA: "layout_sha256", IN_BEST: "best_effort_path", IN_CLAIMS: "claims_path", IN_LIBRARY: "library", IN_WIDTH: "width", IN_LAMBDA: "lambda", IN_PRIOR: "prior_run_id", IN_SMOKE: "smoke_mode", IN_MAX: "max_edges", IN_EXPECT: "expect_prior_edges", IN_PRIOR_MONTHS_SHA: "prior_months_sha256", IN_PRIOR_BEST_SHA: "prior_best_effort_sha256", IN_DIRECTION: "direction", IN_JOIN_END: "join_end" };
   assert.deepEqual(Object.keys(v).sort(), Object.keys(want).sort());
   for (const [k, input] of Object.entries(want)) assert.equal(v[k], `\${{ inputs.${input} }}`, k);
   const inputsDeclared = [...text.matchAll(/^      ([a-z_0-9]+):\n        description:/gm)].map(m => m[1]).sort();
@@ -331,6 +331,10 @@ test("every input reaches the scripts through env, with the exact mapping", () =
   assert.equal(jobs.produce.env.EXPECT_PRIOR, "${{ needs.prepare.outputs.expect_prior_edges }}");
   assert.equal(jobs.produce.env.PRIOR_MONTHS_SHA, "${{ inputs.prior_months_sha256 }}");
   assert.equal(jobs.produce.env.PRIOR_BEST_SHA, "${{ inputs.prior_best_effort_sha256 }}");
+  for (const j of ["produce", "verify"]) {
+    assert.equal(jobs[j].env.DIRECTION, "${{ inputs.direction }}", `${j}: DIRECTION`);
+    assert.equal(jobs[j].env.JOIN_END, "${{ inputs.join_end }}", `${j}: JOIN_END`);
+  }
   assert.equal(jobs.prepare.steps.find(s => s.name === "Check research commit").env.BEST29, "${{ inputs.best_effort_29 }}");
   assert.equal(jobs.verify.env.FAIL_ON_GREEDY, "${{ inputs.fail_on_greedy }}");
   assert.equal(jobs.produce.env.SHA, "${{ inputs.research_ref }}");
@@ -389,17 +393,61 @@ test("it never commits, pushes, tags, comments or dispatches", () => {
   assert.doesNotMatch(text, /git (commit|push|tag)\b|gh (pr|issue|release|workflow)\b|submodule/);
 });
 test("every sed extraction of PROGRESS.txt in the workflow returns the right value on a sample (GNU sed basic regex)", () => {
-  const sample = "complete=false\nstop_reason=max_edges\nedges_total=12\nedges_new=5\nchain_end=2026-08\ngreedy_edges=3\nplan_end=2026-09\nroot_month=2026-05\nrooted=true\nbridge_edges=1\nbest_effort_edges=2\nseconds=9.5\n";
-  const want = { chain_end: "2026-08", edges_total: "12", complete: "false", best_effort: "2", greedy_edges: "3" };
+  const sample = "direction=backward\nchain_start=2019-02\ncomplete=false\nstop_reason=max_edges\nedges_total=12\nedges_new=5\nchain_end=2026-08\ngreedy_edges=3\nplan_end=2026-09\nroot_month=2026-05\nrooted=true\nbridge_edges=1\nbest_effort_edges=2\nseconds=9.5\n";
+  const want = { chain_start: "2019-02", chain_end: "2026-08", edges_total: "12", complete: "false", best_effort: "2", greedy_edges: "3" };
   const found = {};
   for (const j of ["produce", "verify"]) for (const s of jobs[j].steps) for (const l of runLines(s)) {
     const m = l.match(/sed -n '(s\/\^([a-z_]+)=.*\/p)'/);
-    if (!m) continue;
+    if (!m || !l.includes("PROGRESS.txt")) continue;   // VERIFIED.txt extractions (direction, join_end) are covered by the prior tests
     const key = l.match(/^([a-z_]+)=\$\(/)?.[1] ?? (m[2] === "edges_total" ? "edges_total" : m[2]);
     const out = execFileSync("sed", ["-n", m[1]], { input: sample }).toString().trim();
     const expected = want[key] ?? want[m[2]];
     assert.equal(out, expected, `sed for ${key} (${m[2]}) returned '${out}'`);
     found[m[2]] = true;
   }
-  for (const k of ["chain_end", "edges_total", "complete", "best_effort_edges", "greedy_edges"]) assert.ok(found[k], `no sed extraction found for ${k}`);
+  for (const k of ["chain_start", "chain_end", "edges_total", "complete", "best_effort_edges", "greedy_edges"]) assert.ok(found[k], `no sed extraction found for ${k}`);
+});
+
+// --- direction=backward and join_end ---
+test("direction and join_end inputs: forward default, join_end optional, declared as choice and string", () => {
+  const head = text.split("\njobs:")[0];
+  assert.match(head, /^      direction:\n        description: .*\n        type: choice\n        options: \[forward, backward\]\n        default: forward$/m);
+  assert.match(head, /^      join_end:\n        description: .*\n        type: string\n        default: ""$/m);
+});
+test("prepare validates join_end and refuses a backward run with a root month or without join_end=identity", () => {
+  requireLines(step("prepare", "Validate inputs"), [
+    '[ -z "$IN_JOIN_END" ] || [ "$IN_JOIN_END" = identity ] || [[ "$IN_JOIN_END" =~ ^[0-9a-f]{64}$ ]] || fail "join_end must be identity or 64 lowercase hex digits"',
+    'if [ "$IN_DIRECTION" = backward ]; then',
+    '[ -z "$IN_ROOT" ] || fail "direction backward needs an empty root_month (the identity pose is the last month of the list)"',
+    '[ "$IN_JOIN_END" = identity ] || fail "direction backward needs join_end=identity"']);
+});
+test("backward: the producer gets direction=backward only then; a continuation compares direction and join_end", () => {
+  requireJobLines("produce", [
+    '[ "$DIRECTION" != backward ] || args+=(direction=backward)',
+    'pd=$(sed -n \'s/^direction=//p\' "$best/VERIFIED.txt" | head -n 1); [ "${pd:-forward}" = "$DIRECTION" ] || { echo "::error::the prior chain was produced with another direction"; exit 1; }',
+    'pj=$(sed -n \'s/^join_end=//p\' "$best/VERIFIED.txt" | head -n 1); [ "${pj:--}" = "${JOIN_END:--}" ] || { echo "::error::the prior chain was checked with another join_end"; exit 1; }']);
+});
+test("backward: verify cuts the month list at chain_start, exports CAL7_JOIN_END, VERIFIED.txt records both", () => {
+  requireJobLines("verify", [
+    'awk -v start="$chain_start" \'$0 >= start\' "src/$MONTHS_PATH" > "$cut"',
+    'awk -v end="$chain_end" \'$0 <= end\' "src/$MONTHS_PATH" > "$cut"',   // the forward cut is unchanged
+    '[ -z "$JOIN_END" ] || export CAL7_JOIN_END=$JOIN_END',
+    'echo "direction=$DIRECTION"; echo "join_end=${JOIN_END:--}"']);
+});
+test("backward cut: the verify block keeps the tail of the list from chain_start and refuses a PROGRESS.txt without it", () => {
+  const v = step("verify", "Verify chain (Julia, Flix, independent replay)").run;
+  const m = v.match(/^( *)if \[ "\$DIRECTION" = backward \]; then\n[\s\S]*?\n\1fi\n/m);
+  assert.ok(m, "backward cut block");
+  const dir = mkdtempSync(join(tmpdir(), "wcb-"));
+  mkdirSync(join(dir, "src")); mkdirSync(join(dir, "c"));
+  writeFileSync(join(dir, "src/months.tsv"), "2019-01\n2019-02\n2019-03\n2019-04\n");
+  const run = progress => {
+    writeFileSync(join(dir, "c/PROGRESS.txt"), progress);
+    return spawnSync("bash", ["-c", `c=${dir}/c; cut=${dir}/cut.tsv; MONTHS_PATH=months.tsv; DIRECTION=backward; chain_end=2019-04\ncd ${dir}\n${m[0]}`], { encoding: "utf8" });
+  };
+  const ok = run("direction=backward\nchain_start=2019-02\nchain_end=2019-04\n");
+  assert.equal(ok.status, 0, ok.stderr + ok.stdout);
+  assert.equal(readFileSync(join(dir, "cut.tsv"), "utf8"), "2019-02\n2019-03\n2019-04\n");
+  assert.notEqual(run("chain_start=2019-02\n").status, 0, "no direction line");
+  assert.notEqual(run("direction=backward\n").status, 0, "no chain_start");
 });
