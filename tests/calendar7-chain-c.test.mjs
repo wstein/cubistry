@@ -11,7 +11,7 @@ import assert from "node:assert/strict";
 import { cpSync, mkdtempSync, readFileSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
-import { BEST_EFFORT, FIRST, LAST, PINNED, STATES, build, check } from "../scripts/export-calendar7-chain-c.mjs";
+import { BEST_EFFORT, CHAIN, FIRST, LAST, PINNED, STATES, build, check } from "../scripts/export-calendar7-chain-c.mjs";
 import { parseBestEffort, parseDisplays, parseGraph, parseState, verifyChain } from "../src/apps/calendar7/graph.ts";
 import { applyMoves, clonePose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { frontFailures } from "../src/apps/calendar7/display.ts";
@@ -300,4 +300,17 @@ test("2019-01 is a normal chain state: it shows January 2019 (the same board as 
   // Only the back and the side faces differ from the root: the digest of 2019-01 is not that of the root, and the root is the only homogeneous state in the first year.
   const homogeneous = poses.map((p, i) => [i, faceColors(start.printing, p).mixed.length === 0]).filter(([, ok]) => ok).map(([i]) => i);
   assert.ok(homogeneous.includes(0) && !homogeneous.includes(k));
+});
+
+// ---- provenance without a commit pin ----
+
+test("the sources are named by research PR #470 and content digests: no commit SHA in NOTICE.txt, the docs or CHAIN", () => {
+  const sha40 = /\b[0-9a-f]{40}\b/;
+  assert.match(readFileSync(`${DIR}/NOTICE.txt`, "utf8"), /research PR #470/);
+  assert.doesNotMatch(readFileSync(`${DIR}/NOTICE.txt`, "utf8"), sha40);
+  assert.doesNotMatch(readFileSync("docs/CALENDAR7_CHAIN_C.md", "utf8"), sha40);
+  assert.equal(CHAIN.ref, undefined, "the export needs no commit");
+  assert.match(CHAIN.source, /research PR #470/);
+  // The content pins stay: each of them is a SHA-256 (64 hex).
+  for (const [name, digest] of Object.entries(PINNED)) assert.match(digest, /^[0-9a-f]{64}$/, name);
 });
