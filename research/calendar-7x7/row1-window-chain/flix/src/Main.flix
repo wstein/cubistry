@@ -40,14 +40,16 @@ def wEnd(text: String): Int32 \ IO = {
     require(m>=1 and m<=12 and n>=1 and (y<2100 or (y==2100 and m==1)),"window end lies within May 2026 to January 2100");
     n
 }
+// Format bound on move counts (free start block, moves of one edge, total of all edge moves); the Julia checkers use the same value.
+def maxChainMoves(): Int32 = 1000000
 def wHash(s: String): Bool = String.length(s)==64 and List.forAll(c -> List.memberOf(c,String.toList("0123456789abcdef")),String.toList(s))
-def wMoves(rows: List[String],acc: List[(Int32,Int32)]): (List[(Int32,Int32)],List[String]) \ IO = match rows {
+def wMoves(rows: List[String],acc: List[(Int32,Int32)],n: Int32): (List[(Int32,Int32)],List[String]) \ IO = match rows {
     case "end"::rest => (List.reverse(acc),rest)
     case line::rest => match fields(line) {
         case "move"::gg::qq::Nil => {
             let g=integer(gg);let q=integer(qq);
             require(g>=1 and g<=21 and List.memberOf(q,List#{-1,1,2}),"legal generator and exponent; no middle slice");
-            require(List.length(acc)<100000,"bounded edge moves");wMoves(rest,(g,q)::acc)
+            require(n<maxChainMoves(),"bounded edge moves");wMoves(rest,(g,q)::acc,n+1)
         }
         case _ => throw new IllegalArgumentException("move record")
     }
@@ -61,7 +63,7 @@ def wEdges(v2: Bool,count: Int32,rows: List[String],acc: List[WEdge]): List[WEdg
             require(h>=0 and h<=100000 and q>=0 and q<=200000 and r>=0 and r<=100000 and rotq>=0 and rotq<=200000,"bounded nonnegative metrics");
             require(wHash(sh) and wHash(eh),"canonical edge digest");
             let(wrong,halls,afterExtras)=wExtras(v2,rest,Nil,Nil);
-            let(moves,remaining)=wMoves(afterExtras,Nil);require(List.length(acc)<count-1,"at most ${count-1} edges");
+            let(moves,remaining)=wMoves(afterExtras,Nil,0);require(List.length(acc)<count-1,"at most ${count-1} edges");
             wEdges(v2,count,remaining,WEdge.E(y,m,(h,q,r,rotq),sh,eh,moves,wrong,halls)::acc)
         }
         case _ => throw new IllegalArgumentException("edge record")
@@ -83,7 +85,7 @@ def wTake(n: Int32,rows: List[String],acc: List[(Int32,Int32)]): (List[(Int32,In
 def wStart(v3: Bool,rows: List[String]): (Option[List[(Int32,Int32)]],List[String]) \ IO = match rows {
     case line::rest => match fields(line) {
         case "start"::nn::Nil => {
-            require(v3,"free start block needs chain.v3");let n=integer(nn);require(n>=0 and n<=100000,"bounded start moves");
+            require(v3,"free start block needs chain.v3");let n=integer(nn);require(n>=0 and n<=maxChainMoves(),"bounded start moves");
             let(ms,remaining)=wTake(n,rest,Nil);(Some(ms),remaining)
         }
         case _ => (None,rows)
@@ -101,7 +103,7 @@ def wRead(count: Int32,raw: String,start: (Int32,Int32)): (String,List[WEdge],Bo
                 let(startMoves,afterStart)=wStart(header=="cubistry.calendar7.chain.v3",rest);
                 let edges=wEdges(v2,count,afterStart,Nil);
                 let total=List.foldLeft((n,e) -> {let WEdge.E(_,_,_,_,_,moves,_,_)=e;n+List.length(moves)},0,edges);
-                require(total<=100000,"bounded total moves");(h,edges,v2,startMoves)
+                require(total<=maxChainMoves(),"bounded total moves");(h,edges,v2,startMoves)
             }
             case _ => throw new IllegalArgumentException("source record")
         }
