@@ -1,9 +1,9 @@
-Names (long chain, print C, January 2019 - January 2036)
-Long chain from the solved cube (January 2019, "Magic Date") to January 2036: 205 states, 204 edges, 23315 HTM, 27548 QTM. One best-effort month, February 2026: the front differs from its display in row 7, column 1 (the red 29).
-Status: research candidate, not certified, not for release. Print C is not frozen. The best-effort edge is not confirmed by the checkers (months.tsv: unknown). No shortest-route, global-print or build-certification claim.
+Names (long chain, print D, January 1980 - January 2036)
+Long chain from the solved cube (January 1980, "Magic Date") to January 2036: 673 states, 672 edges, 76262 HTM, 90379 QTM. Six best-effort months (1981-02, 1987-02, 1998-02, 2009-02, 2015-02, 2026-02): the front differs from its display in row 7, column 1 (the red 29).
+Status: research candidate, not certified, not for release. Print D (print C relabeled to the root January 1980) is not frozen. The best-effort edges are not confirmed as exact by the checkers. No shortest-route, global-print or build-certification claim.
 Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
 
 SPDX-License-Identifier: CC-BY-SA-4.0
 
-Source: research/calendar-7x7/row1-window-chain evidence/print-c on research/cube-display-feasibility (549c07b0ee843d2e07eed2b71ad9b7418e965a8d); chain artifact of workflow run 43307881914.
+Source: research/calendar-7x7/row1-window-chain evidence/print-d and evidence/chain-1980-2036 on research/cube-display-feasibility (e4ae0493e09396dd6ca4dd528a643db4e4244e83); stage artifacts of workflow runs 43414242499 (1980-01 .. 2019-01, backward, free start); 43307881914 (2019-01 .. 2036-01).
 Regenerate with scripts/export-calendar7-chain-c.mjs. The shipped files public/calendar7/names/*, names-demo/*, state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.

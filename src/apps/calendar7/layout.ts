@@ -26,8 +26,8 @@ export const DEMO_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this
 export const NAMES_ANY_MODE = "names-any";
 export const parseLayoutMode = (value: string | null | undefined): LayoutMode =>
   value === NAMES_DEMO_MODE ? NAMES_DEMO_MODE : value === NAMES_ANY_MODE ? NAMES_ANY_MODE : parseLayout(value);
-/** The canonical data: the long chain on print C (public/calendar7/chain-c). */
-export const CHAIN_C_LABEL = "Names (long chain, print C, January 2019 - January 2036)";
+/** The canonical data: the long chain on print D (public/calendar7/chain-c). */
+export const CHAIN_C_LABEL = "Names (long chain, print D, January 1980 - January 2036)";
 export const NAMES_ANY_LABEL = "Names (any date, print B, display only)";
 export const NAMES_ANY_LOAD_NOTICE = "The names layout data for any date could not be loaded. Showing the standard layout.";
 /** Shown for every date displayed from print B (the names layout outside its chain window, and `names-any`). */
