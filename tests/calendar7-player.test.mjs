@@ -869,3 +869,29 @@ test('mount: color theme selected while the viewer loads is used on its first co
  root.choose('scheme','dracula');assert.equal(root.getAttribute('data-c7-scheme'),'dracula');release(stage);await idle(root);
  assert.deepEqual(stage.schemes,['dracula','configure']);assert.equal(stage.configured,1);inst.dispose();
 });
+
+test("mount: a step into the best-effort month February 2026 interrupted by the step out of it never turns the hatched cube", async () => {
+  const root = fakeRoot();
+  const stage = fakeStage({ manual: true });
+  let wrong = [];
+  const configure = stage.configure;
+  stage.configure = (printing, pose, surface, layout, marked = []) => { wrong = [...marked]; configure(printing, pose, surface); };
+  const turn = stage.turn, wrongAtTurn = [];
+  stage.turn = (...args) => { wrongAtTurn.push(wrong.length); return turn(...args); };
+  const { env } = mountEnv({ stage });
+  const inst = await mountCalendar7(root, q("year=2026&month=1"), env);
+  await idle(root);
+  root.clickLink(href({ year: 2026, month: 2 }));
+  await flush();
+  assert.equal(root.el("play").textContent, "Pause", "the step into February 2026 is playing");
+  root.clickLink(href({ year: 2026, month: 3 })); // the step out of it, while the step in still plays
+  await flush();
+  for (let i = 0; i < 40 && root.getAttribute("data-c7-state") !== "idle"; i++) { root.press("skip"); await flush(); }
+  await idle(root);
+  assert.equal(root.getAttribute("data-c7-month"), "2026-03");
+  assert.equal(root.getAttribute("data-c7-digest"), mountedGraph.nodes[(2026 - 2019) * 12 + 2].hash);
+  assert.ok(wrongAtTurn.length > 0);
+  assert.deepEqual(wrongAtTurn.filter((n) => n !== 0), [], "no turn on a cube with the wrong cell");
+  assert.deepEqual(wrong, [], "March 2026 has no wrong cell");
+  inst.dispose();
+});
