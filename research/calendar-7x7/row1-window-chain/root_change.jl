@@ -71,7 +71,7 @@ function slot_map(P,root)
     J
 end
 relabeled_print(P,root,J)=[(id=p.id,piece=p.piece,pos=p.pos,normal=p.normal,up=root[J[p.id]].up,text=root[J[p.id]].text,ink=root[J[p.id]].ink) for p in P]
-relabel_state(P,Pn,J,st)=[(id=p.id,piece=p.piece,pos=st[J[p.id]].pos,normal=st[J[p.id]].normal,up=st[J[p.id]].up,text=Pn[p.id].text,ink=Pn[p.id].ink) for p in P]
+relabel_state(P,Pd,J,st)=[(id=p.id,piece=p.piece,pos=st[J[p.id]].pos,normal=st[J[p.id]].normal,up=st[J[p.id]].up,text=Pd[p.id].text,ink=Pd[p.id].ink) for p in P]
 # ---- composition -------------------------------------------------------------------------------------------------------------------------
 function compose(P,chains)
     parts=[];seq=Tuple{Int,Int}[];last=nothing
@@ -94,9 +94,9 @@ function run_root_change(args)
     print_path,out=pos[1],pos[2];paths=pos[3:end]
     P=read_print(print_path);chains=[read_chain(p) for p in paths]
     comp=compose(P,chains);states=comp.states;root=states[1]
-    J=slot_map(P,root);Pn=relabeled_print(P,root,J);S=[relabel_state(P,Pn,J,s) for s in states]
-    mkpath(out);write(joinpath(out,"printing.tsv"),encode_print(Pn))
-    @assert canon(S[1])==canon(Pn) "the root state is the identity of print'"
+    J=slot_map(P,root);Pd=relabeled_print(P,root,J);S=[relabel_state(P,Pd,J,s) for s in states]
+    mkpath(out);write(joinpath(out,"printing.tsv"),encode_print(Pd))
+    @assert canon(S[1])==canon(Pd) "the root state is the identity of print'"
     lines=["cubistry.calendar7.chain.v2","source\t$(comp.months[1][2])\t$(comp.months[1][1])\t$(comp.months[1][2])\t$(state_sha(S[1]))"]
     k=1;best=String[]
     for ch in chains,e in ch.edges

@@ -47,25 +47,25 @@ front(st)=sort([(s.pos,s.up,s.text,s.ink) for s in st if s.normal==(0,0,1)])
 function read_st(p)
     r=rows(p)[2:end];[(id=parse(Int,f[1]),piece=parse(Int,f[2]),pos=RC.v3(f[3]),normal=RC.v3(f[4]),up=RC.v3(f[5]),text=String(f[6]),ink=String(f[7])) for f in r]
 end
-Pn=RC.read_print(joinpath(out,"printing.tsv"))
+Pd=RC.read_print(joinpath(out,"printing.tsv"))
 SP=[read_st(joinpath(out,"states","state-"*lpad(i,2,'0')*".tsv")) for i in 1:NE+1]
 @testset "print'" begin
-    @test length(Pn)==294 && all(i->(Pn[i].id,Pn[i].piece,Pn[i].pos,Pn[i].normal)==(P[i].id,P[i].piece,P[i].pos,P[i].normal),1:294)
-    @test count(i->Pn[i].up!=P[i].up,1:294)>20                       # the up column is relabeled (a fixture that does not turn stickers would not test it)
-    @test count(i->(Pn[i].text,Pn[i].ink)!=(P[i].text,P[i].ink),1:294)>100
+    @test length(Pd)==294 && all(i->(Pd[i].id,Pd[i].piece,Pd[i].pos,Pd[i].normal)==(P[i].id,P[i].piece,P[i].pos,P[i].normal),1:294)
+    @test count(i->Pd[i].up!=P[i].up,1:294)>20                       # the up column is relabeled (a fixture that does not turn stickers would not test it)
+    @test count(i->(Pd[i].text,Pd[i].ink)!=(P[i].text,P[i].ink),1:294)>100
     root=SC[1]
-    @test all(Pn[i] == (id=i,piece=P[i].piece,pos=P[i].pos,normal=P[i].normal,up=only(s.up for s in root if s.pos==P[i].pos && s.normal==P[i].normal),text=only(s.text for s in root if s.pos==P[i].pos && s.normal==P[i].normal),ink=only(s.ink for s in root if s.pos==P[i].pos && s.normal==P[i].normal)) for i in 1:294)
-    @test sort(collect(zip((p.text for p in Pn),(p.ink for p in Pn))))==sort(collect(zip((p.text for p in P),(p.ink for p in P))))   # same multiset of labels
+    @test all(Pd[i] == (id=i,piece=P[i].piece,pos=P[i].pos,normal=P[i].normal,up=only(s.up for s in root if s.pos==P[i].pos && s.normal==P[i].normal),text=only(s.text for s in root if s.pos==P[i].pos && s.normal==P[i].normal),ink=only(s.ink for s in root if s.pos==P[i].pos && s.normal==P[i].normal)) for i in 1:294)
+    @test sort(collect(zip((p.text for p in Pd),(p.ink for p in Pd))))==sort(collect(zip((p.text for p in P),(p.ink for p in P))))   # same multiset of labels
 end
 @testset "root and fronts" begin
-    @test RC.canon(SP[1])==RC.canon(Pn)                              # the first month is the solved cube of print'
+    @test RC.canon(SP[1])==RC.canon(Pd)                              # the first month is the solved cube of print'
     @test all(k->front(SC[k])==front(SP[k]),1:NE+1)                  # front images unchanged
     @test RC.canon(SC[1])!=RC.canon(P) && all(k->RC.canon(SC[k])==RC.canon(SP[k]),1:NE+1) && any(k->SC[k]!=SP[k],1:NE+1)   # the same labeled poses, other sticker ids; the root differs from print C
 end
 @testset "words unchanged" begin
     words=vcat(w2,w1,wf)
     @test all(k->RC.canon(RC.apply_word(SP[k],words[k]))==RC.canon(SP[k+1]),1:NE)
-    st=Pn;for w in words;st=RC.apply_word(st,w);end
+    st=Pd;for w in words;st=RC.apply_word(st,w);end
     @test RC.canon(st)==RC.canon(SP[end])
     ch=RC.read_chain(joinpath(out,"chain.moves.tsv"))
     @test ch.startword===nothing && length(ch.edges)==NE && vcat((e.word for e in ch.edges)...)==vcat(words...)
@@ -73,7 +73,7 @@ end
 end
 @testset "digests" begin
     ch=RC.read_chain(joinpath(out,"chain.moves.tsv"))
-    @test ch.src.hash==RC.state_sha(Pn) && RC.state_sha(SP[1])==RC.state_sha(Pn)
+    @test ch.src.hash==RC.state_sha(Pd) && RC.state_sha(SP[1])==RC.state_sha(Pd)
     @test all(k->ch.edges[k].sh==RC.state_sha(SP[k]) && ch.edges[k].eh==RC.state_sha(SP[k+1]),1:NE)
     @test all(k->ch.edges[k].sh!=RC.read_chain(c2).edges[1].sh,1:NE)   # digests are those of print', none is a digest of print C
     old=[RC.state_sha(s) for s in SC];@test isempty(intersect(old,[ch.edges[k].eh for k in 1:NE]))
