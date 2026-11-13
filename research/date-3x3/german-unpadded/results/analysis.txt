@@ -1,0 +1,118 @@
+== A. Rotations: parity of the corner and edge permutation (0 even, 1 odd)
+rotation          corners=0 edges=0  face-turn reachable
+rotation x        corners=0 edges=1  not reachable by outer turns
+rotation x'       corners=0 edges=1  not reachable by outer turns
+rotation x2       corners=0 edges=0  face-turn reachable
+rotation y        corners=0 edges=1  not reachable by outer turns
+rotation y'       corners=0 edges=1  not reachable by outer turns
+rotation y2       corners=0 edges=0  face-turn reachable
+rotation z        corners=0 edges=1  not reachable by outer turns
+rotation z'       corners=0 edges=1  not reachable by outer turns
+rotation z2       corners=0 edges=0  face-turn reachable
+rotation x y      corners=0 edges=0  face-turn reachable
+rotation x y'     corners=0 edges=0  face-turn reachable
+rotation x y2     corners=0 edges=1  not reachable by outer turns
+rotation x z      corners=0 edges=0  face-turn reachable
+rotation x z'     corners=0 edges=0  face-turn reachable
+rotation x z2     corners=0 edges=1  not reachable by outer turns
+rotation y' x'    corners=0 edges=0  face-turn reachable
+rotation y' x2    corners=0 edges=1  not reachable by outer turns
+rotation y' z2    corners=0 edges=1  not reachable by outer turns
+rotation z x'     corners=0 edges=0  face-turn reachable
+rotation z x2     corners=0 edges=1  not reachable by outer turns
+rotation z y      corners=0 edges=0  face-turn reachable
+rotation z y2     corners=0 edges=1  not reachable by outer turns
+rotation z' x'    corners=0 edges=0  face-turn reachable
+even/even nonidentity rotations: 11 of 23
+
+== B. Center arrangement of the padded witness (days 1-9)
+targets with day<10: 756  distinct preludes: ["y y y"]
+center at F shows '0' up=(0, 1, 0)
+center at D shows '1' up=(0, 0, -1)
+center at L shows '2' up=(0, -1, 0)
+center at R shows '3' up=(0, -1, 0)
+center at U shows 'blank' up=(0, 0, 1)
+center at B shows 'blank' up=(0, -1, 0)
+
+== C. Slice-only words (M, E, S); corners are never touched by slices
+metric STM (every slice turn counts 1): words searched up to cost 6, reachable states 14176, nontrivial pure-center states 258, minimal cost 4
+  cost 1: none
+  cost 2: none
+  cost 3: none
+  cost 4  E M E' M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E M' E' M      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E S E' S'      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  E S' E' S      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' M E M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' M' E M      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' S E S'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' S' E S      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M E M' E'      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M E' M' E      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M E2 M' E2     edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M S M' S'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M S' M' S      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' E M E'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' E' M E      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' S M S'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' S' M S      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M2 E M2 E'     edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M2 S M2 S'     edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S E S' E'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S E' S' E      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S M S' M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S M' S' M      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  S' E S E'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S' E' S E      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S' M S M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S' M' S M      edges/corners unchanged=true  blank to front (day 1)=true
+metric QTM (half turn counts 2): words searched up to cost 8, reachable states 23332, nontrivial pure-center states 370, minimal cost 4
+  cost 1: none
+  cost 2: none
+  cost 3: none
+  cost 4  E M E' M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E M' E' M      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E S E' S'      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  E S' E' S      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' M E M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' M' E M      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' S E S'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  E' S' E S      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M E M' E'      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M E' M' E      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  M S M' S'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M S' M' S      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' E M E'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' E' M E      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' S M S'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  M' S' M S      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S E S' E'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S E' S' E      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S M S' M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S M' S' M      edges/corners unchanged=true  blank to front (day 1)=true
+  cost 4  S' E S E'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S' E' S E      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S' M S M'      edges/corners unchanged=true  blank to front (day 1)=false
+  cost 4  S' M' S M      edges/corners unchanged=true  blank to front (day 1)=true
+
+== D. Outer turns plus rotations: shortest face-turn word V with V r = pure center word
+r = x2     minimal outer HTM = 8 (all words up to length 10 searched), minimal words 56  first: B2 R L' D2 U2 R L' B2  | first with r: blank to front=true c/e unchanged=true
+r = y2     minimal outer HTM = 8 (all words up to length 10 searched), minimal words 56  first: B2 U D' L2 R2 U D' B2  | first with r: blank to front=true c/e unchanged=true
+r = z2     minimal outer HTM = 8 (all words up to length 10 searched), minimal words 56  first: B R2 L2 B F' U2 D2 F'  | first with r: blank to front=false c/e unchanged=true
+r = x y    minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B R' L D U' F' B R'  | first with r: blank to front=false c/e unchanged=true
+r = x y'   minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B' R' L D' U F B' L  | first with r: blank to front=false c/e unchanged=true
+r = x z    minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B U D' L R' F' B D'  | first with r: blank to front=false c/e unchanged=true
+r = x z'   minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B' U' D L R' F B' D  | first with r: blank to front=false c/e unchanged=true
+r = y' x'  minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B' U D' L' R F B' U  | first with r: blank to front=true c/e unchanged=true
+r = z x'   minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B R L' D' U F' B L'  | first with r: blank to front=false c/e unchanged=true
+r = z y    minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B U' D L' R F' B U'  | first with r: blank to front=true c/e unchanged=true
+r = z' x'  minimal outer HTM = 8 (all words up to length 10 searched), minimal words 21  first: B' R L' D U' F B' R  | first with r: blank to front=false c/e unchanged=true
+candidates with blank to front: 154
+W (outer HTM 8, rotation moves 1) = B2 R L' D2 U2 R L' B2 x2
+W_inverse = x2 B2 L R' U2 D2 L R' B2
+shortest with a diagonal 120-degree rotation (outer 8, rotation moves 2) = B U' D L' R F' B U' z y
+
+== E. Application of W to every padded target with day < 10
+targets checked: 756  front matches unpadded display and all 48 corner/edge stickers unchanged: 756
+glyph 0 after W (position, up): ["B up=(0, -1, 0)" => 756]
+W in the sticker model on all 2562: days >= 10 are not touched

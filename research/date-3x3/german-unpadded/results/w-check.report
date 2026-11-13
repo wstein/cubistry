@@ -1,0 +1,81 @@
+PARITY corner/edge permutation parity of the 24 rotations (0 even, 1 odd)
+ROT - 0 0
+ROT x 0 1
+ROT x' 0 1
+ROT x2 0 0
+ROT y 0 1
+ROT y' 0 1
+ROT y2 0 0
+ROT z 0 1
+ROT z' 0 1
+ROT z2 0 0
+ROT x y 0 0
+ROT x y' 0 0
+ROT x y2 0 1
+ROT x z 0 0
+ROT x z' 0 0
+ROT x z2 0 1
+ROT y' x' 0 0
+ROT y' x2 0 1
+ROT y' z2 0 1
+ROT z x' 0 0
+ROT z x2 0 1
+ROT z y 0 0
+ROT z y2 0 1
+ROT z' x' 0 0
+ROT-EVEN-EVEN-NONIDENTITY 11
+SLICE length=1 words=9 cornersEdgesRestored=0 pureCenterNontrivial=0
+SLICE length=2 words=81 cornersEdgesRestored=9 pureCenterNontrivial=0
+SLICE length=3 words=729 cornersEdgesRestored=18 pureCenterNontrivial=0
+SLICE length=4 words=6561 cornersEdgesRestored=225 pureCenterNontrivial=48
+SLICEWORD E M E' M' blankFront=0/756
+SLICEWORD E M' E' M blankFront=0/756
+SLICEWORD E M2 E' M2 blankFront=756/756
+SLICEWORD E S E' S' blankFront=756/756
+SLICEWORD E S' E' S blankFront=0/756
+SLICEWORD E S2 E' S2 blankFront=756/756
+SLICEWORD E' M E M' blankFront=0/756
+SLICEWORD E' M' E M blankFront=0/756
+SLICEWORD E' M2 E M2 blankFront=756/756
+SLICEWORD E' S E S' blankFront=0/756
+SLICEWORD E' S' E S blankFront=756/756
+SLICEWORD E' S2 E S2 blankFront=756/756
+SLICEWORD E2 M E2 M' blankFront=756/756
+SLICEWORD E2 M' E2 M blankFront=756/756
+SLICEWORD E2 S E2 S' blankFront=0/756
+SLICEWORD E2 S' E2 S blankFront=0/756
+SLICEWORD M E M' E' blankFront=756/756
+SLICEWORD M E' M' E blankFront=756/756
+SLICEWORD M E2 M' E2 blankFront=756/756
+SLICEWORD M S M' S' blankFront=0/756
+SLICEWORD M S' M' S blankFront=0/756
+SLICEWORD M S2 M' S2 blankFront=756/756
+SLICEWORD M' E M E' blankFront=0/756
+SLICEWORD M' E' M E blankFront=0/756
+SLICEWORD M' E2 M E2 blankFront=756/756
+SLICEWORD M' S M S' blankFront=0/756
+SLICEWORD M' S' M S blankFront=0/756
+SLICEWORD M' S2 M S2 blankFront=756/756
+SLICEWORD M2 E M2 E' blankFront=756/756
+SLICEWORD M2 E' M2 E blankFront=756/756
+SLICEWORD M2 S M2 S' blankFront=0/756
+SLICEWORD M2 S' M2 S blankFront=0/756
+SLICEWORD S E S' E' blankFront=0/756
+SLICEWORD S E' S' E blankFront=0/756
+SLICEWORD S E2 S' E2 blankFront=0/756
+SLICEWORD S M S' M' blankFront=0/756
+SLICEWORD S M' S' M blankFront=756/756
+SLICEWORD S M2 S' M2 blankFront=0/756
+SLICEWORD S' E S E' blankFront=0/756
+SLICEWORD S' E' S E blankFront=0/756
+SLICEWORD S' E2 S E2 blankFront=0/756
+SLICEWORD S' M S M' blankFront=0/756
+SLICEWORD S' M' S M blankFront=756/756
+SLICEWORD S' M2 S M2 blankFront=0/756
+SLICEWORD S2 E S2 E' blankFront=756/756
+SLICEWORD S2 E' S2 E blankFront=756/756
+SLICEWORD S2 M S2 M' blankFront=756/756
+SLICEWORD S2 M' S2 M blankFront=756/756
+WCHECK W=B2 R L' D2 U2 R L' B2 x2 outer=8 rotations=1 slices=0 targets=756 ok=756
+GLYPH0 B up=(0, -1, 0) 756
+REPORT-SHA256 f180b0261392be12fefc92c8ae3ea7f2d461b613e580906d9f87f42764645d79

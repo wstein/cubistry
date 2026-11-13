@@ -1,0 +1,40 @@
+R corner=1 edge=1 centerperm=0 twistsum=1
+R' corner=1 edge=1 centerperm=0 twistsum=3
+R2 corner=0 edge=0 centerperm=0 twistsum=2
+L corner=1 edge=1 centerperm=0 twistsum=1
+L' corner=1 edge=1 centerperm=0 twistsum=3
+L2 corner=0 edge=0 centerperm=0 twistsum=2
+U corner=1 edge=1 centerperm=0 twistsum=1
+U' corner=1 edge=1 centerperm=0 twistsum=3
+U2 corner=0 edge=0 centerperm=0 twistsum=2
+D corner=1 edge=1 centerperm=0 twistsum=1
+D' corner=1 edge=1 centerperm=0 twistsum=3
+D2 corner=0 edge=0 centerperm=0 twistsum=2
+F corner=1 edge=1 centerperm=0 twistsum=1
+F' corner=1 edge=1 centerperm=0 twistsum=3
+F2 corner=0 edge=0 centerperm=0 twistsum=2
+B corner=1 edge=1 centerperm=0 twistsum=1
+B' corner=1 edge=1 centerperm=0 twistsum=3
+B2 corner=0 edge=0 centerperm=0 twistsum=2
+M corner=0 edge=1 centerperm=1 twistsum=4
+M' corner=0 edge=1 centerperm=1 twistsum=4
+M2 corner=0 edge=0 centerperm=0 twistsum=4
+E corner=0 edge=1 centerperm=1 twistsum=0
+E' corner=0 edge=1 centerperm=1 twistsum=0
+E2 corner=0 edge=0 centerperm=0 twistsum=0
+S corner=0 edge=1 centerperm=1 twistsum=4
+S' corner=0 edge=1 centerperm=1 twistsum=12
+S2 corner=0 edge=0 centerperm=0 twistsum=8
+x corner=0 edge=1 centerperm=1 twistsum=8
+x' corner=0 edge=1 centerperm=1 twistsum=8
+x2 corner=0 edge=0 centerperm=0 twistsum=8
+y corner=0 edge=1 centerperm=1 twistsum=4
+y' corner=0 edge=1 centerperm=1 twistsum=4
+y2 corner=0 edge=0 centerperm=0 twistsum=4
+z corner=0 edge=1 centerperm=1 twistsum=8
+z' corner=0 edge=1 centerperm=1 twistsum=16
+z2 corner=0 edge=0 centerperm=0 twistsum=12
+"c+e+z=0 S%2=0 c=0 e=0 z=0" => 753
+"c+e+z=0 S%2=0 c=0 e=1 z=1" => 815
+"c+e+z=0 S%2=1 c=1 e=0 z=1" => 709
+"c+e+z=0 S%2=1 c=1 e=1 z=0" => 723
