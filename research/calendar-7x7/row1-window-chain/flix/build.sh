@@ -10,7 +10,7 @@ cp "$here/../../english/flix/src/"{Core,Data,Dag}.flix "$build_dir/src/"
 cp "$here/../../pure-split-states/flix/src/Stacked.flix" "$build_dir/src/"
 awk '/^def main\(\)/ { exit } { print }' "$here/../../row1-corner-coupling/flix/src/Main.flix" > "$build_dir/src/Coupling.flix"
 awk '/^def main\(\)/ { exit } { print }' "$here/../../row1-window-print/flix/src/Main.flix" > "$build_dir/src/Window.flix"
-cp "$here/src/Main.flix" "$build_dir/src/"
+cp "${CALENDAR7_CHAIN_FLIX_MAIN:-$here/src/Main.flix}" "$build_dir/src/Main.flix"
 cd "$build_dir"
 export FLIX_CACHE_HOME=${FLIX_CACHE_HOME:-/tmp/cubistry-flix-cache}
 export COURSIER_CACHE=${COURSIER_CACHE:-/tmp/cubistry-flix-coursier}

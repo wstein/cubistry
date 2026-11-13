@@ -6,7 +6,7 @@
 #   total-accept  100001 edge moves in total (old limit + 1)     Julia and Flix accept and the receipts are identical (verify_chain.jl has no total bound and is not run on it)
 #   start-reject  start block declares 1000001 moves             all three reject at the start bound
 #   total-reject  1000001 edge moves in total                    Julia and Flix reject at "bounded total moves"
-# Usage: check_move_bound.sh JULIA JAVA CHAIN_JAR OUT   (OUT: new scratch directory; about 10 minutes of CPU, run it niced)
+# Usage: check_move_bound.sh JULIA JAVA CHAIN_JAR OUT   (OUT: new scratch directory; about 1 minute; CHECK_JL and VERIFY_CHAIN_JL replace the Julia checkers for the mutation run)
 set -uo pipefail
 here=$(cd -- "$(dirname -- "$0")" && pwd)
 J=${1:?Julia executable}; JAVA=${2:?Java executable}; JAR=${3:?Flix chain checker jar}; OUT=${4:?new scratch directory}
@@ -19,9 +19,9 @@ export WINDOW_END=2028-01
 bad=0; n=0
 ok()   { n=$((n+1)); echo "ok   $1"; }
 fail() { n=$((n+1)); bad=1; echo "FAIL $1"; }
-run_julia() { "$J" --startup-file=no "$here/check.jl" "$layout" "$printing" "$OUT/cases/$1.tsv" "$states" > "$OUT/$1.julia.tsv" 2> "$OUT/$1.julia.log"; }
+run_julia() { "$J" --startup-file=no "${CHECK_JL:-$here/check.jl}" "$layout" "$printing" "$OUT/cases/$1.tsv" "$states" > "$OUT/$1.julia.tsv" 2> "$OUT/$1.julia.log"; }
 run_flix() { "$JAVA" -Xmx2g -jar "$JAR" "$layout" "$printing" "$OUT/cases/$1.tsv" "$states" "$evidence" > "$OUT/$1.flix.tsv" 2> "$OUT/$1.flix.log"; }
-run_indep() { "$J" --startup-file=no "$here/verify_chain.jl" "$layout" "$printing" "$OUT/cases/$1.tsv" "$states" > "$OUT/$1.indep.tsv" 2> "$OUT/$1.indep.log"; }
+run_indep() { "$J" --startup-file=no "${VERIFY_CHAIN_JL:-$here/verify_chain.jl}" "$layout" "$printing" "$OUT/cases/$1.tsv" "$states" > "$OUT/$1.indep.tsv" 2> "$OUT/$1.indep.log"; }
 accept() { # case, checkers
   local c=$1; shift; local k
   for k in "$@"; do
