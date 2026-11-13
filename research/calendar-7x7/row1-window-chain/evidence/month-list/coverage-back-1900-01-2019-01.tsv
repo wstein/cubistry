@@ -1,0 +1,31 @@
+headline	planned-exact-gapless	1900-01	1903-01	37
+list	6f858506f30a3b58ba4e4330234c280d5093908cae5f0e62d093933afa0447d0	1429	root	1900-01	start	1900-01	range	2026-01	2019-01
+counts	chain_members	1429	planned_exact_runs	14	best_effort	13	gaps	0	bridges	0	before_start	0
+kind	from	to	count	status	evidence
+run	1900-01	1903-01	37	planned_exact	
+run	1903-03	1914-01	131	planned_exact	
+run	1914-03	1925-01	131	planned_exact	
+run	1925-03	1931-01	71	planned_exact	
+run	1931-03	1942-01	131	planned_exact	
+run	1942-03	1953-01	131	planned_exact	
+run	1953-03	1959-01	71	planned_exact	
+run	1959-03	1970-01	131	planned_exact	
+run	1970-03	1981-01	131	planned_exact	
+run	1981-03	1987-01	71	planned_exact	
+run	1987-03	1998-01	131	planned_exact	
+run	1998-03	2009-01	131	planned_exact	
+run	2009-03	2015-01	71	planned_exact	
+run	2015-03	2019-01	47	planned_exact	
+best_effort	1903-02	1903-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1914-02	1914-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1925-02	1925-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1931-02	1931-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1942-02	1942-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1953-02	1953-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1959-02	1959-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1970-02	1970-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1981-02	1981-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1987-02	1987-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	1998-02	1998-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	2009-02	2009-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
+best_effort	2015-02	2015-02	1	best_effort_unverified	wrong=7,1 evidence=february-hall-C-back-1900.tsv
