@@ -42,8 +42,8 @@ lines=split(chop(text;tail=1),'\n')
 ms=ym.(lines)
 include(joinpath(EV,"config-coverage","config_table.jl"))   # ConfigTable.board_of / match_config (the repository print checker code); no top-level run
 const PC=get(ENV,"CAL7_CHAINBACK_PRINTC",joinpath(EV,"print-c"))   # a mutated copy of print C in the print-mutant test
-include(joinpath(@__DIR__,"window_chain_lib.jl"))
-using .WindowChainLib: backward_plan, backward_export, backward_import, chain_progress
+include(get(ENV,"CAL7_BACKWARD_LIB",joinpath(@__DIR__,"window_chain_lib.jl")))   # a mutated copy of the library in tests of this test
+using .WindowChainLib: backward_plan, backward_export, backward_import, chain_progress, read_best_effort, backward_root, backward_must_continue
 @testset "backward month list 1900-01 .. 2019-01" begin
     @testset "pin and format" begin
         @test sha(joinpath(ML,LIST))==PIN
@@ -149,6 +149,10 @@ using .WindowChainLib: backward_plan, backward_export, backward_import, chain_pr
             end
             push!(out,"finish");out
         end
+        @test WindowChainLib.read_month_list(joinpath(ML,LIST),PIN)==newm      # the producer's reader (range 1900-01 .. 2100-01, size, LF) accepts the list
+        bf=read_best_effort(joinpath(ML,BEST))
+        @test length(bf)==13 && Set(keys(bf))==Set(ym(l) for l in NOT_EXACT) && all(v->v[2]=="7,1",values(bf)) && !haskey(bf,newm[1])
+        @test backward_root(newm,"")==(2019,1) && !backward_must_continue((1900,1),bf)   # the root is the identity month; the tip 1900-01 is no best-effort month: a run may stop there
         oldplan=backward_plan(oldm);newplan=backward_plan(newm)
         @test oldplan==newplan[1:469] && oldplan[1]==(2019,1) && newplan[end]==(1900,1)
         fwd=backward_export(search_chain(oldplan))                              # the exported chain.v3 of the old list: what the prior artifact holds
