@@ -26,8 +26,8 @@ const F = 1.8;
 const PAPER_RED = SCHEMES.find((s) => s.id === "paper-red");
 
 // ---- the table, the edge and the gap ----
-test("outer layer widths: the one table (N = 2, 3, 4: 1; N = 5: 1.2; N = 6: 1.5 proposal; N = 7: 1.8) and the widths [f, 1, ..., 1, f]", () => {
-  assert.deepEqual({ ...OUTER_LAYER_WIDTH }, { 2: 1, 3: 1, 4: 1, 5: 1.2, 6: 1.5, 7: 1.8 });
+test("outer layer widths: the one table (N = 2, 3, 4: 1; N = 5: 1.1; N = 6: 1.3; N = 7: 1.6, owner decision 2026-11-11) and the widths [f, 1, ..., 1, f]", () => {
+  assert.deepEqual({ ...OUTER_LAYER_WIDTH }, { 2: 1, 3: 1, 4: 1, 5: 1.1, 6: 1.3, 7: 1.6 });
   for (let n = 2; n <= 7; n++) assert.deepEqual(layerWidthsFor(n), thickOuterLayerWidths(n, outerLayerWidth(n)), `N = ${n}`);
   assert.deepEqual(layerWidthsFor(7), [1.8, 1, 1, 1, 1, 1, 1.8]);
   assert.deepEqual(layerWidthsFor(3), [1, 1, 1]);
