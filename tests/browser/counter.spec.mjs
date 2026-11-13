@@ -100,7 +100,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(cube.y);
   expect(chooser.y + chooser.height).toBeLessThanOrEqual(controls.y);
   for (const text of [
-    "Picture Puzzle Playground",
+    "3×3 Super Picture Cube",
     "CI Quality Cube · Workflow monitor",
     "Calendar · Deutsch / English",
     "H/M/S Counter 00–59",
@@ -113,6 +113,7 @@ test("mobile layout, chooser placement and keyboard Set remain accessible", asyn
   ]) {
     await expect(page.locator("#application").getByRole("option", { name: text, exact: true })).toBeAttached();
   }
+  await expect(page.locator("#application").getByRole("option", { name: "Picture Puzzle Playground", exact: true })).toHaveCount(0);
   await expect(page.locator("#application")).toHaveValue(/^(certified|counter\.html)$/);
   await expect(page.locator("#auto,#step,#start,#pause,#front")).toHaveCount(0);
   await page.locator("#value").fill("42");
