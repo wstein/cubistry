@@ -51,7 +51,7 @@ the gesture for a whole-cube rotation (deferred, see Open decisions).
 5. At every 90 degrees a magnet/snap effect is shown (D2), visual; haptics only where the platform provides them (rationale:
    iOS provides none; not in the decision comment). On release the layer eases to the nearest quarter turn (D8a; rubber band,
    start value 100 to 180 ms, tuned on mouse and phone, from the owner update of 2026-11-12). The owner update also names
-   release speed as an input; its effect on the target is not specified.
+   release speed as an input; its effect on the target is not decided (Open decisions, item 6).
 6. Layer choice on N = 4 to 7: by hit depth of the touched sticker (D8c). Two fingers on two layers of the same axis turn all
    layers between and including both together (wide turn, D3). Two fingers on different axes are invalid (D8d).
 7. One commit per gesture, at release: the net number of quarter turns, applied once. Nothing is committed while dragging. Net 0
@@ -64,7 +64,7 @@ the gesture for a whole-cube rotation (deferred, see Open decisions).
     pivot binding stay in the TypeScript viewer package. The viewer shows a caller-validated legal selection and angle on a
     temporary turn pivot; controllers own state, deadlines and commit ([VIEWER_RENDERING](../../docs/VIEWER_RENDERING.md)).
 12. Reset on print-bound cubes returns to the state shown when play mode started (entry state, D5). Whether this is one jump or
-    an undo history is open (Open decisions, item 3). Reset for other cubes is not decided (derived extension, not a decision). No
+    an undo history is open (Open decisions, item 3). Reset for cubes that are not print-bound is not decided (Open decisions, item 7). No
     solver call.
 
 ## Decisions (2026-11-13)
@@ -77,15 +77,15 @@ D2. **owner** One finger on a sticker. The touched sticker is signaled; layer an
    follows the finger freely in both directions and back; a magnet effect at every 90 degrees; returning to the start without
    releasing counts as no move.
 D3. **owner** Two fingers on two layers rotate all layers between them (generalized wide turn).
-D4. **owner** Whole-cube rotation counts as a move (x/y/z moves in the move list; this changes the move model). Its gesture is
+D4. **owner** Whole-cube rotation counts as a move. Its gesture is
    deferred; the three-finger gesture is rejected; a solution is still to be found. Candidate to investigate, not decided: two
    fingers outside the cube.
-   - Derived, not decided: the net turn of a gesture can then be a rotation move; the equality check (requirement 8) covers
+   - Derived, not decided: rotations are x/y/z moves in the move list, which changes the move model; the net turn of a gesture can then be a rotation move; the equality check (requirement 8) covers
      rotations; view-mode orbit stays presentation only. Rationale (author's): the three-finger gesture collides with iOS system
      gestures; two fingers outside the cube collide with camera pinch-zoom and need a rule.
 D5. **owner** Reset target on print-bound cubes: the state shown when play mode started.
 D6. **owner** Activation: viewer toggle, not persisted.
-D7. **owner** First apps: Playground and Picture Cube. Others later; calendar apps not yet.
+D7. **owner** First apps: Playground and Picture Cube. (Derived, not in the decision comment: other apps later, calendar apps not yet.)
 D8. **proposal accepted** ("we agree on the new gesture control"): (a) release rounds to the nearest 90 degrees; (b) dead zone of
    about 8 px; (c) layer choice on N >= 4 by hit depth; (d) two fingers on different axes are invalid.
    Proposal only, not decided: (e) Shift+drag is the mouse equivalent of the wide turn.
@@ -104,6 +104,8 @@ clock, status cube) are not yet in scope, so the "reset to the date" question do
 3. Reset as one jump or as an undo history of the session.
 4. Whether a `play` URL parameter is allowed (the owner has decided only that play mode is not persisted).
 5. Mouse equivalent of the wide turn: Shift+drag is a proposal only (D8e).
+6. How release speed affects the target quarter turn (the owner update of 2026-11-12 names it; D8a rounds by angle).
+7. Reset for cubes that are not print-bound (Playground is one of the first apps).
 
 ## Invariants
 
