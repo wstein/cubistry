@@ -13,7 +13,7 @@ Print D and the chain are the output of `root_change.jl` of the research branch 
 stage chains for print C (run 43414242499, 1980-01 to 2019-01 backward; run 43307881914, 2019-01 to 2036-01) are
 transformed so that the first month is the solved cube. The edge words are those of the stage chains; only the sticker
 identities (print D) and the digests are new. The committed research evidence is `evidence/print-d/` and
-`evidence/chain-1980-2036/` at research ref `e4ae0493e09396dd6ca4dd528a643db4e4244e83` (Julia, Flix and independent receipts).
+`evidence/chain-1980-2036/` of research PR #470, pinned by the SHA-256 of each file (Julia, Flix and independent receipts).
 The 673 state files are not in a repository: `root_change.jl --states` reproduces them from the stage artifacts, and
 `states.sha256` of the evidence lists their SHA-256.
 
@@ -38,7 +38,7 @@ of `chain-1980-2036` in the research evidence (`chain.moves.tsv`, `months.tsv`, 
 
 ## Extending the chain (1900-01 backward, 2100-01 forward)
 
-The export is parametrized by one object, `CHAIN` in `scripts/export-calendar7-chain-c.mjs` (research ref, evidence
+The export is parametrized by one object, `CHAIN` in `scripts/export-calendar7-chain-c.mjs` (source, evidence
 directories, first and last month, best-effort months, stage runs), and the pins `PINNED`. First month, number of states and the
 best-effort list are derived from it; nothing else names 2019 or 1980 except `WINDOW_FIRST_YEAR` in `src/apps/calendar7/graph.ts`
 (first year a chain may name). To extend: run `root_change.jl` over all stage chains in time order (the segment list of
@@ -62,6 +62,6 @@ node --test tests/calendar7-chain-c.test.mjs
 node scripts/export-calendar7-chain-c.mjs --check <states-dir> <research-root>
 ```
 
-`<research-root>` is a checkout of research/cube-display-feasibility at the pinned ref (a `git archive` of
+`<research-root>` is a checkout that holds the evidence of research PR #470 (the files are checked by SHA-256; a `git archive` of
 `research/calendar-7x7/row1-window-chain/evidence/{print-d,chain-1980-2036}` is enough); `<states-dir>` is the `--states` output
 directory of `root_change.jl`. The test with the sources reads `CAL7_CHAIN_C_ARTIFACT` (states directory) and `CAL7_CHAIN_C_RESEARCH`.

@@ -9,7 +9,7 @@
 //       Without sources: manifest digests, source digests against the pins, app parsers and a full replay of the committed
 //       files (npm run verify:calendar7-chain-c). With sources: also regenerate and compare byte for byte.
 //
-// <research-root> is a checkout (or archive) of research/cube-display-feasibility at CHAIN.ref; the script reads
+// <research-root> is a checkout (or archive) of research/cube-display-feasibility that holds the research PR #470 evidence (CHAIN.source); the script reads
 // research/calendar-7x7/row1-window-chain/evidence/{print-d,chain-1980-2036}/ (print, layout, chain, month list, best-effort list,
 // receipts, state manifest). <states-dir> holds states/state-NN.tsv: the snapshots of the chain, reproduced by
 //   julia --startup-file=no research/calendar-7x7/row1-window-chain/root_change.jl <print-c printing.tsv> <states-dir> --states <chain.moves.tsv of every stage in time order>
@@ -17,7 +17,7 @@
 // states.sha256 of the research evidence.
 //
 // Extending the chain (1900-01 backward, 2100-01 forward): run root_change.jl over all stage chains again, commit its output
-// in research, and describe the new chain in CHAIN below (ref, directories, first and last month, best-effort months and the pinned
+// in research, and describe the new chain in CHAIN below (source, directories, first and last month, best-effort months and the pinned
 // digests, PINNED); the format, the checks and the app need no other change except WINDOW_FIRST_YEAR in graph.ts.
 //
 // Format (documented in docs/CALENDAR7_CHAIN_C.md): the states are not stored one by one (673 snapshots are 8.9 MB). The
@@ -41,7 +41,8 @@ const sha256 = (bytes) => createHash("sha256").update(bytes).digest("hex");
 const EVIDENCE = "research/calendar-7x7/row1-window-chain/evidence/";
 /** The chain: where it lives in research and what it is. Everything else is derived from the files or checked against them. */
 export const CHAIN = {
-  ref: "e4ae0493e09396dd6ca4dd528a643db4e4244e83",
+  /** Informative: where the sources live (no commit is required; the files are pinned by content digest). */
+  source: "research PR #470 (print D, root change), research/cube-display-feasibility",
   printDir: `${EVIDENCE}print-d/`,
   chainDir: `${EVIDENCE}chain-1980-2036/`,
   first: { year: 1980, month: 1 },
@@ -57,7 +58,7 @@ export const CHAIN = {
 const RESEARCH_INPUTS = { layout: `${CHAIN.printDir}layout.tsv`, printing: `${CHAIN.printDir}printing.tsv` };
 const CHAIN_FILES = ["chain.moves.tsv", "months.tsv", "best-effort.tsv", "VERIFIED.txt", "julia.tsv", "flix.tsv", "independent.tsv", "provenance.tsv", "states.sha256"];
 const stateName = (k) => `state-${String(k + 1).padStart(2, "0")}.tsv`;
-/** Digests of the sources (research ref CHAIN.ref). */
+/** Digests of the sources (content digests of the research PR #470 evidence). */
 export const PINNED = {
   layout: "e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a",
   printing: "48ff9c8bc60c10908762573c02429fc258c1afc54b431c8c5e3049f11b4b475c",
@@ -256,7 +257,7 @@ export function build(statesDir, researchRoot, options = {}) {
     `Long chain from the solved cube (January 1980, "Magic Date") to January 2036: ${STATES} states, ${STATES - 1} edges, ${edges.reduce((a, e) => a + e.metrics[0], 0)} HTM, ${edges.reduce((a, e) => a + e.metrics[1], 0)} QTM. Six best-effort months (${CHAIN.bestEffort.join(", ")}): the front differs from its display in row 7, column 1 (the red 29).\n` +
     `Status: ${STATUS}. Print D (print C relabeled to the root January 1980) is not frozen. The best-effort edges are not confirmed as exact by the checkers. No shortest-route, global-print or build-certification claim.\n` +
     `${LICENSE}\n\nSPDX-License-Identifier: CC-BY-SA-4.0\n\n` +
-    `Source: research/calendar-7x7/row1-window-chain evidence/print-d and evidence/chain-1980-2036 on research/cube-display-feasibility (${CHAIN.ref}); stage artifacts of workflow runs ${CHAIN.segments.join("; ")}.\n` +
+    `Source: research/calendar-7x7/row1-window-chain evidence/print-d and evidence/chain-1980-2036 (${CHAIN.source}); stage artifacts of workflow runs ${CHAIN.segments.join("; ")}.\n` +
     `Regenerate with scripts/export-calendar7-chain-c.mjs. The shipped files public/calendar7/names/*, names-demo/*, state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.\n`;
   const hashes = (names) => names.map((n) => `${sha256(files[n])}  ${n}\n`).join("");
   files["manifest.sha256"] = hashes(["NOTICE.txt", "best-effort.v1.json", "displays.v1.json", "graph.v1.json", "state.v1.json"]);
