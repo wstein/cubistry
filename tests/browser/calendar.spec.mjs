@@ -75,7 +75,8 @@ test("German A shows a physical weekday/day/month and renders responsively", asy
   });
   await artFits(page);
   await expect(page.locator("#calendar-digital")).toContainText("2024");
-  await expect(page.locator("#calendar-padding-label")).toBeHidden();
+  await expect(page.locator("#calendar-padding-label")).toBeVisible();
+  await expect(page.locator("#calendar-padding")).toBeChecked();
   await page.screenshot({
     path: "test-results/calendar-de-desktop.png",
     fullPage: true,
