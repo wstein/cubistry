@@ -442,7 +442,7 @@ body:has(> aside + .shell) > .shell {
 }
 /* Chip radio group and stop slider (src/apps/shell/choice-controls.ts). Chips carry a symbol and a word, so color is
    never the only signal; tap targets are at least 44 px and the row wraps instead of overflowing. Tones are the state
-   colors of the CI Quality Cube print (docs/STATUS_CUBE.md); the checked chip is filled with white text. */
+   colors of the CI Quality Cube print (docs/STATUS_CUBE.md, tokens --st-* in tokens.css); the checked chip is filled with --on-st text. */
 .shell .shell-slot-body .shell-quick-choice {
   min-height: 44px;
 }
@@ -468,11 +468,11 @@ body:has(> aside + .shell) > .shell {
   border-radius: var(--r-pill);
   white-space: nowrap;
 }
-.shell .shell-choice[data-tone="open"] { --tone: #56616a; }
-.shell .shell-choice[data-tone="running"] { --tone: #145a91; }
-.shell .shell-choice[data-tone="ok"] { --tone: #187044; }
-.shell .shell-choice[data-tone="error"] { --tone: #b12c2c; }
-.shell .shell-choice[data-tone="blocked"] { --tone: #855600; }
+.shell .shell-choice[data-tone="open"] { --tone: var(--st-open); }
+.shell .shell-choice[data-tone="running"] { --tone: var(--st-running); }
+.shell .shell-choice[data-tone="ok"] { --tone: var(--st-ok); }
+.shell .shell-choice[data-tone="error"] { --tone: var(--st-error); }
+.shell .shell-choice[data-tone="blocked"] { --tone: var(--st-blocked); }
 .shell .shell-choice-symbol {
   color: color-mix(in srgb, var(--tone) 55%, var(--ink));
   font-weight: 700;
@@ -480,7 +480,7 @@ body:has(> aside + .shell) > .shell {
 .shell .shell-slot-body .shell-choice[aria-checked="true"] {
   border-color: var(--tone);
   background: var(--tone);
-  color: #fff;
+  color: var(--on-st);
 }
 .shell .shell-choice[aria-checked="true"] .shell-choice-symbol {
   color: inherit;
