@@ -55,6 +55,14 @@ decision.
 11. A cube turned by hand can be reset or solved again. Proposed (not decided): undo history of the session plus one jump to the
     application's target state; no solver call.
 
+## Owner decisions
+
+- **Whole-cube turns are moves (owner, 2026-11-13).** A whole-cube rotation counts as a move, like a layer turn: rotations
+  are x/y/z moves in the move list. This changes the move model (rotations are part of the move list, not only presentation).
+  Consequences recorded here, no further decision: the net turn of a gesture (requirement 6) can be a rotation move; the
+  state-equality check (requirement 7) covers rotations; view-mode orbit stays a presentation change and is not a move. The
+  gesture that selects a whole-cube turn, and its interplay with layer choice on N = 4 to 7, are open (Open decisions, item 5).
+
 ## Per-application availability (design draft, not decided)
 
 Applications where the picture is the point (Picture Cube 2 to 7, special cubes) offer play mode fully. Applications whose
@@ -63,15 +71,17 @@ a hand turn leaves the shown date. Counter and clock: no manual moves proposed.
 
 ## Open decisions (owner)
 
+Items 1 to 4 are unchanged from #461.
+
 1. Layers on N = 4 to 7: single layer by hit depth only, or also wide turns?
 2. Reset target for print-bound cubes: home state (solved) or the state the application currently shows?
 3. Which applications allow manual moves; date applications: disabled or free play with reset.
 4. Activation: viewer toggle, persisted setting, or both.
-5. Whole-cube turns versus view rotation, and which layer on N > 3 by hit depth (not covered by the owner proposal).
+5. Gesture for a whole-cube turn in play mode, and layer choice on N = 4 to 7 under the owner decision above (not derivable from #461): which hit or gesture selects a whole-cube turn instead of a layer, and how that relates to the single-layer-by-depth question (item 1).
 
 ## Invariants
 
-- View mode never turns a layer.
+- View mode never turns a layer and never commits a move (orbit is presentation only).
 - Puzzle state changes only through one committed move per gesture; the state is never read back from the animation.
 
 ## Acceptance criteria
