@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout, the month banner in FIXED unit-grid coordinates (cube center origin, cell pitch 1), independent of the
-// outer layer factor f (1.8 for the 7x7): banner y 2.9 .. 3.9 (height 1.0, its bottom 0.4 above the lower edge of the top cell
+// outer layer factor f (1.6 for the 7x7): banner y 2.9 .. 3.9 (height 1.0, its bottom 0.4 above the lower edge of the top cell
 // row 2.5 .. 3.5), x -3.8 .. 3.8 (0.3 beyond the cell grid edges at +-3.5), corner radius 0.3. Like the digits and lines, the
 // print is the same at every f; when the outer cubie is too small the art continues beyond the face and is clipped at its edge.
 import { test } from "node:test";
@@ -36,11 +36,11 @@ const tileDump = () => {
   return out;
 };
 
-// Digests taken at the head 72e44d0b (accepted design: banner 1.0 tall at y 2.9 .. 3.9, x -3.8 .. 3.8, radius 0.3, f = 1.8).
-const PINS = { table: "a7e43093e437a385c76b485a79ad1b2437b9f7f792cb843b9448abed857e93e0", tiles: "e12f85796b086640d133fe3bca215b90aca233b311a20cb599c24dba03b645fa" };
+// Digests of the accepted design (banner 1.0 tall at y 2.9 .. 3.9, x -3.8 .. 3.8, radius 0.3) at the shipped f = 1.6 (owner decision 2026-11-11; taken at 72e44d0b with f = 1.8 before: the cube edge, the gap in units and the bands f - 1 follow the table).
+const PINS = { table: "4c6d8e8147a5170b2a3757f0c2b3993407c94ac605680a69209dd4576d6b84da", tiles: "e7092f7dd110378af46f4cdce52b37172809fbe55e73220a5c4535dd3cee304d" };
 
-test("at f = 1.8 the banner defined by its absolute unit-grid constants reproduces the geometry of the accepted design exactly (14-font table, grid rectangles and cut-face edge colors of all 294 tiles in all 10 schemes)", () => {
-  assert.equal(outerLayerWidth(CALENDAR7_SIZE), 1.8);
+test("at the shipped f = 1.6 the banner defined by its absolute unit-grid constants reproduces the geometry of the accepted design exactly (14-font table, grid rectangles and cut-face edge colors of all 294 tiles in all 10 schemes)", () => {
+  assert.equal(outerLayerWidth(CALENDAR7_SIZE), 1.6);
   assert.equal(sha(tableDump()), PINS.table);
   assert.equal(sha(tileDump()), PINS.tiles);
 });
@@ -139,7 +139,7 @@ test("clipping at f = 1.2: the banner extends beyond the outer cubie face (top f
 });
 
 test("font table at f = 1.2 and 1.6: no blocked tile, sizes and tracking range pinned as literals, equal to the table at 1.8 (the first-tile room of the 0.8 unit stays within the texture edge)", () => {
-  const PIN = { noto: [96, -8.28, 4.68], nunito: [94.75, -4.82, 3.85], "nunito-sans": [95, -6.02, 3.64], quicksand: [98.5, -2.61, 2.47], "nova-oval": [91.25, -10.75, 11.73], "nova-square": [95.5, -10.92, 6.81], "nova-mono": [120, -1.95, 3.69], comfortaa: [86.5, -3.34, 8.99], "varela-round": [90.25, -3.08, 5.54], "crete-round": [91.25, -1.35, 13.42], "dseg14classic-bold": [83.5, -1.14, 0.82], "dseg14classic-regular": [83.5, -1.14, 0.82], "dseg14modern-bold": [82.5, 0, 0.09], "dseg14modern-regular": [82.5, 0, 0.09] };
+  const PIN = { noto: [96, -8.3, 4.68], nunito: [94.75, -4.82, 3.85], "nunito-sans": [95, -6.03, 3.64], quicksand: [98.5, -2.61, 2.46], "nova-oval": [91.25, -10.76, 11.73], "nova-square": [95.5, -10.94, 6.8], "nova-mono": [120, -1.96, 3.68], comfortaa: [86.5, -3.35, 8.98], "varela-round": [90.25, -3.09, 5.53], "crete-round": [91.25, -1.35, 13.42], "dseg14classic-bold": [83.5, -1.14, 0.82], "dseg14classic-regular": [83.5, -1.14, 0.82], "dseg14modern-bold": [82.5, 0, 0.08], "dseg14modern-regular": [82.5, 0, 0.08] };
   for (const f of [1.2, 1.6, 1.8]) for (const [id, font] of Object.entries(FONT_METRICS)) {
     const t = nameFaceTable(font, f), tr = [...t.tiles.values()].map((x) => x.tracking), [size, lo, hi] = PIN[id];
     assert.equal(t.blocked.length, 0, `${id} f ${f}: no blocked tile`);

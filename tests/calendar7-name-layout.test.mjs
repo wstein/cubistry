@@ -119,20 +119,20 @@ test("name layout: the tile gaps follow the tracking (a middle tile fills its cu
 // the cube edge, its ink keeps half a seam gap from the banner edge); a change of the metrics, the geometry or the rule has to
 // change this table on purpose.
 const PINNED = {
-"noto": { size: 96, seamGap: 10.75, tracking: [-8.28, 4.68] },
+"noto": { size: 96, seamGap: 10.75, tracking: [-8.3, 4.68] },
   "nunito": { size: 94.75, seamGap: 10.80, tracking: [-4.82, 3.85] },
-  "nunito-sans": { size: 95, seamGap: 10.74, tracking: [-6.02, 3.64] },
-  "quicksand": { size: 98.5, seamGap: 10.24, tracking: [-2.61, 2.47] },
-  "nova-oval": { size: 91.25, seamGap: 12.04, tracking: [-10.75, 11.73] },
-  "nova-square": { size: 95.5, seamGap: 16.33, tracking: [-10.92, 6.81] },
-  "nova-mono": { size: 120, seamGap: 11.04, tracking: [-1.95, 3.69] },
-  "comfortaa": { size: 86.5, seamGap: 11.50, tracking: [-3.34, 8.99] },
-  "varela-round": { size: 90.25, seamGap: 12.00, tracking: [-3.08, 5.54] },
-  "crete-round": { size: 91.25, seamGap: 8.03, tracking: [-1.35, 13.42] },
+  "nunito-sans": { size: 95, seamGap: 10.74, tracking: [-6.03, 3.64] },
+  "quicksand": { size: 98.5, seamGap: 10.24, tracking: [-2.61, 2.46] },
+  "nova-oval": { size: 91.25, seamGap: 12.04, tracking: [-10.76, 11.73] },
+  "nova-square": { size: 95.5, seamGap: 16.33, tracking: [-10.94, 6.8] },
+  "nova-mono": { size: 120, seamGap: 11.04, tracking: [-1.96, 3.68] },
+  "comfortaa": { size: 86.5, seamGap: 11.50, tracking: [-3.35, 8.98] },
+  "varela-round": { size: 90.25, seamGap: 12.00, tracking: [-3.09, 5.53] },
+  "crete-round": { size: 91.25, seamGap: 8.02, tracking: [-1.35, 13.42] },
   "dseg14classic-bold": { size: 83.5, seamGap: 15.86, tracking: [-1.14, 0.82] },
   "dseg14classic-regular": { size: 83.5, seamGap: 15.86, tracking: [-1.14, 0.82] },
-  "dseg14modern-bold": { size: 82.5, seamGap: 15.67, tracking: [0, 0.09] },
-  "dseg14modern-regular": { size: 82.5, seamGap: 15.67, tracking: [0, 0.09] },
+  "dseg14modern-bold": { size: 82.5, seamGap: 15.67, tracking: [0, 0.08] },
+  "dseg14modern-regular": { size: 82.5, seamGap: 15.67, tracking: [0, 0.08] },
 };
 test("name layout: the per-font table (size, seam gap, tracking range) is pinned, no font is below its weekday size", () => {
   assert.deepEqual(Object.keys(PINNED), IDS);
