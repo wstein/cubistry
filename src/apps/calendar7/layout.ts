@@ -22,7 +22,7 @@ export const parseLayout = (value: string | null | undefined): Layout => (value 
  */
 export type LayoutMode = Layout | "names-demo" | "names-any";
 export const NAMES_DEMO_MODE = "names-demo";
-export const DEMO_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this date (print C).";
+export const DEMO_DISPLAY_ONLY_NOTICE = "Display only: no move sequence for this date (print D).";
 export const NAMES_ANY_MODE = "names-any";
 export const parseLayoutMode = (value: string | null | undefined): LayoutMode =>
   value === NAMES_DEMO_MODE ? NAMES_DEMO_MODE : value === NAMES_ANY_MODE ? NAMES_ANY_MODE : parseLayout(value);

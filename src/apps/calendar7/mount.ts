@@ -123,7 +123,7 @@ export async function mountCalendar7(
     '<div class="c7-view"><p class="c7-loading">Loading the 7x7 calendar data…</p></div>';
   const view = root.querySelector(".c7-view") as HTMLElement;
   const live = root.querySelector(".c7-live") as HTMLElement;
-  // The canonical data: the long chain on print C (docs/CALENDAR7_CHAIN_C.md). Fetched when the mode opens, never bundled.
+  // The canonical data: the long chain on print D (docs/CALENDAR7_CHAIN_C.md). Fetched when the mode opens, never bundled.
   const [graphJson, displaysJson, stateJson, bestEffortJson] = await Promise.all([
     env.fetchJson(`${env.base}calendar7/chain-c/graph.v1.json`),
     env.fetchJson(`${env.base}calendar7/chain-c/displays.v1.json`),

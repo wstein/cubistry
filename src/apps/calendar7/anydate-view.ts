@@ -68,6 +68,6 @@ export function anyDatePageHtml(model: PageModel): string {
     verdict +
     (any?.kind === "best-effort" ? `<div class="${HIDDEN_SHEET_CLASS}" data-c7-sheet-hidden>${sheet}</div>` : sheet) +
     `<p class="c7-range" data-c7-any-range>${esc(model.longChain ? DEMO_DISPLAY_ONLY_NOTICE : ANY_DISPLAY_ONLY_NOTICE)} Board configuration: ${esc(any ? configText(any.key) : "")}. ` +
-    `Years ${ANY_FIRST_YEAR} to ${ANY_LAST_YEAR}.${calendar} ${model.longChain ? "Same print C. Move reachability is unverified. Print C is not frozen." : "Print B is not frozen."} Research candidate, not certified.</p></div>`
+    `Years ${ANY_FIRST_YEAR} to ${ANY_LAST_YEAR}.${calendar} ${model.longChain ? "Same print D. Move reachability is unverified. Print D is not frozen." : "Print B is not frozen."} Research candidate, not certified.</p></div>`
   );
 }

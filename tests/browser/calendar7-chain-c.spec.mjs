@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// The long chain C (public/calendar7/chain-c, January 2019 to January 2036) is the one Calendar7 view. Historical layout parameters
-// do not select another dataset. Acceptance of the root month 2019-01 in the real app: the solved cube, white front in Rubik-Tint.
+// The long chain on print D (public/calendar7/chain-c, January 1980 to January 2036) is the one Calendar7 view. Historical layout parameters
+// do not select another dataset. Acceptance of the root month 1980-01 in the real app: the solved cube, white front in Rubik-Tint.
 import { readFileSync } from "node:fs";
 import { test, expect } from "@playwright/test";
 import { DEFAULT_WORD_OPTIONS, stepNotation } from "../../src/apps/calendar7/notation.ts";
@@ -24,7 +24,7 @@ test("the canonical calendar plays the chain steps: the step counts on the page 
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout-mode", "names");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
   await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveCount(0);
-  await expect(page.locator("[data-c7-chain]")).toContainText("January 2019 to January 2036, 204 steps");
+  await expect(page.locator("[data-c7-chain]")).toContainText("January 1980 to January 2036, 672 steps");
   await expect(page.locator("body")).not.toContainText("DEMO");
   await expect(summary(page, "next")).toContainText(`December 2026 · ${moves(2026, 11, 1)} moves`);
   await expect(summary(page, "previous")).toContainText(`October 2026 · ${moves(2026, 10, 1)} moves`);
@@ -43,12 +43,12 @@ test("the chain ends in January 2036; February 2036 stays on the same print with
   await at(page, "2036-02");
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-layout", "names");
   await expect(page.locator(".c7-step")).toHaveCount(0);
-  await expect(page.locator("[data-c7-any-range]")).toContainText("Same print C");
+  await expect(page.locator("[data-c7-any-range]")).toContainText("Same print D");
   await expect(page.locator("[data-c7-any-range]")).toContainText("Move reachability is unverified");
   expect(new URL(page.url()).searchParams.has("layout")).toBe(false);
 });
 
-test("every former layout parameter selects the canonical chain C dataset, with no standard or print B fetch", async ({ page }) => {
+test("every former layout parameter selects the canonical chain dataset, with no standard or print B fetch", async ({ page }) => {
   for (const layout of ["standard", "names", "names-demo", "names-any", "bogus"]) {
     const datasets = [];
     const record = (request) => { if (/\/calendar7\/(?:[^/]+\/)?(?:state|graph|displays|configs|best-effort)\.v1\.json/.test(request.url())) datasets.push(new URL(request.url()).pathname); };
@@ -81,12 +81,12 @@ test("February 2026 is the best-effort chain month: the wrong cell is marked on 
   expect(errors).toEqual([]);
 });
 
-test("root month 2019-01 in the real app: all 6 faces one color (the solved cube), the front face white in Rubik-Tint", async ({ page }) => {
+test("root month 1980-01 in the real app: all 6 faces one color (the solved cube), the front face white in Rubik-Tint", async ({ page }) => {
   test.setTimeout(120000);
   const errors = [];
   page.on("pageerror", (e) => errors.push(String(e)));
-  await page.goto("/index.html?app=calendar7&year=2019&month=1&scheme=rubik-tint");
-  await at(page, "2019-01"); await idle(page);
+  await page.goto("/index.html?app=calendar7&year=1980&month=1&scheme=rubik-tint");
+  await at(page, "1980-01"); await idle(page);
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-scheme", "rubik-tint");
   const graphJson = JSON.parse(readFileSync("public/calendar7/chain-c/graph.v1.json", "utf8"));
   await expect(page.locator(ROOT)).toHaveAttribute("data-c7-digest", graphJson.nodes[0].hash);

@@ -81,7 +81,7 @@ test("raw expansions map legal generators to the actual animated block and exclu
   await expect(page.locator('[data-c7="progress"]')).toContainText("move 1 of");
   await page.locator('[data-c7="skip"]').click();await idle(page,"2026-12");
 });
-// The longest word of the chain C is March to April 2023 (124 block moves); October to November 2026 is 100 and does not scroll.
+// A long word of the chain is March to April 2023 (124 block moves); October to November 2026 is 100 and does not scroll.
 test("long prefix words follow only inside their container, preserve focus and clear highlights after interruption",async({page})=>{
   await page.setViewportSize({width:390,height:844});
   await controlled(page,"2023&month=3");

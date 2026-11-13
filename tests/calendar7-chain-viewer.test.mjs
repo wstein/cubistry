@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 mount on the long chain C data (public/calendar7/chain-c) as the canonical data: lazy fetch of its four files,
-// the range January 2019 to January 2036, the solved root month, and the best-effort month February 2026 (wrong cell (7,1)).
+// the range January 1980 to January 2036, the solved root month, and the best-effort month February 2026 (wrong cell (7,1)).
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync, readdirSync } from "node:fs";
@@ -16,10 +16,10 @@ const graph = parseGraph(json("public/calendar7/chain-c/graph.v1.json"));
 const start = parseState(json("public/calendar7/chain-c/state.v1.json"));
 const ym = (y, m) => `${y}-${String(m).padStart(2, "0")}`;
 
-test("the canonical data are the four chain C files, fetched at runtime and nothing else", async () => {
+test("the canonical data are the four chain data files (print D), fetched at runtime and nothing else", async () => {
   const root = fakeRoot(), { env, calls } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=2019&month=1"), env);
-  await settle(root, "2019-01");
+  const inst = await mountCalendar7(root, new URLSearchParams("year=1980&month=1"), env);
+  await settle(root, "1980-01");
   assert.deepEqual([...calls.fetched].sort(), ["/calendar7/chain-c/best-effort.v1.json", "/calendar7/chain-c/displays.v1.json", "/calendar7/chain-c/graph.v1.json", "/calendar7/chain-c/state.v1.json"]);
   inst.dispose();
 });
@@ -31,28 +31,28 @@ test("no source file of the mode imports the chain data: they stay out of the ma
   }
 });
 
-test("range January 2019 to January 2036, 204 steps, no demo wording; 2018-12 and 2036-02 are outside", async () => {
+test("range January 1980 to January 2036, 672 steps, no demo wording; 1979-12 and 2036-02 are outside", async () => {
   const root = fakeRoot(), { env } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=2019&month=1"), env);
-  await settle(root, "2019-01");
-  assert.match(root.view.innerHTML, /January 2019 to January 2036, 204 steps/);
+  const inst = await mountCalendar7(root, new URLSearchParams("year=1980&month=1"), env);
+  await settle(root, "1980-01");
+  assert.match(root.view.innerHTML, /January 1980 to January 2036, 672 steps/);
   assert.doesNotMatch(root.view.innerHTML, /DEMO|demo|beam preview/);
-  assert.match(root.view.innerHTML, /No earlier month: January 2019 is the start of the chain/);
+  assert.match(root.view.innerHTML, /No earlier month: January 1980 is the start of the chain/);
   inst.dispose();
-  for (const [y, m] of [[2018, 12], [2036, 2]]) {
+  for (const [y, m] of [[1979, 12], [2036, 2]]) {
     const r = fakeRoot(), { env: e } = setup();
     const i = await mountCalendar7(r, new URLSearchParams(`year=${y}&month=${m}`), e);
     await settle(r, ym(y, m));
-    assert.match(r.view.innerHTML, /Display only: no move sequence for this date \(print C\)/);
+    assert.match(r.view.innerHTML, /Display only: no move sequence for this date \(print D\)/);
     assert.equal(r.el("player").hidden, true);
     i.dispose();
   }
 });
 
-test("root month 2019-01 in the app: the cube is built from the chain C print and shows the solved root pose, white front in Rubik-Tint", async () => {
+test("root month 1980-01 in the app: the cube is built from the chain print D and shows the solved root pose, white front in Rubik-Tint", async () => {
   const root = fakeRoot(), { env, stage } = setup();
-  const inst = await mountCalendar7(root, new URLSearchParams("year=2019&month=1&scheme=rubik-tint"), env);
-  await settle(root, "2019-01");
+  const inst = await mountCalendar7(root, new URLSearchParams("year=1980&month=1&scheme=rubik-tint"), env);
+  await settle(root, "1980-01");
   assert.equal(root.getAttribute("data-c7-scheme"), "rubik-tint");
   assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[0].hash);
   assert.deepEqual([...stage.configs[0].printing.text], [...start.printing.text]);
@@ -69,7 +69,7 @@ test("February 2026 is a best-effort chain month: the wrong cell (7,1) goes to t
   const root = fakeRoot(), { env, stage } = setup();
   const inst = await mountCalendar7(root, new URLSearchParams("year=2026&month=2"), env);
   await settle(root, "2026-02");
-  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[85].hash);
+  assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[553].hash);
   assert.equal(root.el("player").hidden, false, "the chain month keeps the player: steps are animated");
   const c = stage.configs.at(-1), pose = stage.shows.at(-1);
   assert.deepEqual(c.wrong, wrongStickerIndices(pose, [[7, 1]]));
@@ -99,7 +99,7 @@ test("the wrong cell appears with the best-effort month and is gone one step lat
     await settle(root, ym(y, m));
     assert.deepEqual(stage.configs.at(-1).wrong ?? [], [], "left February 2026");
     assert.ok(wrongAtTurn.length > 0 && wrongAtTurn.every((n) => n === 0), `turns after leaving: ${wrongAtTurn}`);
-    assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[(y - 2019) * 12 + m - 1].hash);
+    assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[(y - 1980) * 12 + m - 1].hash);
     inst.dispose();
   }
 });
@@ -108,7 +108,7 @@ test("a failed best-effort download stops the mount like any other canonical fil
   const root = fakeRoot(), { env } = setup();
   const fetchJson = env.fetchJson;
   env.fetchJson = async (url) => { if (url.endsWith("best-effort.v1.json")) throw new Error("HTTP 404"); return fetchJson(url); };
-  await assert.rejects(mountCalendar7(root, new URLSearchParams("year=2019&month=1"), env), /HTTP 404/);
+  await assert.rejects(mountCalendar7(root, new URLSearchParams("year=1980&month=1"), env), /HTTP 404/);
 });
 
 test("the best-effort sentence is red text only: the sheet red token, no frame, no background, 4.5:1 on the surface and canvas of both themes", async () => {
@@ -126,4 +126,24 @@ test("the best-effort sentence is red text only: the sheet red token, no frame, 
     assert.ok(contrast(light, pick(name, 0)) >= 4.5, `light ${name}`);
     assert.ok(contrast(dark, pick(name, darkAt)) >= 4.5, `dark ${name}`);
   }
+});
+
+test("each of the six best-effort months of the chain (1981-02, 1987-02, 1998-02, 2009-02, 2015-02, 2026-02) sends the wrong cell (7,1) to the cube and says it once", async () => {
+  for (const [y, m] of [[1981, 2], [1987, 2], [1998, 2], [2009, 2], [2015, 2], [2026, 2]]) {
+    const root = fakeRoot(), { env, stage } = setup();
+    const inst = await mountCalendar7(root, new URLSearchParams(`year=${y}&month=${m}`), env);
+    await settle(root, ym(y, m));
+    assert.equal(root.getAttribute("data-c7-digest"), graph.nodes[(y - 1980) * 12 + m - 1].hash, ym(y, m));
+    const c = stage.configs.at(-1);
+    assert.deepEqual(c.wrong, wrongStickerIndices(stage.shows.at(-1), [[7, 1]]), ym(y, m));
+    assert.equal(c.printing.text[c.wrong[0]], "29");
+    assert.equal(root.view.innerHTML.split("data-c7-best-effort").length - 1, 1, ym(y, m));
+    inst.dispose();
+  }
+  // A February that print D shows exactly (2024, Thursday start, 29 days) has no wrong cell.
+  const root = fakeRoot(), { env, stage } = setup();
+  const inst = await mountCalendar7(root, new URLSearchParams("year=2024&month=2"), env);
+  await settle(root, "2024-02");
+  assert.deepEqual(stage.configs.at(-1).wrong ?? [], []);
+  inst.dispose();
 });
