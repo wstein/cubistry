@@ -36,9 +36,8 @@ the gesture for a whole-cube rotation (deferred, see Open decisions).
 ## Requirements
 
 1. The viewer starts in view mode everywhere. Play mode is switched on explicitly; leaving it returns to view mode.
-2. Play mode is a viewer toggle. It is also a persisted setting and a `play` URL parameter following the `speed` pattern
-   (survives an app switch; an invalid value falls back to the default, which is view mode). Whether toggle, setting or both
-   ship is an open decision.
+2. Play mode is a viewer toggle and is not persisted: every page load starts outside play mode (owner decision 7). It is
+   therefore neither a stored setting nor a URL parameter.
 3. The interaction machine has the states Idle, Pending, Orbiting, Turning, Settling. A gesture that starts on the cube
    (raycast in the cube's local frame) starts a move gesture; a gesture that starts outside the cube starts Orbiting.
 4. One finger on a sticker (owner decision 1 and 2): the touched sticker is signaled (highlight). Layer and axis are derived
@@ -59,8 +58,8 @@ the gesture for a whole-cube rotation (deferred, see Open decisions).
 10. Layering: the pure state machine and the move decision belong to the shared core (PuzlWerk); pointer events, raycast and
     pivot binding stay in the TypeScript viewer package. The viewer shows a caller-validated legal selection and angle on a
     temporary turn pivot; controllers own state, deadlines and commit ([VIEWER_RENDERING](../../docs/VIEWER_RENDERING.md)).
-11. A cube turned by hand can be reset or solved again. Proposed (not decided): undo history of the session plus one jump to the
-    application's target state; no solver call.
+11. A cube turned by hand can be reset to the state shown when play mode started (entry state; owner decision 6). Whether the
+    reset is one jump or an undo history of the session is not decided; no solver call.
 
 ## Owner decisions (2026-11-13)
 
@@ -79,21 +78,21 @@ the gesture for a whole-cube rotation (deferred, see Open decisions).
    model. Consequences: the net turn of a gesture can be a rotation move; the state-equality check (requirement 7) covers
    rotations; view-mode orbit stays presentation only and is not a move. The gesture for it is deferred (Open decisions).
    This replaces the earlier open item on the gesture and on layer choice, which decisions 3 and 4 answer.
+6. **Reset target on print-bound cubes.** The state shown when play mode started (entry state).
+7. **Activation.** Viewer toggle, not persisted; every page load starts outside play mode.
+8. **Apps allowed first.** Playground and Picture Cube. All others later; calendar apps not yet.
 
-## Per-application availability (design draft, not decided)
+## Per-application availability
 
-Applications where the picture is the point (Picture Cube 2 to 7, special cubes) offer play mode fully. Applications whose
-state is a date (Calendar7, clock, status cube) either disable it or offer free play with a "reset to the date" action, because
-a hand turn leaves the shown date. Counter and clock: no manual moves proposed.
+First release: Playground and Picture Cube (decision 8). Other applications follow later; calendar apps (Calendar7, calendar,
+clock, status cube) are not yet in scope, so the "reset to the date" question does not arise for now.
 
 ## Open decisions (owner)
 
-1. Reset target for print-bound cubes: home state (solved) or the state the application currently shows?
-2. Activation: viewer toggle, persisted setting, or both.
-3. Which applications allow manual moves; date applications: disabled or free play with reset.
-4. Gesture for a whole-cube rotation. The three-finger gesture is rejected (iOS system gestures). Candidates, not decided: two
-   fingers outside the cube; Alt+drag with the mouse.
-5. Sticker-edge rule for deriving layer and axis from the gesture direction (to be specified).
+1. Sticker-edge rule for deriving layer and axis from the gesture direction (to be specified in the implementation step).
+2. Gesture for a whole-cube rotation: deferred. The three-finger gesture is rejected (iOS system gestures). Investigation
+   candidate, not decided: two fingers outside the cube, counted as an x/y/z move in 90 degree steps; it conflicts with camera
+   pinch-zoom and needs a rule. Alt+drag with the mouse is a candidate for the mouse.
 
 ## Invariants
 
