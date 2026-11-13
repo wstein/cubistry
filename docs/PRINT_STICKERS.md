@@ -2,8 +2,8 @@
 
 The separate **Print stickers** page provides complete physical prints for German
 A, English 3 and both H/M/S lettering variants. Open it from the selected calendar,
-clock or HSM counter; the physical print is selected automatically. English's
-leading-zero and unpadded day options use the same print.
+clock or HSM counter; the physical print is selected automatically. The
+leading-zero and unpadded day options of both prints use the same print.
 
 ## Measure before ordering
 
