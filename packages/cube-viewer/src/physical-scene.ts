@@ -277,8 +277,9 @@ export class PhysicalCubeScene {
    */
   setPictureProjection(projection: PictureProjection | null): void {
     this.clearProjection();
-    this.projecting = projection !== null;
-    if (!projection) { this.updateBodyUv(); this.refreshArtwork(); return; }
+    this.projecting = false; // set only once the projection is complete: a thrown demand leaves the arc-length UV in place
+    this.updateBodyUv();
+    if (!projection) { this.refreshArtwork(); return; }
     const n = this.axisCoordinates[0].length;
     demand(this.axisCoordinates.every((c) => c.length === n), "Picture projection needs a cube");
     const widths = this.layers?.widths ?? Array<number>(n).fill(1);
@@ -307,6 +308,7 @@ export class PhysicalCubeScene {
       entry.surface.needsUpdate = true;
       entry.projected = true;
     }
+    this.projecting = true;
     this.updateBodyUv();
   }
   /**
