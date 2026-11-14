@@ -50,9 +50,9 @@ test("bounded portfolio improves all recorded November actual poses without rela
       tokens(result.word).length <= row.expectedMoves,
       JSON.stringify(row),
     );
-    assert.equal(result.maximumTotalNodes, 200000);
+    assert.equal(result.maximumTotalNodes, 2000000);
     assert(result.attempts.length <= 2);
-    assert(result.attempts.every((a) => a.maximumNodes === 100000));
+    assert(result.attempts.every((a) => a.maximumNodes === 1000000));
     assert.equal(interims.length, 1);
     assert(tokens(result.word).length <= tokens(interims[0].word).length);
     const refs = referencesForPlan(ctx, result.word),
@@ -106,7 +106,7 @@ test("deadline preserves an interim center-aware candidate and its backend truth
                   backendUsed: "center-aware",
                   solverStatus: "solved",
                   chosenMoves: tokens(first.word).length,
-                  maximumTotalNodes: 200000,
+                  maximumTotalNodes: 2000000,
                 },
               },
             }),

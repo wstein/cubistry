@@ -1,4 +1,8 @@
-import { tryCenterPortfolio, referencesForPlan } from "./center-planner.mjs";
+import {
+  tryCenterPortfolio,
+  referencesForPlan,
+  CENTER_SEARCH_MAX_NODES,
+} from "./center-planner.mjs";
 import { KPattern } from "cubing/kpuzzle";
 import { puzzles } from "cubing/puzzles";
 import {
@@ -83,9 +87,9 @@ self.onmessage = async (
           attempts: first.attempts,
           directMoves: result.word.split(/\s+/).filter(Boolean).length,
           chosenMoves: first.word.split(/\s+/).filter(Boolean).length,
-          maximumNodes: 100000,
+          maximumNodes: CENTER_SEARCH_MAX_NODES,
           maximumAttempts: 2,
-          maximumTotalNodes: 200000,
+          maximumTotalNodes: CENTER_SEARCH_MAX_NODES * 2,
         },
       });
     });
@@ -112,9 +116,9 @@ self.onmessage = async (
         reason: candidate.reason,
         directMoves: result.word.split(/\s+/).filter(Boolean).length,
         chosenMoves: candidate.word.split(/\s+/).filter(Boolean).length,
-        maximumNodes: 100000,
+        maximumNodes: CENTER_SEARCH_MAX_NODES,
         maximumAttempts: 2,
-        maximumTotalNodes: 200000,
+        maximumTotalNodes: CENTER_SEARCH_MAX_NODES * 2,
         attempts: candidate.attempts,
         improvementSkippedReason: candidate.improvementSkippedReason,
         centerRepairVersion: corrections.version,

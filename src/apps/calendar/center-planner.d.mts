@@ -2,6 +2,7 @@ import type {
   CalendarPlanningContext,
   CalendarRoutePlanner,
 } from "./controller.ts";
+export const CENTER_SEARCH_MAX_NODES: number;
 export interface CenterOptions {
   backend?: "direct" | "center-aware";
   policy?: "default" | "portfolio";
