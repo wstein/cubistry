@@ -87,7 +87,7 @@ export function namesExposure(scene: THREE.Object3D, rotation: THREE.Quaternion,
  * darkness (a shadow material, independent of the intensity of the light); the shading of the faces by shadows and by the key
  * shrinks by this share.
  */
-export const NAMES_DIRECTIONAL_SHARE = 0.05;
+export const NAMES_DIRECTIONAL_SHARE = 0.08;
 
 /**
  * Turns the directional lights of `scene` to `share` of their intensity (1 restores them) and raises the ambient light by the
