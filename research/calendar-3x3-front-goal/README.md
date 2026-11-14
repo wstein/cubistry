@@ -90,19 +90,23 @@ The root heuristic is 5 to 6 at the median where the optimum is 7 to 9: the gap 
 
 ## Verification and tests
 
-- `test/runtests.jl` (1649 assertions, 76 s): the Julia predicate against the app's `matches()` on 504 cases (177
+- `test/runtests.jl` (1804 assertions, about 145 s): the Julia predicate against the app's `matches()` on 504 cases (177
   positive, including a 12 move word that twists only the front center, which must be rejected; cases come from
   `export-predicate-cases.mjs`, expected values computed by the app); the acceptance tables against the real up vector
   produced by the engine for every slot/sticker pair reachable in three turns; known optima (a back turn costs 0 although
   the full-state optimum is 1, one front turn costs 1); the optimum against heuristic-free brute force on 40 scrambles of
   1 to 3 turns (depth 3) and against an independent Node brute force on 40 cases of optimum 1 to 7 with opposite-face
   pairs (`fixtures/bf-cases.tsv`, `export-bf-cases.mjs`: moves tabulated from the app's `apply`, goal confirmed by the app's
-  `matches`); the inclusive depth bound; fewest rotation tokens; free rotations against brute force; strictly fewer nodes
+  `matches`); free rotations against an independent Node brute force on 24 cases where the needed center is off the front and
+  the optimum needs a two-token rotation (`fixtures/bf-rot-cases.tsv`, `export-bf-rot-cases.mjs`); the inclusive depth bound; fewest
+  rotation tokens; the first rotation word in table order kept on equal ties; the final `matches` check with a table-free heuristic;
+  free rotations against brute force; strictly fewer nodes
   with nine tables than with two.
 - `test/verify.test.mjs` (4 tests): the verifier accepts the recorded routes and rejects a tampered route, a wrong count and a
   file without any solved row (zero verified routes is a failure).
-- `run-mutations.sh`: each of nine mutations makes the named test set fail (new: both orders of opposite faces forbidden,
-  depth bound one short, last candidate kept on ties, first table only). Earlier five: heuristic plus one (known optima, brute force,
+- `run-mutations.sh`: each of twelve mutations makes the named test set fail (both orders of opposite faces forbidden,
+  depth bound one short, last route found kept regardless of rotation tokens, first table only; new: rotation candidates limited to
+  one token, later tie kept (`<=`), final `matches` check dropped). Earlier five: heuristic plus one (known optima, brute force,
   free rotations), relaxed sources made strict (brute force and four more), up direction ignored (predicate and acceptance
   tables), center up ignored (predicate), slot 9 dropped (predicate and acceptance tables). Output: all CAUGHT.
 - Route verification: `verify-routes.mjs` replays every route with the app's `apply` and requires `matches` for the
@@ -123,14 +127,14 @@ node --test research/calendar-3x3-front-goal/test/verify.test.mjs
 ```
 
 `research/calendar-3x3-front-goal/data/` holds the app's routes and a pose hash per step, `fixtures/` the prints,
-27 targets per print and the predicate cases, `results/` the raw measurements of this report.
+27 targets per print, the predicate cases and the brute-force cases (`bf-cases.tsv`, `bf-rot-cases.tsv`), `results/` the raw measurements of this report.
 
 ## Not verified
 
 - Browser or WASM speed: nothing was run in a browser or worker; all numbers are Julia on one core, the app numbers are
   Node.
-- Optimality is shown by the admissibility argument, brute force to depth 3 and equality under a weaker heuristic; not by
-  an independent Flix or second implementation, and not by an exhaustive search at depth 7 to 9.
+- Optimality is shown by the admissibility argument, brute force (40 scrambles to depth 3, 40 independent Node cases to optimum 7, 24 rotation cases to optimum 4) and equality under a weaker heuristic; not by
+  an independent Flix or second implementation, and not by an exhaustive search at depth 8 to 12.
 - The sample is 100 consecutive days per print, not all 2562 targets; worst cases elsewhere are unknown (the largest search
   here was 3.9 million nodes).
 - Rotations: the metric is HTM with rotations free. Rotation tokens (at most 2) are reported but not optimized; physical
@@ -178,5 +182,5 @@ routes use one), and whether optimal routes are wanted or a bound with a time li
 ## Files
 
 `FrontGoal.jl` (search), `run_steps.jl`, `run-all.sh`, `summarize.jl`, `ablation.jl`, `goalset-stats.jl` (Julia);
-`lib.mjs`, `dump-app-chain.mjs`, `export-fixtures.mjs`, `export-predicate-cases.mjs`, `verify-routes.mjs` (Node glue and
+`lib.mjs`, `dump-app-chain.mjs`, `export-fixtures.mjs`, `export-predicate-cases.mjs`, `export-bf-cases.mjs`, `export-bf-rot-cases.mjs`, `verify-routes.mjs` (Node glue and
 verifier, importing `src/apps/calendar/*`); `run-mutations.sh`; `test/`; `data/`, `fixtures/`, `results/`.
