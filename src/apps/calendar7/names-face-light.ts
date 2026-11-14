@@ -25,20 +25,28 @@ const smoothstep = (a: number, b: number, x: number): number => { const t = Math
 /** W of a fragment whose normal has the cosine `d` to the camera direction. */
 export const frontWeight = (d: number): number => smoothstep(FRONT_FROM, FRONT_TO, d);
 
-/** Sharpness of the face share of a fragment: weight |n_a|^p of the body axis a (a flat face: one axis; a bevel: the face it is nearer to). */
-export const FACE_SHARE_POWER = 4;
 /**
- * Reference of the fragment shader (`vC7Obj`, `vC7Axes`): the cosine to the camera of the body face a fragment belongs to. `n` is the
- * interpolated object space normal, `axisCos` the cosine to the camera of the +x, +y and +z body axes. A flat face gives the cosine of
- * its face; a bevel the cosines of its two faces weighted by |n_a|^FACE_SHARE_POWER, so a bevel belongs to the face it is nearer to. The
- * fragment weight W uses min(n . c, this cosine) in place of n . c: the weight of a bevel fragment is never larger than that of its
- * face, and where the fragment turns away from the camera by more than its face does, it keeps the smaller weight of its own normal.
- * Only the weight changes: the diffuse light of the fragment still follows its normal, so a bevel that faces a light is brighter than
- * the flat face (the large bevel of the O2 radius had taken the full studio light, W = 1, on the top face and clipped).
+ * A body axis takes part in the face of a fragment when the object space normal has a component along it: its share is
+ * smoothstep(0, FACE_FADE, |n_a|), so the axes of the two faces of a bevel count from where the normal leaves the face, and a flat
+ * face (the other components are 0) has only its own axis.
+ */
+export const FACE_FADE = 0.2;
+const smooth01 = (x: number): number => smoothstep(0, FACE_FADE, x);
+/**
+ * Reference of the fragment shader (`vC7Obj`, `vC7Axes`): the cosine to the camera of the face a fragment belongs to, for the weight.
+ * `n` is the interpolated object space normal, `axisCos` the cosine to the camera of the +x, +y and +z body axes. A flat face gives the
+ * cosine of its face; a bevel the smallest cosine of the faces it joins, so it is lit like the darker of its two faces (a bevel between
+ * a face that looks at the camera and one that looks away is not lit as the front face, which let the studio's light from above run
+ * along it as a streak, and was not lifted to the front face's brightness at the lower edge, as a dark band). The fragment weight W uses
+ * min(n . c, this cosine) in place of n . c. Only the weight changes: the diffuse light of the fragment still follows its normal.
  */
 export function faceCosine(n: readonly [number, number, number], axisCos: readonly [number, number, number]): number {
-  const a = n.map(x => Math.pow(Math.abs(x), FACE_SHARE_POWER)), sum = a[0] + a[1] + a[2] + 1e-6;
-  return (a[0] * Math.sign(n[0]) * axisCos[0] + a[1] * Math.sign(n[1]) * axisCos[1] + a[2] * Math.sign(n[2]) * axisCos[2]) / sum;
+  let cosine = 1;
+  for (let k = 0; k < 3; k++) {
+    const share = smooth01(Math.abs(n[k])), c = Math.sign(n[k]) * axisCos[k];
+    cosine = Math.min(cosine, 1 + (c - 1) * share);
+  }
+  return cosine;
 }
 
 /** The uniform of the shaders: (share, target T, FRONT_FROM, FRONT_TO). Share 1 and target 0 give the studio's light on every face. */
@@ -72,7 +80,7 @@ const DEFAULT_NORMAL = "#include <defaultnormal_vertex>";
 /** Vertex shader: the object space normal and the cosine to the camera of the three body axes (constant per mesh; the camera looks along -z in view space). */
 const FACE_VERTEX = `\n\tvC7Obj = objectNormal;\n\tvC7Axes = vec3( normalize( normalMatrix[ 0 ] ).z, normalize( normalMatrix[ 1 ] ).z, normalize( normalMatrix[ 2 ] ).z );`;
 /** Fragment shader: the cosine of the face the fragment belongs to (reference: faceCosine). */
-const FACE_COS = `vec3 c7A = pow( abs( vC7Obj ), vec3( 4.0 ) );\n\tfloat c7FaceCos = dot( c7A, sign( vC7Obj ) * vC7Axes ) / ( c7A.x + c7A.y + c7A.z + 1e-6 );`;
+const FACE_COS = `vec3 c7S = smoothstep( 0.0, ${FACE_FADE.toFixed(3)}, abs( vC7Obj ) );\n\tvec3 c7C = sign( vC7Obj ) * vC7Axes;\n\tfloat c7FaceCos = min( mix( 1.0, c7C.x, c7S.x ), min( mix( 1.0, c7C.y, c7S.y ), mix( 1.0, c7C.z, c7S.z ) ) );`;
 const NORMAL = "vec3 geometryNormal = normal;";
 const DIRECTIONAL = "getDirectionalLightInfo( directionalLight, directLight );";
 const INDIRECT = "RE_IndirectDiffuse( irradiance,";
