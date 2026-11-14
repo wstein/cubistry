@@ -454,3 +454,34 @@ unconstrained re-solve reproduces the stored edge, otherwise the run differs fro
 Expected wall time: about 1 to 2 minutes of setup (library build) plus, per edge, one solve of 10 to 70 s and up to five re-root solves of
 10 to 70 s, so about 5 to 8 minutes for a long edge, 12 to 20 minutes per job (estimate from the first measurement, not measured for this
 run). The wall-clock limit is below 345 minutes (job 340 minutes; no re-root solve starts after `deadline_min`).
+
+### Reference lengths, negative costs, granularity (after the probe run 43643890220)
+
+The probe (edges 87 and 166, library L5, width 40) reproduced both stored edges (`same_moves` true for 166) but the re-root at P = 1, 21,
+33 HTM gave a total of 97, 103, 104 HTM against `free_htm` = 134 (`cost_htm` -37, -31, -30; +4 at P = 81, 0 at P = 99). A negative cost means
+that the free reference is not optimal: the beam is a heuristic, a run that starts from a different root state finds a shorter route.
+`cost_htm` stays as defined (streamed - free) but it is not readable as the price of streaming when the reference is beatable.
+
+Better reference per edge (`measure_edges.jl`, `reroot=1`):
+- `ref_root_htm`: a fresh unconstrained solve from the root (P = 0), same configuration. It is the same call as the free run, so a
+  difference to `free_htm` is the spread of the solver (thread order), and it equals `free_htm` when the solver is deterministic.
+- `ref_wide_htm`: the same solve with width `ref_width` (default 2 x width, 1-400; the stored chain is width 40, so 80). A wider beam does not
+  always find a shorter route; the value is only a second reference.
+- `best_ref_htm` = min(stored HTM of the chain edge, `ref_root_htm`, `ref_wide_htm`); a solve that was skipped (deadline) or failed counts as missing.
+- `cost_vs_best_htm` = `streamed_htm - best_ref_htm`; `share` is as before. Columns in `reroot.tsv` (appended after `status`) and `summary.tsv`
+  (`ref_root_htm`, `ref_wide_htm`, `best_ref_htm`, `ref_wide_width`).
+
+What `cost_vs_best_htm` says: how much longer the streamed route of one commit point is than the best route any of the three
+unconstrained solves found for that edge. It is an upper bound of the price of that single commit, relative to a reference that is
+still only a heuristic bound, not the optimum (no proof of optimality, UNKNOWN). A value <= 0 means no loss was found against these references.
+What it does not say: the cumulative cost of a sequence of commits in one solve (not measured); the price for other widths or libraries; player speed.
+
+Granularity: a token is one element of the move word, one quarter turn (a signed generator, `+g` or `-g`); a half turn is two equal
+tokens, HTM counts it as 1 (`macro_moves`). A commit point cuts the word between two tokens, so P can end inside a half turn.
+
+"2-token seam" (answer): the junction of P and the re-solved rest is a 2-token seam when the last token of P and the first token of the rest
+are equal (`g g` becomes the half turn `g2`, saving 1 HTM) or opposite (`g -g` cancels, saving 2 HTM). The player has played P, so the streamed
+route keeps both tokens; the saving is `streamed_htm - merged_htm` and `seam_cancel` counts the removed tokens. Longer cancellations show as larger values.
+
+Workflow input `ref_width` (optional; empty = 2 x width). `research_ref` is a commit of the research branch (`research/cube-display-feasibility`),
+not a commit of a PR branch and not a commit of `main`.
