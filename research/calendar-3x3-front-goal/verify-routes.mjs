@@ -41,5 +41,6 @@ for (const file of process.argv.slice(2)) {
     }
   }
 }
+if (checked === 0) fail("no route was verified (every row unsolved or no rows)");
 console.log(`verified ${checked} routes with the app engine, failures ${bad}`);
 process.exit(bad ? 1 : 0);
