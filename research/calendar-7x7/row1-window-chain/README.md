@@ -382,6 +382,8 @@ Committed: `evidence/print-d/` (print' = print D, working name; layout unchanged
 1998-02, 2009-02, 2015-02, 2026-02; Julia, Flix and independent receipts, `VERIFIED.txt`). The 673 state files (9 MB) are not committed; `states.sha256` lists their SHA-256. Reproduce (stage artifacts
 are the sources; `chain.moves.tsv` SHA-256 `fe9f9fac8a2d0359d188df755e8e55336dcb4ec1a5d18119dfd422d5727214e3`, `b6cb3c525f12e8e2511cc04e5adc84e013e9f052ffd2ff8b454742ab44e5e2e6`, see `provenance.tsv`): `root_change.jl evidence/print-c/printing.tsv OUT --states <run 43414242499>/chain.moves.tsv <run 43307881914>/chain.moves.tsv`.
 Checks: `test_root_change.jl` (synthetic chains with two backward and one forward segment, 5 s), `run_root_change_mutants.sh` (16 source mutants), `test_root_change_evidence.jl` (consistency of the committed files).
+
+Backward chain 1900-01 .. 2019-01 (run 43542652089, 1428 edges, print C, root 2019-01): `evidence/chain-back-1900-2019/` (README there), consistency test `test_chain_back_1900_evidence.jl`. The root change over this chain, the Print D freeze and the forward chain are open.
 Not run: print checker, Hall table and coverage files for print D (the 90-configuration matching file lists pieces of print C and would have to be transformed), a workflow run on the composed chain.
 
 ## Scope and limits
