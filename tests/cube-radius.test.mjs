@@ -155,12 +155,12 @@ test("planarFaceUv: every one of the six face groups of a cut-face body is plana
   scene.dispose();
 });
 
-test("stickerSideFor keeps 0.01 between the sticker and the start of the bevel, and the sticker radius equals the body radius from 3x3 on", () => {
+test("stickerSideFor ends the sticker where the bevel starts (no margin), and the sticker radius equals the body radius from 3x3 on", () => {
   for (const [n, edge] of [[5, 5], [5, 5.2], [7, 7], [7, 8.2]]) {
     const r = bodyRadiusFor(n, edge), flat = P.bodyWidth - 2 * r;
-    near(stickerSideFor(1, r), flat - 0.01, 1e-12, `N=${n} edge ${edge}: flat part of the body less 0.01`);
+    near(stickerSideFor(1, r), flat, 1e-12, `N=${n} edge ${edge}: flat part of the body`);
     assert.equal(stickerRadiusFor(n, edge), bodyRadiusFor(n, edge), "the corner radius of sticker and body agree (the side rule uses the body radius)");
   }
   assert.equal(stickerSideFor(1, 0.055), 0.87);
-  assert.equal(stickerSideFor(1.6, 0.15), Math.min(0.87 * 1.6, 1.6 - 0.01 - 0.3 - 0.01));
+  assert.equal(stickerSideFor(1.6, 0.15), Math.min(0.87 * 1.6, 1.6 - 0.01 - 0.3));
 });

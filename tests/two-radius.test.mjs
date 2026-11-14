@@ -157,13 +157,13 @@ test("scene: the sticker is the same size on every cell (inner, edge, corner), t
   }
 });
 
-test("sticker side per size: 0.87 where the flat face allows it, else the flat face less the 0.01 margin, the same on every cell", () => {
+test("sticker side per size: 0.87 where the flat face allows it, else the flat face, the same on every cell", () => {
   for (const [n, edge] of [[2, 2], [3, 3], [5, 5], [7, 7], [5, 5.2], [7, 8.2]]) {
     const small = innerRadiusFor(n, edge), side = stickerSideFor(1, small), flat = 1 - (1 - P.bodyWidth) - 2 * small;
-    near(side, Math.min(0.87, flat - 0.01), 1e-12, `N=${n} edge ${edge}`);
-    assert.ok(side <= flat - 0.01 + 1e-12 || side === 0.87, "inside the flat face with the margin, or the preset share");
+    near(side, Math.min(0.87, flat), 1e-12, `N=${n} edge ${edge}`);
+    assert.ok(side <= flat + 1e-12, "inside the flat face");
   }
-  near(stickerSideFor(1, innerRadiusFor(7, 8.2)), 1 - 0.01 - 2 * 0.0902 - 0.01, 1e-3, "7x7 profile sticker 0.80");
+  near(stickerSideFor(1, innerRadiusFor(7, 8.2)), 1 - 0.01 - 2 * 0.0902, 1e-3, "7x7 profile sticker 0.81");
   near(stickerSideFor(1, innerRadiusFor(2)), 0.87, 1e-12); near(stickerSideFor(1, innerRadiusFor(3)), 0.87, 1e-12);
 });
 
