@@ -48,9 +48,10 @@ export interface StickerWindow {
 
 /**
  * Window of the sticker of `face` on the cubie with the world layer indices `layerIndex` (0..n-1 per axis, increasing with
- * the world coordinate). `share` is the part of the cell the surface covers (the sticker 0.87, a body face 0.99).
+ * the world coordinate). `share` is the part of the cell the surface covers (the sticker 0.87, a body face 0.99); `size` (right x up,
+ * scene units) replaces it where the surface is not that share of the cell (a sticker narrowed by a larger bevel radius).
  */
-export function stickerWindow(widths: LayerWidths, share: number, face: FaceKey, layerIndex: Vec3): StickerWindow {
+export function stickerWindow(widths: LayerWidths, share: number, face: FaceKey, layerIndex: Vec3, size?: readonly [number, number]): StickerWindow {
   const frame = PROJECTED_FACES[face];
   demand(frame !== undefined, "Unknown face");
   demand(share > 0, "Invalid projection geometry");
@@ -67,7 +68,7 @@ export function stickerWindow(widths: LayerWidths, share: number, face: FaceKey,
     return { index: layerIndex[axis], sign, size: widths[layerIndex[axis]], center: sign * centers[layerIndex[axis]] };
   };
   const r = along(right), u = along(frame.up);
-  const sizeU = share * r.size, sizeV = share * u.size;
+  const sizeU = size ? size[0] : share * r.size, sizeV = size ? size[1] : share * u.size;
   return {
     col: r.sign > 0 ? r.index : n - 1 - r.index,
     row: u.sign > 0 ? n - 1 - u.index : u.index,
