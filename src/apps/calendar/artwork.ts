@@ -1,5 +1,5 @@
 import type { Sticker } from "./model.ts";
-import { SCHEMES, underlineInk, type ColorScheme } from "../calendar7/schemes.ts";
+import { SCHEMES, type ColorScheme } from "../calendar7/schemes.ts";
 
 /** Label classes of a 3x3 calendar sticker. German has no weekend class: its weekday stickers are plain in every scheme. */
 export type StickerRole = "day" | "weekday" | "month" | "weekend";
@@ -44,11 +44,13 @@ export const CAL3_EXCLUDED: readonly { readonly id: string; readonly reason: str
 function fromCalendar7(s: ColorScheme): Cal3Scheme {
   const weekend: RoleInk = { ink: s.sunSatInk, ground: s.weekendFill ?? s.weekendTint ?? s.dayFill, weight: 800 };
   const on = (ink: string): RoleInk => ({ ink, ground: s.dayFill, weight: 600 });
+  // Month stickers are inverse chips: the month color as ground (the band color; line schemes use their accent) with the month ink.
+  const chip: RoleInk = { ground: s.bandFill ?? s.monthInk, ink: s.bandFill ? s.monthInk : s.dayFill, weight: 600 };
   return Object.freeze({
     id: s.id,
     name: s.name,
     ground: s.dayFill,
-    roles: Object.freeze({ day: on(s.dayInk), weekday: on(s.weekdayInk), month: on(underlineInk(s)), weekend }),
+    roles: Object.freeze({ day: on(s.dayInk), weekday: on(s.weekdayInk), month: chip, weekend }),
   });
 }
 

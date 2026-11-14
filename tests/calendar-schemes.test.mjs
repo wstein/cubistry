@@ -54,10 +54,27 @@ test("unknown, null and missing scheme ids give the default; the catalog is the 
 
 test("every label class of every 3x3 scheme passes the contrast gates", () => {
   for (const sc of CAL3_SCHEMES.slice(1)) {
-    for (const role of ["day", "weekday", "month"]) assert.ok(contrast(sc.roles[role].ink, sc.ground) >= 4.5, `${sc.id} ${role} ${contrast(sc.roles[role].ink, sc.ground)}`);
+    for (const role of ["day", "weekday", "month"]) assert.ok(contrast(sc.roles[role].ink, sc.roles[role].ground) >= 4.5, `${sc.id} ${role} ${contrast(sc.roles[role].ink, sc.roles[role].ground)}`);
     // SAT/SUN and the German S are large bold (82 px and 168 px, weight 800): the 3:1 gate of the Calendar7 weekend labels.
     assert.ok(contrast(sc.roles.weekend.ink, sc.roles.weekend.ground) >= 3, `${sc.id} weekend`);
     assert.equal(sc.roles.weekend.weight, 800);
+  }
+});
+
+test("month stickers are inverse chips: the scheme's month color as ground with its month ink; day and weekday stay on paper; default unchanged", () => {
+  for (const sc of CAL3_SCHEMES.slice(1)) {
+    const src = SCHEMES.find((s) => s.id === sc.id);
+    assert.equal(sc.roles.month.ground, src.bandFill ?? src.monthInk, sc.id);
+    assert.equal(sc.roles.month.ink, src.bandFill ? src.monthInk : src.dayFill, sc.id);
+    assert.notEqual(sc.roles.month.ground, sc.roles.weekday.ground, sc.id + " month ground differs from the weekday ground");
+    assert.equal(sc.roles.weekday.ground, sc.ground);
+    assert.equal(sc.roles.day.ground, sc.ground);
+  }
+  assert.equal(DEFAULT_CAL3_SCHEME.roles.month.ground, "#fffdf6");
+  // EN months are three stickers, DE months one letter each: all month stickers (slot >= 3, not digits) use the chip.
+  for (const id of IDS) for (const s of designs[id].printing) {
+    const art = stickerArt(s, cal3SchemeById("dracula"));
+    assert.equal(art.ground === "#ff79c6", stickerRole(s) === "month", id + " " + s.slot + ":" + s.image);
   }
 });
 

@@ -104,7 +104,7 @@ const CONTROLS = () => `
     <p id="calendar-layout" class="small"></p>
     <label for="calendar-scheme">Cube color theme</label>
     <select id="calendar-scheme">${CAL3_SCHEMES.map((s) => `<option value="${s.id}">${s.name}</option>`).join("")}</select>
-    <p class="small">Screen only: print files and the print export keep the default colors. English SAT and SUN use the weekend color; German has no weekend cue.</p>
+    <p class="small">Screen only: print files and the print export keep the default colors. Month stickers are inverse chips; English SAT and SUN use the weekend color; German has no weekend cue.</p>
     <label id="calendar-padding-label" hidden><input id="calendar-padding" type="checkbox" checked /> Leading zero</label>
     <label for="calendar-date">Inspect a date</label>
     <input type="date" id="calendar-date" min="0001-01-01" max="9999-12-31" disabled />
