@@ -50,7 +50,8 @@ function fromCalendar7(s: ColorScheme): Cal3Scheme {
   const weekend: RoleInk = { ink: s.sunSatInk, ground: s.weekendFill ?? s.weekendTint ?? s.dayFill, weight: 800 };
   const on = (ink: string): RoleInk => ({ ink, ground: s.dayFill, weight: 600 });
   // Month stickers are inverse chips: the month color as ground (the band color; line schemes use their accent) with the month ink.
-  const chip: RoleInk = { ground: s.bandFill ?? s.monthInk, ink: s.bandFill ? s.monthInk : s.dayFill, weight: 600, ...CHIP_OVERRIDES[s.id] };
+  const own = { ground: s.bandFill ?? s.monthInk, ink: s.bandFill ? s.monthInk : s.dayFill };
+  const chip: RoleInk = { ...own, ...CHIP_OVERRIDES[s.id], weight: 600 };
   return Object.freeze({
     id: s.id,
     name: s.name,
