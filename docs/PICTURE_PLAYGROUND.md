@@ -72,7 +72,7 @@ face only. The image rectangle is the full face extent (the sum of the layer wid
 unchanged): no margin, the image reaches the sticker edge on the outer border (g = 0). A sticker covers 0.87 of its cell
 and a body face 0.99, so both lie inside the image; only the gaps, bevels and seams cut it away (stickered: plastic; stickerless: white body). The outline of a sticker is the
 sticker geometry (rounded as in A): the image window uses the sticker's own UV and there is no mask, no square outline and no
-plastic-colored margin inside the sticker. The rule is the pure module
+plastic-colored margin inside the sticker. In the stickerless look the image faces of the body have planar UV (`u = position / (0.99 x cell) + 0.5`, `planarBodyUv` in `body-artwork.ts`), because Three's arc-length body UV is not linear in position and shifted the image by up to 0.007 pitch against the seams; look A and B keep the arc-length UV (tests: `tests/projected-scene.test.mjs`, `tests/browser/stickerless-seam.spec.mjs`). The rule is the pure module
 [`projected-uv.ts`](../packages/cube-viewer/src/projected-uv.ts) (tests: `tests/projected-uv.test.mjs`).
 
 Nothing is prerendered. The viewer keeps one texture per face (the face image, loaded once through the bounded asset loader
