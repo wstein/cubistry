@@ -10,7 +10,7 @@ The adapter relabels physical pieces relative to the selected target, aligns the
 six physical centers, and preserves the visible front center orientation. Hidden
 center goal orientations are free; physical parity remains checked. Every chosen
 route is replayed against the actual sticker model. The default attempt has
-100,000 nodes and depth at most 24, further limited to strictly beat the checked
+1,000,000 nodes and depth at most 24, further limited to strictly beat the checked
 direct route. Unknown, invalid, failed or late searches retain a verified route;
 there is no universal 21-move or optimality claim. Cold initialization takes about
 two seconds in the measured Node pilot. The worker has an eight-second deadline
@@ -56,8 +56,8 @@ native outer-turn cap. Both attempts retain the same physical replay and exact
 reference requirements. A failed, unknown or non-improving second attempt keeps
 the first checked result; this is a portfolio, not an optimal solver.
 
-Each attempt permits at most 100,000 nodes by default: **at most two attempts and
-200,000 nodes total**, in addition to the unchanged existing direct planner. The
+Each attempt permits at most 1,000,000 nodes by default: **at most two attempts and
+2,000,000 nodes total**, in addition to the unchanged existing direct planner. The
 worker's eight-second hard deadline is unchanged. It posts the first center-aware
 candidate and its exact references before the improvement attempt, so a deadline
 retains that best known candidate with its actual backend identity. Diagnostics
