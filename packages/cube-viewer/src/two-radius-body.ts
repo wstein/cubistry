@@ -95,8 +95,8 @@ export function createTwoRadiusBody(options: TwoRadiusBodyOptions): THREE.Buffer
     const nl = Math.hypot(nv[0], nv[1], nv[2]);
     return { p, n: nv.map((x) => x / nl) };
   };
-  let vertexCount = 0;
-  for (let face = 0; face < 6; face++) {
+  /** The grid lines of the two tangent axes of a face. */
+  const faceLines = (face: number): [number[], number[]] => {
     const a = face >> 1, s = face & 1 ? -1 : 1, b = (a + 1) % 3, c = (a + 2) % 3;
     const side = s > 0 ? 1 : 0;
     // The rounding extents of each border along the face (two values for mixed corners).
@@ -110,7 +110,23 @@ export function createTwoRadiusBody(options: TwoRadiusBodyOptions): THREE.Buffer
       }
       return { extents, ramp };
     };
-    const ub = lines(h[b], extent(b, c, 0), extent(b, c, 1)), vc = lines(h[c], extent(c, b, 0), extent(c, b, 1));
+    return [lines(h[b], extent(b, c, 0), extent(b, c, 1)), lines(h[c], extent(c, b, 0), extent(c, b, 1))];
+  };
+  // One set of grid lines per axis for all faces: two faces that share a box edge get the same vertices along it (a closed hull).
+  const axisLines: number[][] = [[], [], []];
+  for (let face = 0; face < 6; face++) {
+    const a = face >> 1, [ub, vc] = faceLines(face);
+    axisLines[(a + 1) % 3].push(...ub); axisLines[(a + 2) % 3].push(...vc);
+  }
+  const union = axisLines.map((all) => {
+    const sorted = [...all].sort((x, y) => x - y), out: number[] = [];
+    for (const v of sorted) if (out.length === 0 || v - out[out.length - 1] > 1e-9) out.push(v);
+    return out;
+  });
+  let vertexCount = 0;
+  for (let face = 0; face < 6; face++) {
+    const a = face >> 1, s = face & 1 ? -1 : 1, b = (a + 1) % 3, c = (a + 2) % 3;
+    const ub = union[b], vc = union[c];
     const first = vertexCount, startIndex = index.length;
     const [uAxis, uSign, vAxis, vSign] = FACE_UV[face];
     for (const y of vc) for (const x of ub) {
