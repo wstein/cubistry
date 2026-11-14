@@ -7,7 +7,8 @@ import assert from "node:assert/strict";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import {
-  PhysicalCubeScene, createPresentationGeometry, thickOuterLayerWidths, layerCenters,
+  PhysicalCubeScene, createPresentationGeometry, thickOuterLayerWidths, layerCenters, layerEdge,
+  presentationLayerProfile, bodyRadiusFor, stickerRadiusFor, stickerSideFor,
 } from "@cubistry/cube-viewer";
 import { PROJECTED_FACES, FACE_KEYS } from "../packages/cube-viewer/src/projected-uv.ts";
 
@@ -219,7 +220,7 @@ test("round trip in the stickerless construction: after Per sticker the body fac
 });
 
 /** The image coordinate that each flat-part vertex of an image face of every body samples, against its ideal place on the cube. */
-function imageErrors(scene, parent, fr, n) {
+function imageErrors(scene, parent, fr, n, radius = 0.055) {
   let worst = 0, count = 0, beyondUnit = 0;
   parent.children.filter((b) => b.isGroup).forEach((body) => {
     const shell = body.children[0];
@@ -234,8 +235,8 @@ function imageErrors(scene, parent, fr, n) {
       for (let i = group.start; i < group.start + group.count; i++) {
         const v = (shell.geometry.index?.getX(i) ?? i); if (seen.has(v)) continue; seen.add(v);
         const p = [pos.getX(v), pos.getY(v), pos.getZ(v)], u = along(p, right), w = along(p, up);
-        // The flat part of this body: up to where its bevel starts (half of its own width minus the radius 0.055).
-        const flat = (d) => half[d.findIndex((c) => c !== 0)] - 0.055 + 1e-4;
+        // The flat part of this body: up to where its bevel starts (half of its own width minus the radius of the cube).
+        const flat = (d) => half[d.findIndex((c) => c !== 0)] - radius + 1e-4;
         if (Math.abs(u) > flat(right) || Math.abs(w) > flat(up)) continue;
         if (Math.abs(u) > 0.4401 || Math.abs(w) > 0.4401) beyondUnit++; // only a cell wider than the unit cell gets here
         const tu = map.offset.x + map.repeat.x * uv.getX(v), tv = map.offset.y + map.repeat.y * uv.getY(v);
@@ -289,4 +290,41 @@ test("a projection that throws leaves the arc-length body UV in place (the plana
   scene.setConstruction("stickered"); scene.setConstruction("stickerless");
   assert.deepEqual(uvOf(), initial, "and construction changes do not bring it back");
   scene.dispose();
+});
+
+// O2 radii (owner decision 2026-11-14): the preset profile gives every cell the bevel radius of the cube edge and every sticker
+// its own size, so the planar UV of the stickerless faces and the window of a projected sticker follow the new radius.
+function buildPreset(n, widths) {
+  const edge = layerEdge(widths), fr = frames(n), parent = new THREE.Group(), profile = presentationLayerProfile(widths);
+  const geometry = createPresentationGeometry(n, edge);
+  const originals = new Map(fr.map((s) => { const m = new THREE.MeshPhysicalMaterial({ color: "#fffdf6" }); m.map = new THREE.Texture({ width: 2, height: 2 }); return [s.id, m]; }));
+  const scene = new PhysicalCubeScene(parent, fr, originals, new THREE.MeshPhysicalMaterial(), 1, geometry, new Map(fr.map((s) => [s.id, "#fffdf6"])), { layers: profile });
+  scene.sync(fr); parent.updateMatrixWorld(true);
+  const stickers = new Map(); parent.traverse((o) => { if (o.userData.stickerId !== undefined) stickers.set(o.userData.stickerId, o); });
+  return { scene, parent, fr, edge, stickers };
+}
+test("O2 radii, stickerless projected: planar UV is exact on the flat part of bodies with the larger bevel radius", () => {
+  for (const [n, f] of [[5, 1.1], [7, 1.6]]) {
+    const widths = thickOuterLayerWidths(n, f), { scene, parent, fr, edge } = buildPreset(n, widths);
+    scene.setConstruction("stickerless"); scene.setPictureProjection({ faces: faceTextures() });
+    const { worst, count } = imageErrors(scene, parent, fr, edge, bodyRadiusFor(n, edge));
+    assert.ok(count > 20, `${n}: vertices checked`);
+    assert.ok(worst < 1e-6, `${n}: image coordinate error ${worst}`);
+    scene.dispose();
+  }
+});
+test("O2 radii, stickered projected: the window of a sticker is its own size (narrowed by the larger radius), not 0.87 of the cell", () => {
+  for (const [n, f] of [[5, 1.1], [7, 1.6]]) {
+    const widths = thickOuterLayerWidths(n, f), { scene, fr, edge, stickers } = buildPreset(n, widths), IMG = edge;
+    scene.setPictureProjection({ faces: faceTextures() });
+    const r = stickerRadiusFor(n, edge), h = (n - 1) / 2;
+    for (const s of fr) {
+      const { up } = PROJECTED_FACES[faceOf(s.n)], map = stickers.get(s.id).material.map;
+      const right = [up[1] * s.n[2] - up[2] * s.n[1], up[2] * s.n[0] - up[0] * s.n[2], up[0] * s.n[1] - up[1] * s.n[0]];
+      const cellOf = (d) => widths[Math.round(s.p[d.findIndex((c) => c !== 0)] + h)];
+      near(map.repeat.x, stickerSideFor(cellOf(right), r) / IMG, 1e-12, `${n} repeat x`); near(map.repeat.y, stickerSideFor(cellOf(up), r) / IMG, 1e-12, `${n} repeat y`);
+    }
+    assert.ok(stickerSideFor(1, r) < 0.87, "the sticker is narrower than the old 0.87 share");
+    scene.dispose();
+  }
 });
