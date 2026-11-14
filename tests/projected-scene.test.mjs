@@ -44,7 +44,7 @@ function faceTextures() {
 function build(n, { widths, double = false, plastic = new THREE.MeshPhysicalMaterial({ color: "#1b2431" }), colors } = {}) {
   const fr = frames(n, double), parent = new THREE.Group();
   const geometry = { ...createPresentationGeometry(double ? 2 : undefined), body: unitBody() };
-  const originals = new Map(fr.map((s) => { const m = new THREE.MeshPhysicalMaterial({ color: "#ffffff" }); m.map = new THREE.Texture({ width: 2, height: 2 }); return [s.id, m]; }));
+  const originals = new Map(fr.map((s) => { const m = new THREE.MeshPhysicalMaterial({ color: "#fffdf6" }); m.map = new THREE.Texture({ width: 2, height: 2 }); return [s.id, m]; }));
   const scene = new PhysicalCubeScene(parent, fr, originals, plastic, double ? 0.5 : 1, geometry, colors ?? new Map(fr.map((s) => [s.id, "#fffdf6"])),
     widths ? { layers: { widths, body: profileBody } } : {});
   scene.sync(fr); parent.updateMatrixWorld(true);
@@ -148,7 +148,7 @@ test("switching back to Per sticker restores the tile materials exactly and rele
 });
 
 test("stickerless: the exterior body faces carry the same window; the body is white with the image (no mask)", () => {
-  const colors = new Map(); const { scene, parent, fr } = build(3, { colors });
+  const { scene, parent, fr } = build(3); // face colors are #fffdf6, not white: the white body face is set by the projection
   scene.setConstruction("stickerless");
   const faces = faceTextures(); scene.setPictureProjection({ faces });
   let count = 0;
