@@ -243,36 +243,71 @@ test("exposure: the studio has only the light types the irradiance counts, and a
   assert.equal(namesExposure(scene, new THREE.Quaternion(), cam), 1);
 });
 
-// ---- light per face: the names light rig (names-exposure.ts) ----
-import { NAMES_DIRECTIONAL_SHARE, applyNamesLightRig } from "../src/apps/calendar7/names-exposure.ts";
-const topOverFront = (scene, pitch, yaw) => {
-  const q = turned(yaw, pitch), n = (a) => new THREE.Vector3(...a).applyQuaternion(q);
-  return irradiance(scene, n([0, 1, 0])) / irradiance(scene, n([0, 0, 1]));
-};
-const VIEWS = [[0, 0], [0.22, 0.3], [0.3, 0.5], [0.45, 0.5], [0.95, 0.5]];
+// ---- light per face: the face that looks at the camera is lit as before, the others get the share (names-face-light.ts) ----
+import { FRONT_FROM, FRONT_TO, NAMES_DIRECTIONAL_SHARE, faceIrradiance, faceLightChunks, frontWeight } from "../src/apps/calendar7/names-face-light.ts";
+const faceNormal = (axis, q) => new THREE.Vector3(...axis).applyQuaternion(q);
+const FACES = { up: [0, 1, 0], front: [0, 0, 1], right: [1, 0, 0], left: [-1, 0, 0] };
+const VIEWS = [[0, 0], [0.22, 0.3], [0.3, 0.5], [0.45, 0.5], [0.95, 0.5]]; // [pitch, yaw]: the studio views of the washout report
 
-test("light rig: the studio lights the top face 2.1 to 4.8 times the front face, the names rig at most 1.3 times (pitch 0 to 0.95)", () => {
-  const studio = studioScene();
-  assert.ok(Math.min(...VIEWS.map(([p, y]) => topOverFront(studio, p, y))) > 2, "the studio itself: the reason of the washed top face");
-  assert.ok(NAMES_DIRECTIONAL_SHARE <= 0.1);
-  const rigged = studioScene();
-  applyNamesLightRig(rigged, NAMES_DIRECTIONAL_SHARE);
-  for (const [p, y] of VIEWS) assert.ok(topOverFront(rigged, p, y) <= 1.3, `pitch ${p}: ${topOverFront(rigged, p, y)}`);
+test("face light: the weight is 1 for a face that looks at the camera, the share at grazing and below, and rises smoothly in between", () => {
+  assert.equal(NAMES_DIRECTIONAL_SHARE, 0.08);
+  assert.equal(frontWeight(1), 1);
+  assert.equal(frontWeight(FRONT_TO), 1);
+  assert.equal(frontWeight(0.8), 1);
+  assert.equal(frontWeight(FRONT_FROM), 0);
+  for (const d of [0, 0.2, -0.5, -1]) assert.equal(frontWeight(d), 0, String(d));
+  let prev = 0;
+  for (let d = FRONT_FROM; d <= FRONT_TO; d += 0.005) { const w = frontWeight(d); assert.ok(w >= prev - 1e-12 && w <= 1, String(d)); assert.ok(w - prev < 0.06, `no step at ${d}`); prev = w; }
+  assert.ok(FRONT_TO <= 0.8 && FRONT_TO > 0.6, "a face within 37 degrees of the camera is front: the start view and its turned views");
+  assert.ok(FRONT_TO - FRONT_FROM >= 0.25, "a wide range: a turn changes the light slowly");
 });
 
-test("light rig: the head-on front face keeps its irradiance (exposure 1.217), and the call is idempotent and reversible", () => {
-  const scene = studioScene(), cam = camera(), q0 = new THREE.Quaternion();
-  const before = namesExposure(scene, q0, cam), lights = [];
-  scene.traverse((o) => { if (o.isLight) lights.push([o, o.intensity]); });
-  applyNamesLightRig(scene, NAMES_DIRECTIONAL_SHARE);
-  const once = lights.map(([o]) => o.intensity);
-  assert.ok(Math.abs(namesExposure(scene, q0, cam) - before) < 1e-9, "front face irradiance unchanged");
-  assert.ok(Math.abs(before - 1.217) < 0.003);
-  applyNamesLightRig(scene, NAMES_DIRECTIONAL_SHARE);
-  assert.deepEqual(lights.map(([o]) => o.intensity), once, "second call: same values");
-  for (const [o, base] of lights) if (o.isDirectionalLight) assert.ok(Math.abs(o.intensity - base * NAMES_DIRECTIONAL_SHARE) < 1e-12);
-  applyNamesLightRig(scene, 1);
-  assert.deepEqual(lights.map(([o]) => o.intensity), lights.map(([, i]) => i), "share 1 restores the studio");
+test("face light: the face that looks at the camera has exactly the studio's irradiance, the other faces about that of the front face at the least (0.97) and at most 1.15 times it", () => {
+  const scene = studioScene(), cam = camera();
+  for (const [p, y] of VIEWS.slice(0, 4)) {
+    const q = turned(y, p), mainFront = irradiance(scene, faceNormal(FACES.front, q));
+    assert.ok(Math.abs(faceIrradiance(scene, faceNormal(FACES.front, q), q, cam) - mainFront) < 1e-9, `front at pitch ${p}`);
+    for (const k of ["up", "right"]) {
+      const n = faceNormal(FACES[k], q), now = faceIrradiance(scene, n, q, cam);
+      if (n.z < 0.2) continue; // looks away from the camera
+      assert.ok(now <= 1.15 * mainFront && now >= 0.97 * mainFront, `${k} at pitch ${p}: ${now} against the front's ${mainFront}`);
+    }
+  }
+  // Steep view: the top face is the face that looks at the camera and keeps the studio's light; the front face is lit like the others.
+  const q = turned(0.5, 0.95), top = faceNormal(FACES.up, q);
+  assert.equal(frontWeight(top.z), 1);
+  assert.ok(Math.abs(faceIrradiance(scene, top, q, cam) - irradiance(scene, top)) < 1e-9);
+  assert.ok(frontWeight(faceNormal(FACES.front, q).z) < 0.5, "the front face is not the face that looks at the camera there");
+});
+
+test("face light: the irradiance of every face is continuous while the cube turns about y and about x (no step, no pop)", () => {
+  const scene = studioScene(), cam = camera(), step = (rot, from, to, face) => {
+    let worst = 0, prev = null;
+    for (let a = from; a <= to + 1e-9; a += 0.01) {
+      const q = rot(a), n = faceNormal(FACES[face], q);
+      if (n.z < 0.1) { prev = null; continue; }
+      const v = faceIrradiance(scene, n, q, cam);
+      if (prev !== null) worst = Math.max(worst, Math.abs(v - prev));
+      prev = v;
+    }
+    return worst;
+  };
+  // Largest change per 0.01 rad of turn of the irradiance a face gets (the studio's own change is up to 0.1 for the front face at a pitch);
+  // a hard switch between front and not front changes it by 1 or more.
+  for (const face of Object.keys(FACES)) for (const [name, rot, from, to] of [["yaw", (a) => turned(a, 0.3), -1.3, 1.3], ["pitch", (a) => turned(0.3, a), -1.3, 1.3]]) {
+    const worst = step(rot, from, to, face);
+    assert.ok(worst < 0.25, `${face} ${name}: largest step of 0.01 rad ${worst}`);
+  }
+});
+
+test("face light: the three.js light chunks take the face light at the three places, and a changed chunk is refused", () => {
+  const { begin, end } = faceLightChunks();
+  assert.ok(begin.includes("c7Direct = mix( c7FaceLight.x, 1.0, c7W )") && begin.includes("directLight.color *= c7Direct;") && begin.includes("c7DirSum"));
+  assert.ok(end.includes("irradiance += vec3( ( 1.0 - c7W ) * max( 0.0, c7FaceLight.y - c7Base ) );") && end.indexOf("c7Base") < end.indexOf("RE_IndirectDiffuse( irradiance,"));
+  const at = begin.indexOf("directLight.color *= c7Direct;");
+  assert.ok(at > 0 && begin.indexOf("directionalLightShadows[ i ]", at) > at, "in the directional loop, before its shadow factor");
+  assert.throws(() => faceLightChunks("vec3 other;", THREE.ShaderChunk.lights_fragment_end), /changed its light chunk/);
+  assert.throws(() => faceLightChunks(THREE.ShaderChunk.lights_fragment_begin, "nothing"), /changed its light chunk/);
 });
 
 // ---- soft shoulder (names-tone.ts) ----
@@ -327,10 +362,3 @@ test("plasticity: the exposure gain gives back what shadows, specular and clearc
   assert.ok(plasticityGain(1) > plasticityGain(0.25));
 });
 
-test("plasticity: the shadow part of the gain scales with the share of the directional lights the layout keeps", () => {
-  for (const p of [0.25, 0.6, 1]) {
-    assert.equal(plasticityGain(p, true, 1), plasticityGain(p), "share 1 is the studio as it is");
-    assert.equal(plasticityGain(p, true, NAMES_DIRECTIONAL_SHARE) - plasticityGain(p, false) < 0.01, true, `${p}: ${plasticityGain(p, true, NAMES_DIRECTIONAL_SHARE)} vs ${plasticityGain(p, false)}`);
-    assert.ok(plasticityGain(p, true, NAMES_DIRECTIONAL_SHARE) >= plasticityGain(p, false), String(p));
-  }
-});

@@ -48,7 +48,8 @@ import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLA
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
-import { NAMES_DIRECTIONAL_SHARE, applyNamesLightRig, namesExposure } from "./names-exposure.ts";
+import { namesExposure } from "./names-exposure.ts";
+import { NAMES_DIRECTIONAL_SHARE, faceLightUniform, patchFaceLight, updateFaceLight } from "./names-face-light.ts";
 import { NAMES_TONE_MAPPING, installNamesToneMapping } from "./names-tone.ts";
 import { DEFAULT_PLASTICITY, clampPlasticity, floorOpacityFactor, plasticityGain, plasticityParts } from "./names-plasticity.ts";
 
@@ -161,6 +162,9 @@ export class Calendar7Viewer implements StageView {
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
   private frames: { id: number; cubie: number; p: number[]; n: number[]; up: number[] }[] = [];
   private readonly tween = new MoveTween();
+  /** The uniform of the face light of the names layout materials and the share it was set to. */
+  private readonly faceLight = faceLightUniform();
+  private directionalShare = NAMES_DIRECTIONAL_SHARE;
   private dirty = true;
   private destroyed = false;
   private readonly lastQuaternion = new THREE.Quaternion();
@@ -250,9 +254,17 @@ export class Calendar7Viewer implements StageView {
     floor.opacity = ((floor.userData.c7OpacityBase ??= floor.opacity) as number) * floorOpacityFactor(strength);
   }
 
-  /** The names layout follows the face that looks at the camera (names-exposure.ts); the standard layout keeps the shared value. */
+  /** Share of the directional lights that the faces which do not look at the camera keep in the names layout (1: the studio's light on every face; a test hook, default `NAMES_DIRECTIONAL_SHARE`). */
+  setDirectionalShare(share: number): void {
+    this.directionalShare = share;
+    this.syncExposure();
+    this.dirty = true;
+  }
+
+  /** The names layout follows the face that looks at the camera (names-exposure.ts, names-face-light.ts); the standard layout keeps the shared value. */
   syncExposure(): void {
-    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled, NAMES_DIRECTIONAL_SHARE) : STANDARD_EXPOSURE;
+    updateFaceLight(this.faceLight, this.scene, this.presentation.quaternion, this.camera, this.layout === "names", this.directionalShare);
+    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled) : STANDARD_EXPOSURE;
   }
 
   /**
@@ -409,10 +421,9 @@ export class Calendar7Viewer implements StageView {
     this.layout = layout;
     this.scheme = layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     this.fitExtent(layout);
-    // The names layout: its colors are the scheme tokens (geometry.ts), so it has its own light rig (the top face is not much brighter
-    // than the front: names-exposure.ts) and the soft shoulder tone mapping at its own exposure; otherwise the shared tone mapping and exposure 1.
+    // The names layout: its colors are the scheme tokens (geometry.ts), so it has the soft shoulder tone mapping at its own exposure
+    // (the studio lights are never changed: the faces that do not look at the camera are lit less in their materials, names-face-light.ts); otherwise the shared tone mapping and exposure 1.
     installNamesToneMapping();
-    applyNamesLightRig(this.scene, layout === "names" ? NAMES_DIRECTIONAL_SHARE : 1);
     this.renderer.toneMapping = layout === "names" ? NAMES_TONE_MAPPING : this.standardToneMapping;
     this.syncExposure();
     this.clear();
@@ -484,6 +495,10 @@ export class Calendar7Viewer implements StageView {
     // The scene hides the sticker meshes and gives each cubie face the label texture (the cut faces take bodyColor: the day fill when stickerless).
     this.cube.setConstruction("stickerless");
     this.applyPlasticity();
+    if (layout === "names") this.presentation.traverse((o) => { // the face light of the names layout: only these materials know it
+      if (!(o as THREE.Mesh).isMesh) return;
+      for (const m of [].concat((o as THREE.Mesh).material as never) as THREE.Material[]) patchFaceLight(m, this.faceLight);
+    });
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.presentation.traverse((o) => {
       if (o.userData.stickerId !== undefined && this.wrongIds.has(o.userData.stickerId - 1)) this.wrongMeshes.push(o);
