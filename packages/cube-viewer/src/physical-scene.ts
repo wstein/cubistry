@@ -73,6 +73,7 @@ export interface PictureProjection {
 }
 /** Share of a cell that the UV range of a body face covers (the rounded box is `bodyWidth` of the pitch wide). */
 const BODY_SHARE = 0.99;
+const ALL_FACES: ReadonlySet<number> = new Set([0, 1, 2, 3, 4, 5]);
 /** Size of the box of a body geometry. */
 const bodyExtent = (geometry: THREE.BufferGeometry): Vec3 => {
   geometry.computeBoundingBox();
@@ -83,7 +84,7 @@ export interface PhysicalSceneOptions extends StickerlessBodyOptions {
   readonly layers?: LayerProfile;
   /**
    * Stickerless construction only: the exterior faces of the bodies take planar UV (`u = position / body extent + 0.5`) instead of
-   * Three's arc-length UV, always and not only in the projected look. A face texture is then linear in space: its pixels per
+   * Three's arc-length UV, always and not only in the projected look (the cut faces too: their edge stops follow the exterior art). A face texture is then linear in space: its pixels per
    * unit are the same everywhere (the texture width over the body width) and a cell edge lies where the cell edge is.
    */
   readonly planarFaceUv?: boolean;
@@ -350,9 +351,11 @@ export class PhysicalCubeScene {
       if (!planar) { shell.mesh.geometry = shell.base; continue; }
       // The projected look maps the face image over the preset share of the cell; the planar face UV over the body itself.
       const extent = this.projecting ? shell.extent : bodyExtent(shell.base);
-      const key = `${shell.key}|${extent.join(",")}|${[...shell.image].sort().join("")}`; // the image faces differ between cubies of one orientation key
+      // The projected look maps the image faces only; planarFaceUv maps the cut faces too, so the edge stops of a cut face (drawn from the edge colors of the exterior art) meet the art along the shared edge.
+      const groups = this.projecting ? shell.image : ALL_FACES;
+      const key = `${shell.key}|${extent.join(",")}|${[...groups].sort().join("")}`; // the image faces differ between cubies of one orientation key
       let geometry = this.planarBodies.get(key);
-      if (!geometry) { geometry = planarBodyUv(shell.base, extent, shell.image); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
+      if (!geometry) { geometry = planarBodyUv(shell.base, extent, groups); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
       shell.mesh.geometry = geometry;
     }
   }
