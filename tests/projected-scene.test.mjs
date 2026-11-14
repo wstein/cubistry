@@ -317,7 +317,7 @@ test("O2 radii, stickered projected: the window of a sticker is its own size (na
   for (const [n, f] of [[5, 1.1], [7, 1.6]]) {
     const widths = thickOuterLayerWidths(n, f), { scene, fr, edge, stickers } = buildPreset(n, widths), IMG = edge;
     scene.setPictureProjection({ faces: faceTextures() });
-    const r = stickerRadiusFor(n, edge), h = (n - 1) / 2;
+    const r = bodyRadiusFor(n, edge), h = (n - 1) / 2;
     for (const s of fr) {
       const { up } = PROJECTED_FACES[faceOf(s.n)], map = stickers.get(s.id).material.map;
       const right = [up[1] * s.n[2] - up[2] * s.n[1], up[2] * s.n[0] - up[0] * s.n[2], up[0] * s.n[1] - up[1] * s.n[0]];

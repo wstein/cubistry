@@ -80,12 +80,12 @@ export function stickerRadiusFor(size: number = 3, edge: number = size): number 
   return size <= 3 ? p.stickerRadius : p.stickerRadius * edge / 3;
 }
 /**
- * Side of a sticker on a cell of width `cell` (inner layers): the preset share of the cell, and never wider than the flat part of
+ * Side of a sticker on a cell of width `cell` (inner layers; `bodyRadius`: the radius of the BODY, whose flat part limits it): the preset share of the cell, and never wider than the flat part of
  * the body face less a 0.01 margin (a larger bevel radius shrinks the sticker; N <= 3 keeps 0.87 exactly).
  */
-export function stickerSideFor(cell: number, radius: number): number {
+export function stickerSideFor(cell: number, bodyRadius: number): number {
   const p = PRESENTATION_PRESET, side = p.stickerWidth * cell;
-  return radius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * radius - 0.01);
+  return bodyRadius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * bodyRadius - 0.01);
 }
 /** A rounded-rectangle sticker of the world size `width` x `height` with corner radius `radius` on both axes; UV spans 0..1 over its extent. */
 export function createStickerGeometry(width: number, height: number, radius: number, curveSegments: number = PRESENTATION_PRESET.stickerCurveSegments): THREE.ShapeGeometry {
@@ -117,7 +117,7 @@ export function createPresentationGeometry(size?: number, edge?: number) {
   const p = PRESENTATION_PRESET;
   const body = new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth, p.bevelSegments, bodyRadiusFor(size, edge));
   const radius = stickerRadiusFor(size, edge);
-  const side = stickerSideFor(1, radius);
+  const side = stickerSideFor(1, bodyRadiusFor(size, edge));
   const sticker = createStickerGeometry(side, side, radius);
   return { body, core: new THREE.SphereGeometry(1, 48, 24), sticker, stickerOffset: p.stickerOffset };
 }
@@ -132,7 +132,7 @@ export function presentationLayerProfile(widths: readonly number[]): LayerProfil
   return {
     widths,
     body: (cell) => new RoundedBoxGeometry(cell[0] - gap, cell[1] - gap, cell[2] - gap, p.bevelSegments, Math.min(radius, (Math.min(...cell) - gap) / 2)),
-    sticker: (w, h) => createStickerGeometry(stickerSideFor(w, sticker), stickerSideFor(h, sticker), sticker),
+    sticker: (w, h) => createStickerGeometry(stickerSideFor(w, radius), stickerSideFor(h, radius), sticker),
   };
 }
 
