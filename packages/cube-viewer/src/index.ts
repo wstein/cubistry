@@ -192,7 +192,7 @@ export class CubeViewer {
   /** `pictureChosen`: the value comes from the Pictures menu, a newer choice than the mode that the URL named. */
   setAppearance(value: ViewerAppearance, pictureChosen = false): void {
     const next = validateAppearance(value);
-    if (pictureChosen || next.pictureMode !== this.appearance.pictureMode) this.pictureUrlMode = undefined;
+    if (pictureChosen || next.pictureMode !== this.appearance?.pictureMode) this.pictureUrlMode = undefined;
     this.appearance = next;
     this.plastic?.color.set(this.appearance.frameColor ?? this.defaultPlasticColor);
     this.cube?.setConstruction(this.appearance.construction);
@@ -204,7 +204,7 @@ export class CubeViewer {
   }
   /** The mode in effect: an explicit URL mode, else the explicit stored choice, else Projected. */
   get pictureMode(): PictureMode {
-    return effectivePictureMode({ url: this.pictureUrlMode, stored: this.appearance.pictureMode });
+    return effectivePictureMode({ url: this.pictureUrlMode, stored: this.appearance?.pictureMode });
   }
   /** The mode that the page address named (`?pictures=`); undefined: the address names none. */
   setPictureModeFromUrl(mode: PictureMode | undefined): void {
