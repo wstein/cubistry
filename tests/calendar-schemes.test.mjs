@@ -310,7 +310,9 @@ test("the viewer paints the German weekday with the chip ground (configure of a 
     const chipTextures = (d) => new Set(d.printing.filter((s) => s.image && !/^[0-9]$/.test(s.image)).map((s) => (s.slot < 3 ? "weekday" : "month") + ":" + s.image)).size;
     const de = designs["de-a"], en = designs["en-3-zero"];
     assert.equal(run(de), chipTextures(de), "German: every weekday and month texture is a chip");
-    assert.ok(run(en) < run(de));
+    // English: only month textures are chips; the weekday textures (including SAT/SUN, whose ground is the weekend one) are not.
+    const monthTextures = new Set(en.printing.filter((s) => s.image && !/^[0-9]$/.test(s.image) && s.slot >= 3).map((s) => s.image)).size;
+    assert.equal(run(en), monthTextures, "English weekdays stay on paper");
   } finally { delete globalThis.document; delete globalThis.matchMedia; }
 });
 
