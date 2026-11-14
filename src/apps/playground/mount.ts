@@ -11,6 +11,7 @@
  */
 import type { LoadedAssets } from "@cubistry/cube-assets";
 import { serializeMove } from "@cubistry/cube-mechanics";
+import { parsePictureMode, type PictureMode } from "@cubistry/cube-viewer";
 import type { ModeInstance, MountContext } from "../registry.ts";
 import { ALLOWED_MOVES, UPLOAD_STYLE, createDesign, type Style } from "./model.ts";
 import { PlaygroundController, type PlaygroundViewer } from "./controller.ts";
@@ -26,6 +27,8 @@ export interface PlaygroundHostViewer extends PlaygroundViewer {
   destroy(): void;
   /** True while a turn animates; the viewer cannot be destroyed then. */
   readonly animating: boolean;
+  /** The picture mode that `?pictures=` named (Projected or Per sticker); undefined when the address names none. */
+  setPictureModeFromUrl?(mode: PictureMode | undefined): void;
 }
 
 /** The handle of the pictures panel (pictures.ts `initPictures`). */
@@ -477,6 +480,8 @@ export async function mountPlayground(
     return;
   }
   viewer = env.createViewer(host);
+  // An explicit `pictures=` value is an explicit choice (it beats a stored one); none or an unknown value leaves the default.
+  viewer.setPictureModeFromUrl?.(parsePictureMode(params.get("pictures")));
   applySpeed();
   region.inert = false;
   controller = new PlaygroundController(viewer, sessions.get("picture") as Session, update, env.solverFactory);

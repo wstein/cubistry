@@ -3,6 +3,7 @@
 import { loadAssets } from "@cubistry/cube-assets";
 import { BASE_MOVE_DURATION_MS, CubeViewer } from "@cubistry/cube-viewer";
 import { mountPicturesPanel } from "./pictures-panel.ts";
+import { loadDesignAssets } from "./face-images.ts";
 import type { PlaygroundEnv } from "./mount.ts";
 
 export function browserPlaygroundEnv(base: string): PlaygroundEnv {
@@ -10,7 +11,7 @@ export function browserPlaygroundEnv(base: string): PlaygroundEnv {
     doc: document,
     createViewer: (host) => new CubeViewer(host),
     baseMoveMs: BASE_MOVE_DURATION_MS,
-    loadAssets: (design, local) => loadAssets(design.assets, [design.print], undefined, base, local),
+    loadAssets: (design, local) => loadDesignAssets(loadAssets as never, design, base, local),
     createPictures: (region, hooks) => mountPicturesPanel(region, { baseUrl: base, ...hooks }),
     keys: window,
     replaceParams(own, ownKeys) {

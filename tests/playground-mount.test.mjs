@@ -388,3 +388,13 @@ test("dispose while the solver loads cancels the solve: the late solver plays no
   await flush();
   assert.equal(f.pending.length, 0, "the cancelled solve starts no turn");
 });
+
+test("pictures= : an explicit mode is passed to the viewer before the first design is shown; none or an unknown value passes undefined", async () => {
+  for (const [search, expected] of [["", undefined], ["?pictures=per-sticker", "per-sticker"], ["pictures=PROJECTED", "projected"], ["pictures=tiles", undefined]]) {
+    const f = fixture(), calls = [];
+    f.viewer.setPictureModeFromUrl = (mode) => calls.push(mode);
+    await f.start(search);
+    await flush();
+    assert.deepEqual(calls, [expected], search);
+  }
+});

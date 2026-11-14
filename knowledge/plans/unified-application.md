@@ -452,6 +452,7 @@ Source: search for `URLSearchParams`, `searchParams` and `params.get/has` in `sr
 | `year`, `month` | `src/apps/calendar7/month-view.ts` (`chooseMonth`) | 7x7 calendar mode (`calendar7`) |
 | `outer` | `src/apps/calendar7/geometry.ts` (`outerOverride`) | 7x7 calendar mode (`calendar7`; local look at another outer layer factor, 1.2 to 2.4) |
 | `font`, `layout`, `scheme`, `plasticity`, `banner` | `src/apps/calendar7/mount.ts`, `layout.ts` (`LAYOUT_PARAM`, `SCHEME_PARAM`, `PLASTICITY_PARAM`, `BANNER_PARAM`) | 7x7 calendar mode (`calendar7`; `font` here is the font style, not the single-cube `font` alias of `display`) |
+| `pictures` | `src/apps/playground/mount.ts` (`parsePictureMode` of `packages/cube-viewer/src/picture-mode.ts`) | Picture Cube mode (`playground`; owner decision 2026-11-14: `projected` (default) or `per-sticker`, the tile-per-sticker mapping; absent or unknown leaves the default or the stored choice) |
 | `size` | `src/apps/playground/mount.ts` (`resolveSize` in `src/apps/playground/size.ts`) | Picture Cube mode (`playground`; owner decision 2026-11-10: cube size 2 to 7 as `size=`, replacing the proposed `cube` parameter with the values 2 and 3; only 2 is playable until an engine for larger sizes is in the page, others fall back with a note) |
 | `build`, `test`, `analyze`, `review` | `src/apps/status/params.ts` | CI Quality Cube mode (`ci`; state id `open`, `running`, `ok`, `error` or `blocked`, default `open`, requested after the print loaded) |
 
