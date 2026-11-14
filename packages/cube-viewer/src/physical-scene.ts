@@ -4,6 +4,7 @@ import { bodyArtworkKey, orientBodyArtwork, sourceFaceIndex } from "./body-artwo
 import type { Construction } from "./appearance.ts";
 import { cross, demand, dot, type Vec3 } from "@cubistry/cube-core";
 import { layerCenters, layerEdge, layerIndexOf, type LayerWidths, validateLayerWidths } from "./layer-widths.ts";
+import { PROJECTED_FACES, STICKER_SHARE, faceOfNormal, stickerWindow, type FaceKey, type StickerWindow } from "./projected-uv.ts";
 import { type CutEdgeColor, cutFaceEdges, type EdgeProfile, type EdgeStop, cutPatternKey, cutPatternTexture, type FaceUvAxes, faceUvAxes, flatCutColor } from "./cut-faces.ts";
 
 /** Render-only projection of canonical sticker frames; never an authoritative state. */
@@ -58,6 +59,15 @@ export interface LayerProfile {
   readonly widths: LayerWidths;
   readonly body: (cell: readonly [number, number, number]) => THREE.BufferGeometry;
 }
+/**
+ * Projected picture mode: the whole image of every face. One texture per face (caller-owned, origin bottom-left as the asset
+ * loader delivers); the scene maps it per sticker with a texture transform (see projected-uv.ts), no per-sticker bitmaps.
+ */
+export interface PictureProjection {
+  readonly faces: ReadonlyMap<FaceKey, THREE.Texture>;
+}
+/** Share of a cell that the UV range of a body face covers (the rounded box is `bodyWidth` of the pitch wide). */
+const BODY_SHARE = 0.99;
 export interface PhysicalSceneOptions extends StickerlessBodyOptions {
   readonly layers?: LayerProfile;
 }
@@ -67,8 +77,13 @@ export class PhysicalCubeScene {
   private readonly bodies = new Map<number, THREE.Group>();
   private readonly references = new Map<number, { id: number; inverse: THREE.Matrix4 }>();
   private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[] }>();
-  private readonly artwork: { surface: THREE.MeshStandardMaterial; source: THREE.MeshStandardMaterial; fallback: string }[] = [];
+  private readonly artwork: { id: number; surface: THREE.MeshStandardMaterial; source: THREE.MeshStandardMaterial; fallback: string; projected?: boolean }[] = [];
   private readonly stickers: THREE.Mesh[] = [];
+  /** Projected picture mode: every sticker with its tile material, normal and cubie position; the clones this scene made. */
+  private readonly stickerInfo = new Map<number, { mesh: THREE.Mesh; base: THREE.Material; n: Vec3; up: Vec3; p: Vec3 }>();
+  private projectionTextures: THREE.Texture[] = [];
+  private projectionMaterials: THREE.Material[] = [];
+  private axisCoordinates: number[][] = [[], [], []];
   private readonly bodyVariants = new Map<string, THREE.BufferGeometry>();
   /** Layer profile: one body geometry per cell size. */
   private readonly cellBodies = new Map<string, THREE.BufferGeometry>();
@@ -118,6 +133,7 @@ export class PhysicalCubeScene {
     this.spacing = spacing;
     if (options.layers) validateLayerWidths(options.layers.widths);
     this.layers = options.layers ? { widths: options.layers.widths, centers: layerCenters(options.layers.widths), body: options.layers.body } : null;
+    this.axisCoordinates = [0, 1, 2].map((axis) => [...new Set(printed.map((s) => s.p[axis]))].sort((a, b) => a - b));
     this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
       demand(materials.has(s.id), "Missing printed sticker material");
@@ -158,7 +174,7 @@ export class PhysicalCubeScene {
           const color = faceColors.get(face.id) ?? fallback;
           material.color.set(color);
           if (art instanceof THREE.MeshStandardMaterial)
-            this.artwork.push({ surface: material, source: art, fallback: color });
+            this.artwork.push({ id: face.id, surface: material, source: art, fallback: color });
           faceMaterials[index] = material; sourceIds[index] = face.id;
           exterior.push({ index, color });
           this.faceMaterials.push(material);
@@ -202,6 +218,7 @@ export class PhysicalCubeScene {
         sticker.scale.set(cell[axisOf(cross(s.up, s.n))], cell[axisOf(s.up)], 1);
       }
       sticker.userData.stickerId = s.id;
+      this.stickerInfo.set(s.id, { mesh: sticker, base: materials.get(s.id)!, n: s.n, up: s.up, p: s.p });
       sticker.castShadow = sticker.receiveShadow = true;
       body.add(sticker);
       this.stickers.push(sticker);
@@ -238,11 +255,68 @@ export class PhysicalCubeScene {
   /** Live screen-only formatting follows its existing source material, including
    * image overrides during turns. Texture ownership remains with the caller. */
   refreshArtwork(): void {
-    for (const { surface, source, fallback } of this.artwork) {
+    for (const { surface, source, fallback, projected } of this.artwork) {
+      if (projected) continue; // a projected body face keeps its own windowed image
       if (surface.map !== source.map) { surface.map = source.map; surface.needsUpdate = true; }
       if (source.map) surface.color.copy(source.color);
       else surface.color.set(fallback);
     }
+  }
+  /**
+   * Projected picture mode on (a projection) or off (null: the caller's per-sticker tile materials are restored exactly).
+   * Stickers show their window of their face's image; in the stickerless construction the exterior body faces carry the same
+   * window. Everything outside the image (the margin of one gap width, the gaps, bevels, bodies) stays plastic.
+   */
+  setPictureProjection(projection: PictureProjection | null): void {
+    this.clearProjection();
+    if (!projection) { this.refreshArtwork(); return; }
+    const n = this.axisCoordinates[0].length;
+    demand(this.axisCoordinates.every((c) => c.length === n), "Picture projection needs a cube");
+    const widths = this.layers?.widths ?? Array<number>(n).fill(1);
+    demand(widths.length === n, "Layer widths do not fit the cube");
+    const windowOf = (info: { n: Vec3; up: Vec3; p: Vec3 }, share: number): { face: FaceKey; win: StickerWindow } => {
+      const face = faceOfNormal(info.n);
+      demand(PROJECTED_FACES[face].up.every((c, i) => c === info.up[i]), "Picture projection needs the cube model's face frame");
+      const texture = projection.faces.get(face);
+      demand(texture !== undefined, `Picture projection needs the face image of ${face}`);
+      const index = info.p.map((c, axis) => this.axisCoordinates[axis].indexOf(c)) as unknown as Vec3;
+      return { face, win: stickerWindow(widths, share, face, index, STICKER_SHARE) };
+    };
+    const outside = this.plastic instanceof THREE.MeshStandardMaterial ? this.plastic.color : new THREE.Color(DEFAULT_CORE_COLOR);
+    for (const info of this.stickerInfo.values()) {
+      const { face, win } = windowOf(info, STICKER_SHARE);
+      const material = info.base.clone() as THREE.MeshStandardMaterial;
+      material.map = this.windowedTexture(projection.faces.get(face)!, win);
+      maskOutsideImage(material, outside);
+      this.projectionMaterials.push(material);
+      info.mesh.material = material;
+    }
+    for (const entry of this.artwork) {
+      const info = this.stickerInfo.get(entry.id)!;
+      const { face, win } = windowOf(info, BODY_SHARE);
+      entry.surface.map = this.windowedTexture(projection.faces.get(face)!, win);
+      entry.surface.color.set("#ffffff");
+      entry.surface.needsUpdate = true;
+      entry.projected = true;
+      maskOutsideImage(entry.surface, new THREE.Color(entry.fallback));
+    }
+  }
+  /** A clone of a face texture with the window as texture transform; the clone shares the face's image (one GPU upload). */
+  private windowedTexture(face: THREE.Texture, win: StickerWindow): THREE.Texture {
+    const texture = face.clone();
+    texture.offset.set(win.offsetU, win.offsetV);
+    texture.repeat.set(win.scaleU, win.scaleV);
+    // The shared image was uploaded with the face texture; a clone must not bump the shared source version.
+    texture.version = Math.max(1, face.version);
+    this.projectionTextures.push(texture);
+    return texture;
+  }
+  private clearProjection(): void {
+    for (const info of this.stickerInfo.values()) info.mesh.material = info.base;
+    for (const entry of this.artwork) if (entry.projected) { entry.projected = false; entry.surface.map = null; entry.surface.onBeforeCompile = () => {}; entry.surface.customProgramCacheKey = () => ""; entry.surface.needsUpdate = true; }
+    for (const material of this.projectionMaterials) material.dispose();
+    for (const texture of this.projectionTextures) texture.dispose();
+    this.projectionMaterials = []; this.projectionTextures = [];
   }
   /** Update only this scene's cut faces and core; printed materials and geometry stay owned in place.
    * Only a scene built with an explicit body color has one cut color to replace: without it the cut
@@ -362,6 +436,8 @@ export class PhysicalCubeScene {
     this.shells.clear();
     this.cores.length = 0;
     this.stickers.length = 0;
+    this.clearProjection();
+    this.stickerInfo.clear();
     this.artwork.length = 0;
     this.bodyVariants.clear();
     this.cellBodies.clear();
@@ -372,4 +448,18 @@ export class PhysicalCubeScene {
     for (const material of this.faceMaterials) material.dispose();
     for (const geometry of this.geometries) geometry.dispose();
   }
+}
+
+/** Shader patch: where the windowed map UV leaves 0..1 (outside the projected image) the surface shows `outside`. */
+function maskOutsideImage(material: THREE.Material, outside: THREE.Color): void {
+  material.onBeforeCompile = (shader) => {
+    shader.uniforms.projectedOutside = { value: outside };
+    shader.fragmentShader = "uniform vec3 projectedOutside;\n" + shader.fragmentShader.replace("#include <map_fragment>",
+      `#include <map_fragment>
+#ifdef USE_MAP
+  float projectedIn = step(0.0, vMapUv.x) * step(vMapUv.x, 1.0) * step(0.0, vMapUv.y) * step(vMapUv.y, 1.0);
+  diffuseColor.rgb = mix(projectedOutside, diffuseColor.rgb, projectedIn);
+#endif`);
+  };
+  material.customProgramCacheKey = () => "picture-projected";
 }
