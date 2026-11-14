@@ -43,16 +43,19 @@ const fakeLoaded = (ids, log, name) => ({
   dispose: () => log.push(`dispose ${name}`),
 });
 test("loadDesignAssets: tiles first, then the faces with their own load; the result holds both and releases both once", async () => {
-  const log = [], d = createDesign("picture");
-  const load = async (manifest, prints, signal, base, local) => {
+  const log = [], d = createDesign("picture"), caches = new Set();
+  const load = async (manifest, prints, signal, base, local, bytes) => {
+    assert.ok(bytes instanceof Map, "all loads of a design share one bytes cache");
+    caches.add(bytes);
     log.push([manifest.images[0].id, prints.length, base, local]);
-    return manifest.images[0].id.startsWith("face_") ? fakeLoaded(FACE_KEYS.map(faceImageAssetId), log, "faces") : fakeLoaded(["F_0_0"], log, "tiles");
+    return manifest.images[0].id.startsWith("face_") ? fakeLoaded([manifest.images[0].id], log, "faces " + manifest.images[0].id) : fakeLoaded(["F_0_0"], log, "tiles");
   };
   const assets = await loadDesignAssets(load, d, "/b/", "LOCAL");
-  assert.deepEqual(log, [["F_0_0", 1, "/b/", "LOCAL"], ["face_U", 0, "/b/", "LOCAL"]], "two loads; the faces carry no print");
+  assert.deepEqual(log, [["F_0_0", 1, "/b/", "LOCAL"], ...FACE_KEYS.map((k) => [`face_${k}`, 0, "/b/", "LOCAL"])], "tiles, then one load per face; the faces carry no print");
   assert.ok(assets.images.has("F_0_0") && FACE_KEYS.every((k) => assets.images.has(faceImageAssetId(k))));
+  assert.equal(caches.size, 1, "one cache object for the seven loads");
   assets.dispose();
-  assert.deepEqual(log.slice(2), ["dispose tiles", "dispose faces"]);
+  assert.deepEqual(log.slice(7), ["dispose tiles", ...FACE_KEYS.map((k) => `dispose faces face_${k}`)]);
 });
 
 test("loadDesignAssets: a design without faces is one load; a failing face load releases the tiles", async () => {
@@ -69,4 +72,33 @@ test("withFaceImages keeps the tile manifest and materials", () => {
   const merged = withFaceImages(tiles, faces);
   assert.equal(merged.manifest, tiles.manifest); assert.equal(merged.materials, tiles.materials); assert.equal(merged.textureOrigin, "bottom-left");
   assert.deepEqual([...merged.images.keys()], ["F_0_0", "face_U"]);
+});
+
+test("the face images load one file per call: the asset loader counts a whole image twice, so six 1024 px faces in one call exceed 8388608 decoded pixels", async () => {
+  const set = Object.fromEntries(FACE_KEYS.map((k) => [k, { url: `/x/${k}.webp`, format: "webp", sha256: "0".repeat(64), size: 1024 }]));
+  const design = { assets: { images: [{ id: "F_0_0" }] }, print: {}, faces: set };
+  const BUDGET = 8388608, calls = [];
+  const load = async (manifest) => {
+    const ids = manifest.images.map((i) => i.id);
+    calls.push(ids);
+    if (!ids.some((id) => id.startsWith("face_"))) return fakeLoaded(["F_0_0"], [], "tiles");
+    const pixels = ids.length * 2 * 1024 * 1024; // decode reserve plus the bitmap reserve, per whole image
+    assert.ok(pixels <= BUDGET, `a call of ${ids.length} faces needs ${pixels} pixels`);
+    return fakeLoaded(ids, [], "faces");
+  };
+  const assets = await loadDesignAssets(load, design, "/");
+  assert.equal(calls.filter((c) => c[0].startsWith("face_")).length, 6, "six face loads");
+  assert.ok(FACE_KEYS.every((k) => assets.images.has(faceImageAssetId(k))));
+});
+
+test("loadDesignAssets: a failure in the middle of the face loads releases the tiles and the faces loaded so far", async () => {
+  const log = []; let calls = 0;
+  const load = async (manifest) => {
+    if (++calls === 1) return fakeLoaded(["F_0_0"], log, "tiles");
+    if (calls === 4) throw Error("third face failed");
+    return fakeLoaded([manifest.images[0].id], log, manifest.images[0].id);
+  };
+  await assert.rejects(loadDesignAssets(load, createDesign("picture"), "/"), /third face failed/);
+  assert.equal(log.length, 3);
+  assert.ok(log.includes("dispose tiles"));
 });

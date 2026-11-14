@@ -106,3 +106,20 @@ test("the reload is still charged against the total budget", async () => {
   );
   assert.deepEqual(calls, ["default", "reload"]);
 });
+
+test("a shared bytes cache fetches one file once across loads; a failure is not cached", async () => {
+  const { fetchBoundedCached } = await import("../packages/cube-assets/src/index.ts");
+  const calls = install({ cached: NEW, network: NEW });
+  const cache = new Map();
+  const a = await fetchBoundedCached(cache, "/assets/hsm/words/H.svg", hex(NEW), "svg", { bytes: 0 });
+  const b = await fetchBoundedCached(cache, "/assets/hsm/words/H.svg", hex(NEW), "svg", { bytes: 0 });
+  assert.equal(new TextDecoder().decode(b), NEW);
+  assert.equal(a, b);
+  assert.deepEqual(calls, ["default"], "one network request for two loads");
+  const bad = install({ cached: OLD, network: OLD });
+  await assert.rejects(fetchBoundedCached(new Map(), "/assets/x.svg", hex(NEW), "svg", { bytes: 0 }));
+  const failing = new Map();
+  await assert.rejects(fetchBoundedCached(failing, "/assets/x.svg", hex(NEW), "svg", { bytes: 0 }));
+  assert.equal(failing.size, 0, "a failed fetch is evicted");
+  assert.ok(bad.length >= 2);
+});
