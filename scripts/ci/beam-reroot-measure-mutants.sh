@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Source mutants of .github/workflows/beam-reroot-measure.yml: tests/beam-reroot-measure-workflow.test.mjs must fail on each mutated copy.
-# Usage: [ONLY=name] MUTANT_TMP=<existing dir, not /tmp> scripts/ci/beam-reroot-measure-mutants.sh [node]    (about 2 s each, 31 mutants)
+# Usage: [ONLY=name] MUTANT_TMP=<existing dir, not /tmp> scripts/ci/beam-reroot-measure-mutants.sh [node]    (about 2 s each, 33 mutants)
 set -u
 here=$(cd "$(dirname "$0")/../.." && pwd); node=${1:-node}; bad=0; n=0
 base=${MUTANT_TMP:-${TMPDIR:-}}
@@ -60,5 +60,7 @@ run ref-width-cap            '-le 400 ]; } || fail "ref_width' '-le 4000 ]; } ||
 run ref-width-not-passed     '${REF_WIDTH:+ref_width="$REF_WIDTH"} ' ''
 run ref-width-env-dropped    '      REF_WIDTH: ${{ inputs.ref_width }}' '      REF_WIDTH: ""'
 run ref-width-grep-dropped   'git grep -qw ref_width "$SHA" -- "$WC/measure_edges.jl" ||' 'true ||'
+run summary-cut-shifted     'cut -f1-9,19-21,29-32 "$out/summary.tsv"' 'cut -f1-9,19-21,28-31 "$out/summary.tsv"'
+run summary-cut-first-range 'cut -f1-9,19-21,29-32' 'cut -f1-8,19-21,29-32'
 [ $n -ge 1 ] || { echo "no mutant selected (ONLY=${ONLY:-})" >&2; exit 2; }
 exit $bad
