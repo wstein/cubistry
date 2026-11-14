@@ -1,14 +1,16 @@
 // node --test test/verify.test.mjs   Checks that the independent verifier accepts real routes and rejects tampered ones.
-import { test } from "node:test";
+import { test, after } from "node:test";
 import assert from "node:assert/strict";
 import { spawnSync } from "node:child_process";
-import { readFileSync, writeFileSync, mkdtempSync } from "node:fs";
-import { tmpdir } from "node:os";
+import { readFileSync, writeFileSync, mkdirSync, rmSync } from "node:fs";
 import { here } from "../lib.mjs";
 
 const run = (file) => spawnSync(process.execPath, [`${here}/verify-routes.mjs`, file], { encoding: "utf8" });
 const sample = readFileSync(`${here}/fixtures/results-sample.tsv`, "utf8").split("\n").filter(Boolean);
-const dir = mkdtempSync(`${tmpdir()}/fg-verify-`);
+// scratch under the research directory (gitignored), removed after the run
+const dir = `${here}/.scratch/verify-test-${process.pid}`;
+mkdirSync(dir, { recursive: true });
+after(() => rmSync(dir, { recursive: true, force: true }));
 const write = (name, lines) => { const f = `${dir}/${name}`; writeFileSync(f, lines.join("\n") + "\n"); return f; };
 
 test("accepts the recorded routes (app pose and own pose)", () => {
@@ -35,4 +37,11 @@ test("rejects a wrong move count", () => {
   const r = run(write("counts.tsv", lines));
   assert.equal(r.status, 1);
   assert.match(r.stderr, /counts/);
+});
+
+test("a file with no solved row is a failure, not a pass", () => {
+  const lines = [sample[0], ...sample.slice(1, 4).map((l) => { const f = l.split("\t"); f[6] = "none_within"; return f.join("\t"); })];
+  const r = run(write("unsolved.tsv", lines));
+  assert.equal(r.status, 1);
+  assert.match(r.stderr, /no route was verified/);
 });
