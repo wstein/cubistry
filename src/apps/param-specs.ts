@@ -99,7 +99,7 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   // 7x7 Calendar look (src/apps/calendar7/mount.ts, layout.ts). `banner` is the banner style.
   "c7-font": { name: "font", parse: word },
   layout: { parse: oneOf(["standard", "names", "names-any"]) },
-  scheme: { parse: word },
+  scheme: { parse: word, perMode: true },
   plasticity: { parse: num(0, 1) },
   banner: { parse: oneOf(["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) },
   size: { parse: int(2, 7) },

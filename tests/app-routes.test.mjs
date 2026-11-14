@@ -250,11 +250,12 @@ test("the typed speed and category specs accept exactly what the CI Quality Cube
   }
 });
 
-test("calendar is a registered mode that owns date, lang, design and pad; the pending entry is gone", () => {
+test("calendar is a registered mode that owns date, lang, design, pad and scheme; the pending entry is gone", () => {
   const m = MODE_CATALOG.find((x) => x.id === "calendar");
-  assert.deepEqual([...m.params].sort(), ["date", "design", "lang", "pad"]);
+  assert.deepEqual([...m.params].sort(), ["date", "design", "lang", "pad", "scheme"]);
   assert.equal("calendar" in PENDING_APP_PARAMS, false);
   assert.equal(PARAM_SPECS.design.perMode, true);
+  assert.equal(PARAM_SPECS.scheme.perMode, true, "the 3x3 theme ids differ from the Calendar7 look: scheme never survives a switch");
   const r = parseRoute("?app=calendar&date=2026-02-29&lang=EN&language=de&design=en-3&padding=0&val=3&kiosk=1", registry, "clock");
   assert.deepEqual(r.app, { id: "calendar", known: true });
   assert.deepEqual(r.setup, { lang: "en", design: "en-3", pad: false, kiosk: true });

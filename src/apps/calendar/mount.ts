@@ -19,6 +19,7 @@ import {
 } from "./model.ts";
 import { CalendarController, type CalendarPort, type CalendarRoutePlanner } from "./controller.ts";
 import { CAL3_SCHEMES, cal3SchemeById } from "./artwork.ts";
+import { APP_PARAM } from "../router.ts";
 import type { ModeInstance, MountContext } from "../registry.ts";
 
 export interface CalendarViewerLike extends CalendarPort {
@@ -389,7 +390,7 @@ export async function mountCalendar(
     // The page may have switched DE/EN since the URL was read: write the print that is shown.
     // The router removes `app` from the mount params, so it is set again: a reload or shared link must reopen this mode.
     const query = new URLSearchParams(env.search?.() ?? params);
-    query.set("app", "calendar");
+    query.set(APP_PARAM, "calendar");
     if (schemeId === "default") query.delete(SCHEME_PARAM);
     else query.set(SCHEME_PARAM, schemeId);
     query.delete("language");
