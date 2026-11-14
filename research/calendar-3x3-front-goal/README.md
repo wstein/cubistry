@@ -7,7 +7,8 @@ Status: UNKNOWN until independent review. Research prototype; no app file change
 Optimal outer-turn count (HTM, whole-cube rotations free and counted separately) when the goal is exactly the
 controller's acceptance predicate `matches(state, target.cells)` instead of the full cubie state. Same 100 consecutive
 +1-day steps per print from 2027-01-01 as the measurement of the current planner (app: real `CalendarController` with
-`createPlanner`, 1M node policy). Format: min / median / p95 / max.
+`createPlanner`, 1M node policy; the app column was recomputed by `dump-app-chain.mjs` and equals the figures in the owner's
+solver measurement). Format: min / median / p95 / max.
 
 | print | app HTM | front goal, ACTUAL app pose | front goal, own pose carried | steps saved >= 3 moves | saved min / median / max |
 |---|---|---|---|---|---|
@@ -57,7 +58,8 @@ edges free: 4! * 8! / 2 * 3^3 * 2^7 = 1.67e9 completions, so the median goal set
 
 IDA* over the 18 outer turns (no same face twice in a row, opposite faces in fixed order), iterative deepening to
 depth 12, one search per candidate rotation, depth-major so the first depth with a solution is the optimum, fewest
-rotation tokens among equal depths. Heuristic: the maximum over nine pattern databases (`FrontGoal.jl`).
+rotation tokens among equal depths (tested against independent per-rotation optima; among candidates with equal
+tokens the first found is kept). Heuristic: the maximum over nine pattern databases (`FrontGoal.jl`).
 
 - A database tracks four cubies, each by the location digit (0..23) of one reference sticker, plus the absolute up
   direction of the front center: 24^4 * 4 = 1 327 104 entries, one byte each.
@@ -88,14 +90,19 @@ The root heuristic is 5 to 6 at the median where the optimum is 7 to 9: the gap 
 
 ## Verification and tests
 
-- `test/runtests.jl` (1512 assertions, 43 s): the Julia predicate against the app's `matches()` on 504 cases (177
+- `test/runtests.jl` (1649 assertions, 76 s): the Julia predicate against the app's `matches()` on 504 cases (177
   positive, including a 12 move word that twists only the front center, which must be rejected; cases come from
   `export-predicate-cases.mjs`, expected values computed by the app); the acceptance tables against the real up vector
   produced by the engine for every slot/sticker pair reachable in three turns; known optima (a back turn costs 0 although
   the full-state optimum is 1, one front turn costs 1); the optimum against heuristic-free brute force on 40 scrambles of
-  1 to 3 turns (exact reference, depth 3); free rotations against brute force; the same optimum with a weaker heuristic.
-- `test/verify.test.mjs` (3 tests): the verifier accepts the recorded routes and rejects a tampered route and a wrong count.
-- `run-mutations.sh`: each of five mutations makes the named test set fail: heuristic plus one (known optima, brute force,
+  1 to 3 turns (depth 3) and against an independent Node brute force on 40 cases of optimum 1 to 7 with opposite-face
+  pairs (`fixtures/bf-cases.tsv`, `export-bf-cases.mjs`: moves tabulated from the app's `apply`, goal confirmed by the app's
+  `matches`); the inclusive depth bound; fewest rotation tokens; free rotations against brute force; strictly fewer nodes
+  with nine tables than with two.
+- `test/verify.test.mjs` (4 tests): the verifier accepts the recorded routes and rejects a tampered route, a wrong count and a
+  file without any solved row (zero verified routes is a failure).
+- `run-mutations.sh`: each of nine mutations makes the named test set fail (new: both orders of opposite faces forbidden,
+  depth bound one short, last candidate kept on ties, first table only). Earlier five: heuristic plus one (known optima, brute force,
   free rotations), relaxed sources made strict (brute force and four more), up direction ignored (predicate and acceptance
   tables), center up ignored (predicate), slot 9 dropped (predicate and acceptance tables). Output: all CAUGHT.
 - Route verification: `verify-routes.mjs` replays every route with the app's `apply` and requires `matches` for the
@@ -105,7 +112,7 @@ The root heuristic is 5 to 6 at the median where the optimum is 7 to 9: the gap 
 ## Commands
 
 ```sh
-# run from the repository root; JULIA and NODE are the interpreter paths; Node 24 and Julia 1.13
+# run from the repository root; JULIA and NODE are the interpreter paths; Julia 1.13 (tested 1.13.3); Node 22.23.4 and 24.22.2 both run the scripts (TypeScript imports need Node 22.18 or later)
 node research/calendar-3x3-front-goal/dump-app-chain.mjs de-a 2027-01-01 100 research/calendar-3x3-front-goal/data <scratchDir>
 research/calendar-3x3-front-goal/run-all.sh <outDir>            # 8 runs, under 2 min each
 node research/calendar-3x3-front-goal/verify-routes.mjs <outDir>/front-*.tsv
@@ -132,7 +139,7 @@ node --test research/calendar-3x3-front-goal/test/verify.test.mjs
 - Ties among equal-length routes are broken by fewest rotation tokens, then search order; the own-pose chain depends on
   that choice.
 - `app_ms` in `data/app-chain-*.tsv` was measured on a loaded machine (median 77 to 481 ms, p95 about 2 s) and is not
-  comparable with the earlier measurement.
+  comparable with the owner's earlier measurement of the app (median 238 ms).
 - Slice moves, other print sets, and the `matches` variants of other apps are not covered.
 - `lychee` was not available locally; relative links were checked by hand.
 - The tests were written after a first draft of the search and before any measurement; the commits list them first.
@@ -143,7 +150,7 @@ All values in this section marked "estimate" are estimates, not measurements.
 
 A browser implementation looks realistic for the table size and probably for the time; the shipped-table route does not.
 
-- Shipping tables does not work: the tables depend on the target, 2562 targets per print, 1.3 to 11.4 MiB each (3 to 29 GB
+- Shipping tables does not work: the tables depend on the target, 2562 targets per print, 1.3 to 11.4 MiB each (3 to 29 GiB
   per print).
 - Build at start of planning (estimate): one table takes about 0.09 s natively (0.8 s for nine), so 2 to 5 tables take
   0.2 to 0.5 s; a JavaScript typed-array port is likely 2 to 5 times slower, so 0.4 to 2.5 s against the 8 s worker budget. The search
