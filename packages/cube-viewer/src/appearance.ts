@@ -1,15 +1,20 @@
 import { demand } from "@cubistry/cube-core";
 import type { AssetManifest } from "@cubistry/cube-assets";
+import { PICTURE_MODES, PICTURE_MODE_HELP, PICTURE_MODE_LABEL, DEFAULT_PICTURE_MODE, parsePictureMode, type PictureMode } from "./picture-mode.ts";
 export type Construction = "stickered" | "stickerless";
 export interface ViewerAppearance {
   readonly construction: Construction;
   readonly frameColor: string | null;
+  /** Explicit picture mapping choice; absent means no choice (the default, Projected, applies). */
+  readonly pictureMode?: PictureMode;
 }
 export const DEFAULT_APPEARANCE: ViewerAppearance = Object.freeze({ construction: "stickered", frameColor: null });
 export function validateAppearance(value: ViewerAppearance): ViewerAppearance {
   demand(value && ["stickered", "stickerless"].includes(value.construction), "Invalid cube construction");
   demand(value.frameColor === null || /^#[0-9a-f]{6}$/i.test(value.frameColor), "Invalid frame color");
-  return Object.freeze({ construction: value.construction, frameColor: value.frameColor });
+  demand(value.pictureMode === undefined || PICTURE_MODES.includes(value.pictureMode), "Invalid picture mode");
+  return Object.freeze({ construction: value.construction, frameColor: value.frameColor,
+    ...(value.pictureMode === undefined ? {} : { pictureMode: value.pictureMode }) });
 }
 /** Explicit asset metadata only; never sample pixels, erase white or alter art. */
 export function sourceFaceColor(assetId: string, manifest: AssetManifest | undefined, fallback: string): string {
@@ -23,7 +28,11 @@ export const appearanceStorageKey = (pathname: string) => `cubistry-viewer-appea
 export function readAppearance(storage: Pick<Storage, "getItem">, key: string): ViewerAppearance {
   try {
     const saved = JSON.parse(storage.getItem(key) ?? "null");
-    return saved?.version === 1 ? validateAppearance(saved) : DEFAULT_APPEARANCE;
+    if (saved?.version !== 1) return DEFAULT_APPEARANCE;
+    // An unknown stored picture mode is no choice; the setting stays valid.
+    const { pictureMode, ...rest } = saved;
+    const mode = parsePictureMode(pictureMode);
+    return validateAppearance({ ...rest, ...(mode ? { pictureMode: mode } : {}) });
   } catch { return DEFAULT_APPEARANCE; }
 }
 
@@ -106,7 +115,17 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   const reset = document.createElement("button"); reset.type = "button"; reset.textContent = "Style default";
   moreBody.append(colorLabel, reset);
   more.append(moreSummary, moreBody);
-  viewportSection.append(label, note, more);
+  // Pictures: how a picture cube maps its images. Only picture cubes (faces with whole images) show it.
+  const picturesWrap = document.createElement("div"); picturesWrap.className = "cube-appearance-pictures"; picturesWrap.style.display = "none";
+  const picturesLabel = document.createElement("label"); picturesLabel.textContent = "Pictures ";
+  const pictures = document.createElement("select"); pictures.setAttribute("aria-label", "Picture mapping");
+  for (const id of PICTURE_MODES) {
+    const option = document.createElement("option"); option.value = id; option.textContent = PICTURE_MODE_LABEL[id]; pictures.append(option);
+  }
+  picturesLabel.append(pictures);
+  const picturesHelp = document.createElement("p"); picturesHelp.className = "cube-appearance-picture-hint";
+  picturesWrap.append(picturesLabel, picturesHelp);
+  viewportSection.append(label, note, picturesWrap, more);
 
   panel.append(header, summary, popover);
   let setOpen = (_open: boolean) => {};
@@ -167,6 +186,9 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     value = validateAppearance(next); refresh(); change(value);
     try { localStorage.setItem(key, JSON.stringify({ version: 1, ...value })); } catch { /* Presentation remains usable. */ }
   };
+  const showPictureMode = (id: PictureMode) => { pictures.value = id; picturesHelp.textContent = PICTURE_MODE_HELP[id]; };
+  showPictureMode(DEFAULT_PICTURE_MODE);
+  pictures.addEventListener("change", () => { const id = parsePictureMode(pictures.value); if (id) update({ ...value, pictureMode: id }); });
   mode.addEventListener("change", () => update({ ...value, construction: mode.value as Construction }));
   color.addEventListener("input", () => update({ ...value, frameColor: color.value }));
   reset.addEventListener("click", () => update({ ...value, frameColor: null }));
@@ -174,6 +196,11 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   return {
     panel,
     setDefaultColor(color: string) { defaultColor = color; refresh(); },
+    /** Shows or hides the Pictures choice and shows the mode in effect; never a user choice, nothing is stored. */
+    setPictureChoice(choice: { readonly available: boolean; readonly mode: PictureMode }) {
+      picturesWrap.style.display = choice.available ? "" : "none";
+      showPictureMode(choice.mode);
+    },
     dispose() {
       // A superseded mode can dispose late, after a newer mode docked its own panel (which removed this one): then the
       // dock and the header button belong to the newer panel and stay as they are.
