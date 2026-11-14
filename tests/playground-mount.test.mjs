@@ -266,6 +266,18 @@ test("dispose releases the viewer, the assets and the pictures panel once", asyn
   assert.deepEqual([f.counts.destroyed, f.counts.assetsDisposed, f.counts.picturesDisposed], [1, 1, 1]);
 });
 
+test("the test hook __playgroundViewer is exposed with the viewer and removed on release", async () => {
+  const f = fixture(), exposed = new Map();
+  f.env.expose = (name, value) => (value === undefined ? exposed.delete(name) : exposed.set(name, value));
+  const instance = await f.start();
+  await flush();
+  assert.equal(exposed.get("__playgroundViewer"), f.viewer, "exposed while the mode is mounted");
+  instance.dispose();
+  await flush();
+  frames(f);
+  assert.equal(exposed.has("__playgroundViewer"), false, "removed on release: the disposed viewer is not held");
+});
+
 test("dispose during a legal turn destroys the viewer only after the turn settled", async () => {
   const f = fixture();
   const instance = await f.start();

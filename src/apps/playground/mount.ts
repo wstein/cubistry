@@ -54,6 +54,8 @@ export interface PlaygroundEnv {
   /** Writes the mode's own parameters into the address bar without a history entry. */
   replaceParams(own: URLSearchParams, ownKeys: readonly string[]): void;
   nextFrame(fn: () => void): void;
+  /** Test hook (`__playgroundViewer`); `undefined` removes it. Absent in tests of the mount. */
+  expose?(name: string, value: unknown): void;
 }
 
 type Session = { design: ReturnType<typeof createDesign>; assets: LoadedAssets };
@@ -444,6 +446,7 @@ export async function mountPlayground(
       return;
     }
     viewer?.destroy();
+    env.expose?.("__playgroundViewer", undefined);
     viewer = null;
     for (const s of sessions.values()) s.assets.dispose();
     sessions.clear();
@@ -480,6 +483,7 @@ export async function mountPlayground(
     return;
   }
   viewer = env.createViewer(host);
+  env.expose?.("__playgroundViewer", viewer);
   // An explicit `pictures=` value is an explicit choice (it beats a stored one); none or an unknown value leaves the default.
   viewer.setPictureModeFromUrl?.(parsePictureMode(params.get("pictures")));
   applySpeed();
