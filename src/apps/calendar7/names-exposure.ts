@@ -59,59 +59,31 @@ export function irradianceOf(lighting: Lighting, n: THREE.Vector3): number {
 }
 export const irradiance = (scene: THREE.Object3D, n: THREE.Vector3): number => irradianceOf(collectLights(scene), n);
 
+/** The six cube faces turned by `rotation` (the presentation quaternion) with their weight for the camera (the smooth weighting of the header). */
+export function cameraFaces(rotation: THREE.Quaternion, camera: THREE.Camera): { n: THREE.Vector3; w: number }[] {
+  const toCamera = camera.position.clone().normalize(), out: { n: THREE.Vector3; w: number }[] = [];
+  for (const [x, y, z] of AXES) {
+    const n = new THREE.Vector3(x, y, z).applyQuaternion(rotation), w = Math.max(0, n.dot(toCamera)) ** FACE_WEIGHT_POWER;
+    if (w > 0) out.push({ n, w });
+  }
+  return out;
+}
+
+/** Irradiance of the directional lights alone on the unit normal `n` (the part of `irradianceOf` that a shadow map darkens). */
+export function directionalIrradianceOf(lighting: Lighting, n: THREE.Vector3): number {
+  let sum = 0;
+  for (const d of lighting.directionals) sum += d.amount * Math.max(0, n.dot(d.to));
+  return sum;
+}
+
 /**
  * The exposure for a cube turned by `rotation` (the presentation quaternion) seen by `camera` (looking at the origin).
  * 1 (the shared value) when no light reaches the faces, instead of an infinite exposure.
  */
 export function namesExposure(scene: THREE.Object3D, rotation: THREE.Quaternion, camera: THREE.Camera): number {
-  const lighting = collectLights(scene), toCamera = camera.position.clone().normalize(), n = new THREE.Vector3();
+  const lighting = collectLights(scene);
   let weights = 0, weighted = 0;
-  for (const [x, y, z] of AXES) {
-    n.set(x, y, z).applyQuaternion(rotation);
-    const w = Math.max(0, n.dot(toCamera)) ** FACE_WEIGHT_POWER;
-    if (w === 0) continue;
-    weights += w;
-    weighted += w * irradianceOf(lighting, n);
-  }
+  for (const { n, w } of cameraFaces(rotation, camera)) { weights += w; weighted += w * irradianceOf(lighting, n); }
   const mean = weights > 0 ? weighted / weights : 0;
   return mean > 1e-6 ? Math.PI / mean : 1;
-}
-
-/**
- * Share of the directional lights (key, fill, rim, shadow fill) that the names layout keeps. The studio lights a cube from above:
- * with the exposure of the face that looks at the camera the top face gets 2 to 4.5 times that irradiance and every pastel
- * of it clips to white (measured: 95 % of the Rubik-Tint tiles of the top face render white at pitch 0.45, 0 % of the front).
- * The names layout is a color chart, so the directional part is turned down to this share and an ambient light gives back
- * what the front face loses head on (`applyNamesLightRig`): the irradiance ratio top / front falls from 2.1 head on (4.5 at
- * pitch 0.45) to 1.2 (1.4); the ambient and hemisphere part is the same on every face. The cast shadow of the floor keeps its
- * darkness (a shadow material, independent of the intensity of the light); the shading of the faces by shadows and by the key
- * shrinks by this share.
- */
-export const NAMES_DIRECTIONAL_SHARE = 0.08;
-
-/**
- * Turns the directional lights of `scene` to `share` of their intensity (1 restores them) and raises the ambient light by the
- * irradiance that a face looking along +z (head on to the camera) loses, so that face keeps its irradiance and the exposure
- * of `namesExposure` stays 1.217 head on. The intensities of the studio are remembered in `userData`: the call is idempotent and
- * reversible, and a studio that is rebuilt starts at its own values.
- */
-export function applyNamesLightRig(scene: THREE.Object3D, share: number): void {
-  const front = new THREE.Vector3(0, 0, 1);
-  let lost = 0;
-  const lights: THREE.Light[] = [];
-  scene.updateMatrixWorld(true);
-  scene.traverse((o) => {
-    const l = o as THREE.Light;
-    if (!l.isLight) return;
-    l.userData.c7RigBase ??= l.intensity;
-    lights.push(l);
-    if (!(l as THREE.DirectionalLight).isDirectionalLight || !l.visible) return;
-    const d = l as THREE.DirectionalLight, to = new THREE.Vector3().setFromMatrixPosition(d.matrixWorld).sub(new THREE.Vector3().setFromMatrixPosition(d.target.matrixWorld)).normalize();
-    lost += (d.userData.c7RigBase as number) * luminance(d.color) * Math.max(0, front.dot(to));
-  });
-  for (const l of lights) {
-    const base = l.userData.c7RigBase as number;
-    if ((l as THREE.DirectionalLight).isDirectionalLight) l.intensity = base * share;
-    else if ((l as THREE.AmbientLight).isAmbientLight) l.intensity = base + (1 - share) * lost / Math.max(1e-6, luminance(l.color));
-  }
 }
