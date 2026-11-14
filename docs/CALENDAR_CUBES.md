@@ -34,6 +34,10 @@ In a theme, month stickers are inverse chips: the scheme's month color (its band
 with the scheme's month ink (Classic uses a stronger #d9b36a chip with #3d2005 ink, because its band is too close to its paper), so months differ from weekdays and digits even where the colors match. The default theme keeps the
 plain month artwork. The stickerless body and cut-face rules are unchanged: cut faces follow the sticker grounds.
 
+In the German print, the weekday stickers (two letters) take the same chip as the month, so weekday and month stand out from the
+day digits on paper; the blank cell of the weekday row and the blank tens digit stay paper. English is unchanged, and the default
+theme keeps its plain German weekday artwork.
+
 German has no weekend cue in any theme: its weekday stickers keep the plain weekday ink. In English, SAT and both SUN
 stickers take the weekend token. Weekend labels are large bold text and are gated at 3:1; every other label class is gated
 at 4.5:1 (`tests/calendar-schemes.test.mjs`).

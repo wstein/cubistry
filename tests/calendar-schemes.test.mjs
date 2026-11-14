@@ -54,7 +54,7 @@ test("unknown, null and missing scheme ids give the default; the catalog is the 
 
 test("every label class of every 3x3 scheme passes the contrast gates", () => {
   for (const sc of CAL3_SCHEMES.slice(1)) {
-    for (const role of ["day", "weekday", "month"]) assert.ok(contrast(sc.roles[role].ink, sc.roles[role].ground) >= 4.5, `${sc.id} ${role} ${contrast(sc.roles[role].ink, sc.roles[role].ground)}`);
+    for (const role of ["day", "weekday", "weekdayDe", "month"]) assert.ok(contrast(sc.roles[role].ink, sc.roles[role].ground) >= 4.5, `${sc.id} ${role} ${contrast(sc.roles[role].ink, sc.roles[role].ground)}`);
     // SAT/SUN are large bold (82 px, weight 800): the 3:1 gate of the Calendar7 weekend labels.
     assert.ok(contrast(sc.roles.weekend.ink, sc.roles.weekend.ground) >= 3, `${sc.id} weekend`);
     assert.equal(sc.roles.weekend.weight, 800);
@@ -86,12 +86,12 @@ test("German has no weekend-tinted sticker in any scheme: every sticker is its p
   for (const sc of CAL3_SCHEMES)
     for (const id of ["de-a", "de-a-unpadded"])
       for (const s of designs[id].printing.filter((x) => x.image !== "")) {
-        const art = stickerArt(s, sc);
-        const plainRole = /^[0-9]$/.test(s.image) ? "day" : s.slot < 3 ? "weekday" : "month";
+        const art = stickerArt(s, sc, true);
+        const plainRole = /^[0-9]$/.test(s.image) ? "day" : s.slot < 3 ? "weekdayDe" : "month";
         assert.equal(art.color, sc.roles[plainRole].ink, `${sc.id} ${id} ${s.slot}:${s.image}`);
         assert.equal(art.ground, sc.roles[plainRole].ground);
         assert.equal(art.weight, 600);
-        assert.equal(stickerRole(s), plainRole);
+        assert.equal(stickerRole(s), plainRole === "weekdayDe" ? "weekday" : plainRole);
       }
   assert.equal("scue" in DEFAULT_CAL3_SCHEME.roles, false);
 });
@@ -271,4 +271,61 @@ test("unprinted (blank) stickers are plain paper in every scheme, whatever their
       }
   // The case of the owner report: the German blank center stickers (slot 4) exist in the print.
   assert.deepEqual(designs["de-a-unpadded"].printing.filter((s) => s.image === "" && s.slot >= 3).map((s) => s.id), [30, 43]);
+});
+
+test("German: weekday stickers share the month chip (ground and ink); English, digits, blanks and the default scheme are unchanged", () => {
+  const de = [designs["de-a"], designs["de-a-unpadded"]], en = [designs["en-3-zero"], designs["en-3-unpadded"]];
+  for (const sc of CAL3_SCHEMES.slice(1)) {
+    for (const d of de) for (const s of d.printing) {
+      const art = stickerArt(s, sc, true), role = stickerRole(s);
+      if (s.image === "") assert.equal(art.ground, sc.ground, sc.id + " blank is paper");
+      else if (role === "weekday") { assert.equal(art.ground, sc.roles.month.ground, sc.id); assert.equal(art.color, sc.roles.month.ink, sc.id); assert.equal(art.weight, 600); }
+      else if (role === "day") assert.equal(art.ground, sc.ground, sc.id + " day is paper");
+    }
+    // The German chip color of the weekday is also what the month uses, and differs from the paper (day) ground.
+    assert.equal(sc.roles.weekdayDe.ground, sc.roles.month.ground);
+    assert.notEqual(sc.roles.weekdayDe.ground, sc.roles.day.ground);
+    // English ignores the flag, and its weekday stays plain on paper.
+    for (const d of en) for (const s of d.printing) assert.deepEqual(stickerArt(s, sc, false), stickerArt(s, sc), sc.id);
+    for (const s of en[0].printing.filter((x) => x.slot < 3 && x.image && x.image !== "SAT" && x.image !== "SUN")) assert.equal(stickerArt(s, sc).ground, sc.ground);
+  }
+  for (const d of de) for (const s of d.printing) assert.deepEqual(stickerArt(s, DEFAULT_CAL3_SCHEME, true), stickerArt(s, DEFAULT_CAL3_SCHEME), "default scheme unchanged for German");
+});
+
+test("the viewer paints the German weekday with the chip ground (configure of a German print) and not the English one", async () => {
+  const THREE = await import("three");
+  const { CalendarViewer } = await import("../src/apps/calendar/viewer.ts");
+  const run = (design) => {
+    const painted = [];
+    globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => new Proxy({}, { set: (_t, k, v) => (k === "fillStyle" && painted.push(v), true), get: () => () => {} }) }) };
+    globalThis.matchMedia = () => ({ matches: false });
+    const viewer = Object.assign(Object.create(CalendarViewer.prototype), {
+      presentation: new THREE.Group(), resources: [], artworkTextures: new Map(), glyphs: [], cube: null, busy: false, scheme: cal3SchemeById("dracula"),
+      appearance: { construction: "stickered", frameColor: null }, bodyStale: false,
+    });
+    viewer.configure(design, design.printing);
+    return painted.filter((c) => c === "#ff79c6").length;
+  };
+  try {
+    const chipTextures = (d) => new Set(d.printing.filter((s) => s.image && !/^[0-9]$/.test(s.image)).map((s) => (s.slot < 3 ? "weekday" : "month") + ":" + s.image)).size;
+    const de = designs["de-a"], en = designs["en-3-zero"];
+    assert.equal(run(de), chipTextures(de), "German: every weekday and month texture is a chip");
+    assert.ok(run(en) < run(de));
+  } finally { delete globalThis.document; delete globalThis.matchMedia; }
+});
+
+test("a scheme change on a German viewer repaints the weekday as chip and gives the cut faces the chip ground", async () => {
+  const { CalendarViewer } = await import("../src/apps/calendar/viewer.ts");
+  const fills = [];
+  const ctxOf = () => new Proxy({}, { set: (_t, k, v) => (k === "fillStyle" && fills.push(v), true), get: () => () => {} });
+  const wd = designs["de-a"].printing.find((s) => s.slot === 0 && s.image === "M");
+  const glyphs = [{ canvas: { getContext: ctxOf }, texture: { needsUpdate: false }, sticker: wd, german: true }];
+  let faces = null;
+  const viewer = Object.assign(Object.create(CalendarViewer.prototype), {
+    glyphs, scheme: DEFAULT_CAL3_SCHEME, busy: false, bodyStale: false, german: true, printing: [wd],
+    cube: { setBodyColor() {}, setFaceColors: (m) => (faces = m) },
+  });
+  viewer.setScheme("dracula");
+  assert.equal(fills[0], "#ff79c6", "weekday ground is the chip");
+  assert.equal(faces.get(wd.id), "#ff79c6", "cut-face color follows the chip ground");
 });

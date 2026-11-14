@@ -26,13 +26,15 @@ export class CalendarViewer {
   private cube: PhysicalCubeScene | null = null;
   private artworkTextures = new Map<number, THREE.CanvasTexture>();
   /** One entry per distinct glyph texture of the current build: repainted in place when the scheme changes. */
-  private glyphs: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; sticker: { image: string; slot: number } }[] = [];
+  private glyphs: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; sticker: { image: string; slot: number }; german: boolean }[] = [];
   /** Chosen scheme; null is the default (a viewer built without the constructor, as in tests, has none). */
   private scheme: Cal3Scheme | null = null;
   private get active(): Cal3Scheme {
     return this.scheme ?? DEFAULT_CAL3_SCHEME;
   }
   private printing: Design["printing"] | null = null;
+  /** The German print: its weekday stickers take the chip of the month in a theme. */
+  private german = false;
   /** The scheme changed during a turn: the stickerless body and cut-face colors follow when it ends. */
   private bodyStale = false;
   private studio: ReturnType<typeof createPresentationStudio>;
@@ -107,7 +109,7 @@ export class CalendarViewer {
     if (next === this.active) return;
     this.scheme = next;
     for (const g of this.glyphs) {
-      paintSticker(g.canvas.getContext("2d")!, g.sticker, next);
+      paintSticker(g.canvas.getContext("2d")!, g.sticker, next, g.german);
       g.texture.needsUpdate = true;
     }
     this.bodyStale = true;
@@ -121,13 +123,14 @@ export class CalendarViewer {
     this.bodyStale = false;
   }
   private faceColors(printing: NonNullable<CalendarViewer["printing"]>): Map<number, string> {
-    return new Map(printing.map(s => [s.id, stickerArt(s, this.active).ground]));
+    return new Map(printing.map(s => [s.id, stickerArt(s, this.active, this.german).ground]));
   }
   configure(design: Pick<Design, "id" | "printing">, state: State, artwork?: ReadonlyMap<number, HTMLCanvasElement>): void {
     demand(!this.busy, "Cannot change the calendar print during a turn");
     if (artwork) demand(artwork.size === design.printing.length && design.printing.every(s => artwork.has(s.id)), "Incomplete picture artwork");
     this.clear();
     this.printing = design.printing;
+    this.german = design.id.startsWith("de");
     this.bodyStale = false;
     this.current = state;
     const plastic = createPlasticMaterial("#243d35", 0.65);
@@ -159,12 +162,12 @@ export class CalendarViewer {
       if (maps.has(key)) continue;
       const canvas = document.createElement("canvas");
       canvas.width = canvas.height = 256;
-      paintSticker(canvas.getContext("2d")!, s, this.active);
+      paintSticker(canvas.getContext("2d")!, s, this.active, this.german);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
       const mat = createStickerMaterial(texture);
       this.resources.push(texture, mat);
-      this.glyphs.push({ canvas, texture, sticker: s });
+      this.glyphs.push({ canvas, texture, sticker: s, german: this.german });
       maps.set(key, mat);
     }
     materials = new Map<number, THREE.Material>();
