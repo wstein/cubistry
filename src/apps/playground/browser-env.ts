@@ -9,7 +9,12 @@ import type { PlaygroundEnv } from "./mount.ts";
 export function browserPlaygroundEnv(base: string): PlaygroundEnv {
   return {
     doc: document,
-    createViewer: (host) => new CubeViewer(host),
+    createViewer: (host) => {
+      const viewer = new CubeViewer(host);
+      // Test hook (tests/browser/stickerless-seam.spec.mjs): the spec sets canvas size and view and reads the render; no app code uses it.
+      (window as unknown as Record<string, unknown>).__playgroundViewer = viewer;
+      return viewer;
+    },
     baseMoveMs: BASE_MOVE_DURATION_MS,
     loadAssets: (design, local) => loadDesignAssets(loadAssets as never, design, base, local),
     createPictures: (region, hooks) => mountPicturesPanel(region, { baseUrl: base, ...hooks }),
