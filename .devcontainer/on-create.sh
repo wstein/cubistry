@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
-# System packages, mise, and the flixw checkout. Language toolchains come from /mise.toml.
+# System packages (build tools, jq, unzip, openscad), mise, and the flixw checkout. Language toolchains come from /mise.toml.
 set -euo pipefail
 
 sudo chown -R vscode:vscode "$HOME/.local" "$HOME/.julia" 2>/dev/null || true
 sudo apt-get update -qq
-sudo apt-get install -y --no-install-recommends build-essential time jq unzip >/dev/null
+sudo apt-get install -y --no-install-recommends build-essential time jq unzip openscad >/dev/null
 
 if ! command -v mise >/dev/null && [ ! -x "$HOME/.local/bin/mise" ]; then
   curl -fsSL https://mise.run | sh
