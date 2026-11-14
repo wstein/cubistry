@@ -1,0 +1,41 @@
+# print	cells	scramble_word	scramble_length	bf_opt	bf_word
+de-a	M|O|||0|1|J|A|N	y y y L2 F' D2 B' L2 B U2 F L2 U2 L2 F L U' L F2 D' B2 R2 F' R F R' F R F R' F R F R' F R F R' F R F R' F R' L2 D	3	3	D' R L2
+de-a	D|O|||3|1|M|Ä|R	R U F' R2 U2 F D' B' D2 L2 B U2 L2 D2 L2 F R2 B2 L L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U D B U2	4	4	U2 B' U' D'
+de-a	S|O|||2|9|J|U|N	y y U R2 F2 R2 F2 D B' L2 U2 B2 L' U2 R U2 L' F2 R2 U2 B2 F' L2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U2 D' D2 L2 U'	5	4	U L2 U2 D'
+de-a	M|I|||2|8|S|E|P	y y L2 D U2 F2 D F2 R2 U' B2 U' B2 L' D2 U' L' D2 L F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 F B L U B D'	6	5	U' D B' L' F'
+de-a	S|A|||2|7|D|E|Z	y y L2 D B2 L2 B2 U R2 B2 R2 U' R2 U' F' L U R2 B L B U' L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R' L2 U2 F F R' U	7	6	U' R F2 U2 R L2
+de-a	M|I|||0|1|M|Ä|R	y y y U2 L2 F U D' L F' U2 R2 F2 U L2 F2 U' D2 L2 D B2 R2 B' L2 U2 D' U'	3	2	U' D
+de-a	S|A|||3|0|M|A|I	L2 F D L U' L' D' F2 R2 D2 F' D2 B L2 B R2 U2 B' U' R F R' F R F R' F R F R' F R F R' F R F R' F U D L B'	4	4	B L' U' D'
+de-a	D|I|||2|9|A|U|G	y y U B2 R2 U B2 L2 U B2 R2 D' R2 L U' B2 U2 R2 U2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 R' L2 D D' D'	5	3	D R L2
+de-a	F|R|||2|7|N|O|V	y y F2 U' F2 L2 U' R2 U' B2 U2 L2 R2 U L' U' L F L F' L' F B F' B2 D B	6	2	B' D'
+de-a	D|I|||3|1|J|A|N	U2 F D2 F2 R2 F R2 B D2 B2 U2 F U L F2 L2 B U B' F D U F2 D2 L B R2	7	7	R2 B D2 F2 R U D'
+de-a-unpadded	D|I|||3|1|J|A|N	U2 F D2 F2 R2 F R2 B D2 B2 U2 F U L F2 L2 B U B' F U D U	3	2	U2 D'
+de-a-unpadded	F|R|||3|0|A|P|R	U' F2 L2 R B2 L D2 L B2 U2 F2 D' L' F' R' F R F' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 D U U2 L2	4	3	L2 U D'
+de-a-unpadded	M|O|||3|0|J|U|L	R2 D2 L2 D L2 F2 U F2 D B2 U2 B' L2 F' U' L' U' B F2 U L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 R' L2 U' D2 B2	5	5	B2 U D2 R L2
+de-a-unpadded	D|O|||2|8|O|K|T	y y B' R2 B R2 U2 B2 D2 F D2 R2 U2 B' D' F U' R' B' D B R R F R' F R F R' F R F R' F R F R' F R F R' F U2 D' D' D2 L2 R2	6	3	R2 L2 U2
+de-a-unpadded	M|O||||1|J|A|N	y D' L2 U2 B2 F2 U B2 U R2 D' R2 F2 R' D' R' B2 D' F' L U L' R' L2 B' R2 U R' U2	7	7	U2 R U' R2 B R L2
+de-a-unpadded	D|O|||3|1|M|Ä|R	R U F' R2 U2 F D' B' D2 L2 B U2 L2 D2 L2 F R2 B2 L L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 F' B B	3	1	F
+de-a-unpadded	S|O|||2|9|J|U|N	y y U R2 F2 R2 F2 D B' L2 U2 B2 L' U2 R U2 L' F2 R2 U2 B2 F' L2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 R' L2 F' R'	4	4	R F R L2
+de-a-unpadded	M|I|||2|8|S|E|P	y y L2 D U2 F2 D F2 R2 U' B2 U' B2 L' D2 U' L' D2 L F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L R F2 B2 B'	5	4	F2 B' R' L'
+de-a-unpadded	S|A|||2|7|D|E|Z	y y L2 D B2 L2 B2 U R2 B2 R2 U' R2 U' F' L U R2 B L B U' L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U D U R R2 R2	6	3	R' U2 D'
+de-a-unpadded	M|I||||1|M|Ä|R	y B' U' L B R B U R' L2 D2 F2 B L2 B U2 L2 D2 L2 U2 F U D U' F2 U' F' R2	7	4	R2 L F' D'
+en-3-zero	WED|||M|A|R||0|1	y y y U2 L B2 L' B2 R2 B2 D2 R B2 R D' B' D2 B' U R2 U2 D' R	3	3	R' U2 D
+en-3-zero	SAT|||M|A|Y||3|0	y y y U F2 L2 D L2 B2 U R2 B2 D2 L2 U2 B' R B' R' D' R D' U R F R' F R F R' F R F R' F R F R' F R F R' F U2 D' L R'	4	4	R L' U2 D
+en-3-zero	TUE|||A|U|G||2|9	D F2 R2 U' F2 U2 F2 R2 U2 L2 F2 D' F' R2 F' D2 R2 U B2 U' R F R' F R F R' F R F R' F R F R' F R F R' F B F B' R2 B'	5	3	F D2 F2
+en-3-zero	FRI|||N|O|V||2|7	y F D L2 D' B2 D' R2 U L2 F2 L2 U R2 L' B F' L2 B' L F2 R' L2 F' B' R' L	6	6	R L' F B R L2
+en-3-zero	TUE|||J|A|N||3|1	y y y L2 F U2 B' R2 B R2 F' D2 F R' U F' U2 R' D2 U2 F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 D U U2 U' L' B' F	7	5	F' B L U2 D'
+en-3-zero	FRI|||A|P|R||3|0	y y B2 R2 U2 F D2 B' D2 L2 D2 U2 B D2 U L2 R U R' D B2 F L2 R F R' F R F R' F R F R' F R F R' F R F R' F R' L2 R'	3	2	R2 L2
+en-3-zero	MON|||J|U|L||3|0	D B2 D' B2 U L2 R2 F2 D' F2 U2 B2 L' B' U B F2 U F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U D F U	4	4	U' F' U' D'
+en-3-zero	THU|||O|C|T||2|8	x x x L' F D2 B R2 B' R2 F2 U2 F D2 F R2 D F2 L F D B2 R2 B F F F' U2	5	2	U2 F'
+en-3-zero	MON|||J|A|N||0|1	y y y B2 D2 B' D2 F' D2 F L2 B' U2 R2 U F D2 R' D' R F' R' L2 F D' F' D'	6	6	D F D F' R L2
+en-3-zero	THU|||M|A|R||3|1	y y y L U' L' D R U2 D' F' L2 F D2 B2 U2 B R2 D2 L2 F' L2 R R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U D B F2 R U B'	7	7	B U' R' F2 B' U' D'
+en-3-unpadded	THU|||M|A|R||3|1	y y y L U' L' D R U2 D' F' L2 F D2 B2 U2 B R2 D2 L2 F' L2 R R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 U2 D' L'	3	3	L U2 D
+en-3-unpadded	SUN|||J|U|N||2|9	R2 U2 L2 B2 D U' R2 D L2 R2 U' F' L' F L B2 U F2 U' F R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 F' B R' D2	4	3	D2 R F
+en-3-unpadded	WED|||S|E|P||2|8	x R2 B2 U2 R B2 L' D2 F2 R' D2 U2 R D' L2 F L F2 U F2 L' R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R2 F' R2 L2 B L2 R L B' F' D	5	5	D' F B R' L'
+en-3-unpadded	SAT|||D|E|C||2|7	x D2 R2 B2 D2 B2 R' F2 R D2 L2 U2 R2 U' F D' R D R F' D2 R F R' F R F R' F R F R' F R F R' F R F R' F R' L2 B D' U2 B'	6	6	B U2 D B' R L2
+en-3-unpadded	WED|||M|A|R|||1	y y y F2 L U2 B2 R U2 L U2 R' B2 D2 U R' D2 R' D R2 R F R' F R F R' F R F R' F R F R' F R F R' F D U R' B B B L2	7	5	L2 B R U' D'
+en-3-unpadded	SAT|||M|A|Y||3|0	y y y U F2 L2 D L2 B2 U R2 B2 D2 L2 U2 B' R B' R' D' R D' U R F R' F R F R' F R F R' F R F R' F R F R' F L R L2	3	2	R' L
+en-3-unpadded	TUE|||A|U|G||2|9	D F2 R2 U' F2 U2 F2 R2 U2 L2 F2 D' F' R2 F' D2 R2 U B2 U' R F R' F R F R' F R F R' F R F R' F R F R' F R' L2 R2 R	4	2	R2 L2
+en-3-unpadded	FRI|||N|O|V||2|7	y F D L2 D' B2 D' R2 U L2 F2 L2 U R2 L' B F' L2 B' L F2 F' B R D R'	5	4	R D' R' F
+en-3-unpadded	TUE|||J|A|N||3|1	y y y L2 F U2 B' R2 B R2 F' D2 F R' U F' U2 R' D2 U2 F L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 L2 B' L2 R2 F R2 U2 D' U D' L U'	6	4	U L' U D2
+en-3-unpadded	FRI|||A|P|R||3|0	y y B2 R2 U2 F D2 B' D2 L2 D2 U2 B D2 U L2 R U R' D B2 F L2 R F R' F R F R' F R F R' F R F R' F R F R' F U2 D' U2 L L U F2	7	4	F2 U' L2 D

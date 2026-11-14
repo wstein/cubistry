@@ -1,4 +1,4 @@
-# Julia tests for FrontGoal.jl. Run: julia --project=. test/runtests.jl   (standard library only)
+# Julia tests for FrontGoal.jl. Run: julia test/runtests.jl   (standard library only, no Project.toml needed)
 using Test
 include(joinpath(@__DIR__, "..", "FrontGoal.jl"))
 using .FrontGoal
@@ -170,6 +170,7 @@ end
 end
 
 @testset "weaker heuristic gives the same optimum" begin
+    nodes_full = 0; nodes_weak = 0
     for (id, ks) in (("de-a", [2, 3]), ("en-3-zero", [4]), ("de-a-unpadded", [5]))
         pr = prints[id]
         for k in ks
@@ -180,9 +181,11 @@ end
             a = solve_front(h, pose; maxdepth = 7)
             b = solve_front(weak, pose; maxdepth = 7)
             @test a.status == :solved && b.status == :solved && a.htm == b.htm
-            @test b.nodes >= a.nodes
+            nodes_full += a.nodes; nodes_weak += b.nodes
         end
     end
+    # the maximum over nine tables must prune strictly more than the two-table subset (and than table 1 alone)
+    @test nodes_weak > nodes_full
 end
 
 @testset "tables" begin
@@ -193,6 +196,74 @@ end
     @test all(p -> maximum(filter(!=(0xff), p.dist)) >= 3, h.pdbs)
     @test h.bytes == 9 * 4 * FG.TSIZE
     @test length(FG.ROTWORDS) == 24 && FG.ROTWORDS[1] == "" && all(w -> length(split(w)) <= 2, FG.ROTWORDS[2:end])
+end
+
+# ---- independent brute force at depth 4 to 7 with opposite-face pairs (fixtures/bf-cases.tsv, export-bf-cases.mjs)
+function bf_cases()
+    out = NamedTuple[]
+    for l in eachline(joinpath(FIX, "bf-cases.tsv"))
+        startswith(l, "#") && continue
+        f = split(l, '\t'; keepempty = true)
+        push!(out, (id = String(f[1]), cells = parse_cells(f[2]), word = String(f[3]), k = parse(Int, f[4]),
+            opt = parse(Int, f[5]), bfword = String(f[6])))
+    end
+    return out
+end
+BF = bf_cases()
+HCACHE = Dict{Tuple{String,String},Any}()
+heur(id, cells) = get!(() -> build_heuristic(prints[id], cells), HCACHE, (id, join(cells, "|")))
+opposite_pair(w) = any(p -> p[1] != p[2] && (p[1], p[2]) in (('R', 'L'), ('L', 'R'), ('U', 'D'), ('D', 'U'), ('F', 'B'), ('B', 'F')),
+    zip(first.(split(w)), first.(split(w))[2:end]))
+
+@testset "optimum equals independent brute force, depth 4 to 7, opposite faces" begin
+    deep = 0; opp = 0
+    for c in BF
+        c.opt == 0 && continue
+        pose = apply_word(prints[c.id].solved, c.word)
+        r = solve_front(heur(c.id, c.cells), pose; rotations = :none, maxdepth = 9)
+        @test r.status == :solved && r.htm == c.opt
+        @test FG.matches_pose(prints[c.id], c.cells, apply_word(pose, r.word))
+        c.opt >= 4 && (deep += 1)
+        opposite_pair(c.bfword) && (opp += 1)
+    end
+    @test deep >= 10 && opp >= 8
+end
+
+@testset "depth bound is inclusive" begin
+    n = 0
+    for c in BF
+        c.opt >= 4 || continue
+        pose = apply_word(prints[c.id].solved, c.word)
+        h = heur(c.id, c.cells)
+        @test solve_front(h, pose; rotations = :none, maxdepth = c.opt).htm == c.opt
+        @test solve_front(h, pose; rotations = :none, maxdepth = c.opt - 1).status == :none_within
+        n += 1
+        n >= 6 && break
+    end
+    @test n >= 6
+end
+
+@testset "fewest rotation tokens among equal-length routes" begin
+    mixed = 0
+    for c in BF[1:2:min(end, 30)]
+        c.opt == 0 && continue
+        pose = apply_word(prints[c.id].solved, c.word)
+        h = heur(c.id, c.cells)
+        r = solve_front(h, pose; maxdepth = 9)
+        @test r.status == :solved
+        # independent per-rotation optima: candidate rotation w, then rotation-free search
+        best = Dict{Int,Int}()   # tokens => minimal htm
+        for w in FG.ROTWORDS
+            q = solve_front(h, apply_word(pose, w); rotations = :none, maxdepth = r.htm)
+            q.status == :solved || continue
+            t = isempty(w) ? 0 : length(split(w))
+            best[t] = min(get(best, t, 99), q.htm)
+        end
+        @test minimum(values(best)) == r.htm
+        @test r.rotations == minimum(t for (t, v) in best if v == r.htm)
+        length([t for (t, v) in best if v == r.htm]) >= 2 && (mixed += 1)
+    end
+    @test mixed >= 1
 end
 
 end
