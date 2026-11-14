@@ -97,6 +97,6 @@ export function measureFaces(page, { pitch, rotY, png = false }) {
       }
     });
     for (const f of Object.keys(deltas)) { if (!faces[f]) continue; const d = deltas[f].sort((a, b) => a - b); faces[f].washedTiles = washed[f].list ?? []; faces[f].washedShare = washed[f].tiles ? washed[f].washed / washed[f].tiles : null; faces[f].coloredTiles = washed[f].tiles; faces[f].tiles = d.length; faces[f].delta = d.length ? d[d.length - 1] : 0; faces[f].medianDelta = d.length ? d[d.length >> 1] : 0; faces[f].p90 = d.length ? d[Math.floor(d.length * 0.9)] : 0; }
-    return { exposure: v.renderer.toneMappingExposure, faces, png: png ? cv.toDataURL("image/png") : undefined };
+    return { exposure: v.renderer.toneMappingExposure, toneMapping: v.renderer.toneMapping, faces, png: png ? cv.toDataURL("image/png") : undefined };
   }, { pitch, rotY, png });
 }

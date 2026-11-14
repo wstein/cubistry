@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // Calendar7 names layout: the colors on screen are the scheme tokens. The real viewer renders the front face of the window
 // print (WebGL, Chromium) head on or in the start view; every tile class is sampled and compared with the token it was drawn
-// from. The names layout uses Linear tone mapping at the exposure that makes the face looking at the camera show its albedo
+// from. The names layout uses a tone curve that is Linear up to 0.95 (names-tone.ts) at the exposure that makes the face looking at the camera show its albedo
 // (names-exposure.ts), times the gain that gives back what its shading takes (plasticity, names-plasticity.ts, default 0.6),
 // so the mean color of a flat area is its token with the paper white (NAMES_WHITE) as the reference; single tiles differ a few
 // levels by the shading. Both effect modes are measured: the repo's test mode (cubistry-lowfx=shadows from

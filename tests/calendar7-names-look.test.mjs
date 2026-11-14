@@ -275,6 +275,28 @@ test("light rig: the head-on front face keeps its irradiance (exposure 1.217), a
   assert.deepEqual(lights.map(([o]) => o.intensity), lights.map(([, i]) => i), "share 1 restores the studio");
 });
 
+// ---- soft shoulder (names-tone.ts) ----
+import { SHOULDER_GLSL, SHOULDER_START, installNamesToneMapping, shoulder } from "../src/apps/calendar7/names-tone.ts";
+test("shoulder: identity up to 0.9 (front tokens unchanged), continuous, rising and below 1 for 1.3; white renders within 4 of 255", () => {
+  assert.ok(SHOULDER_START >= 0.9 && SHOULDER_START < 1, "the start must be late enough to leave the front tokens alone");
+  for (let x = 0; x <= 0.9; x += 0.01) assert.equal(shoulder(x), x, String(x));
+  assert.ok(Math.abs(shoulder(SHOULDER_START + 1e-9) - SHOULDER_START) < 1e-6, "continuous at the start");
+  let prev = -1;
+  for (let x = 0; x <= 2; x += 0.005) { const y = shoulder(x); assert.ok(y > prev - 1e-12 && y <= 1, `${x}`); prev = y; }
+  assert.ok(shoulder(1.3) < 1 && shoulder(1.1) < shoulder(1.3), "rolls off instead of clipping at 1");
+  const srgb = (v) => 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+  assert.ok(255 - srgb(shoulder(1)) <= 4, `white renders ${srgb(shoulder(1))}`);
+});
+
+test("shoulder: the shader chunk of three.js carries the same start, and the install is idempotent", () => {
+  assert.ok(SHOULDER_GLSL.includes(SHOULDER_START.toFixed(4)));
+  installNamesToneMapping(); installNamesToneMapping();
+  const chunk = THREE.ShaderChunk.tonemapping_pars_fragment;
+  assert.ok(chunk.includes("toneMappingExposure;") && chunk.includes(SHOULDER_GLSL));
+  assert.equal(chunk.split("vec3 CustomToneMapping").length - 1, 1, "one definition");
+  assert.ok(chunk.includes("vec3 LinearToneMapping") && chunk.includes("vec3 NeutralToneMapping"), "the other tone mappings are untouched");
+});
+
 // ---- plasticity of the names layout (names-plasticity.ts) ----
 import { DEFAULT_PLASTICITY, MIN_SHADOW_STRENGTH, clampPlasticity, floorOpacityFactor, parsePlasticity, plasticityGain, plasticityParts } from "../src/apps/calendar7/names-plasticity.ts";
 test("plasticity: 0 is the flat look, the parts grow with it, the default is in range, parsing and clamping", () => {

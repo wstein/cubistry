@@ -49,6 +49,7 @@ import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
 import { NAMES_DIRECTIONAL_SHARE, applyNamesLightRig, namesExposure } from "./names-exposure.ts";
+import { NAMES_TONE_MAPPING, installNamesToneMapping } from "./names-tone.ts";
 import { DEFAULT_PLASTICITY, clampPlasticity, floorOpacityFactor, plasticityGain, plasticityParts } from "./names-plasticity.ts";
 
 /**
@@ -163,7 +164,7 @@ export class Calendar7Viewer implements StageView {
   private dirty = true;
   private destroyed = false;
   private readonly lastQuaternion = new THREE.Quaternion();
-  /** The shared presentation tone mapping (read from the renderer at construction); the names layout uses Linear (a plain exposure scale). */
+  /** The shared presentation tone mapping (read from the renderer at construction); the names layout uses the soft shoulder of names-tone.ts (a plain exposure scale up to its start). */
   private readonly standardToneMapping: THREE.ToneMapping;
   /** Marks of the pieces on the turning layer (indexed by piece id), reused for every move. */
   private readonly onLayer = new Uint8Array(CUBIES + 1);
@@ -409,9 +410,10 @@ export class Calendar7Viewer implements StageView {
     this.scheme = layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     this.fitExtent(layout);
     // The names layout: its colors are the scheme tokens (geometry.ts), so it has its own light rig (the top face is not much brighter
-    // than the front: names-exposure.ts) and Linear tone mapping at its own exposure; otherwise the shared tone mapping and exposure 1.
+    // than the front: names-exposure.ts) and the soft shoulder tone mapping at its own exposure; otherwise the shared tone mapping and exposure 1.
+    installNamesToneMapping();
     applyNamesLightRig(this.scene, layout === "names" ? NAMES_DIRECTIONAL_SHARE : 1);
-    this.renderer.toneMapping = layout === "names" ? THREE.LinearToneMapping : this.standardToneMapping;
+    this.renderer.toneMapping = layout === "names" ? NAMES_TONE_MAPPING : this.standardToneMapping;
     this.syncExposure();
     this.clear();
     this.bodyStale = false;
