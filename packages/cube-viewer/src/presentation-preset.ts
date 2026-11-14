@@ -2,6 +2,8 @@
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import type { LayerProfile } from "./physical-scene.ts";
+import { createTwoRadiusBody } from "./two-radius-body.ts";
+import { thickOuterLayerWidths } from "./layer-widths.ts";
 
 /** Bounded presentation quality, shared by every current 2×2/3×3 consumer.
  * Shared cube geometry and two bounded shadow maps per scene (key and shadow fill). */
@@ -10,6 +12,8 @@ export const PRESENTATION_PRESET = Object.freeze({
   cubiePitch: 1,
   bodyWidth: 0.99,
   bodyRadius: 0.055,
+  /** Radius of the edges that are not on one of the 12 cube edges, as a share of the radius of the cube edges (owner decision 2026-11-14). */
+  innerRadiusShare: 0.6,
   /** Smaller 2×2 bevels reduce the visible seam without closing the turn clearance. */
   size2BodyRadius: 0.03,
   bevelSegments: 3,
@@ -66,13 +70,22 @@ export const PRESENTATION_PRESET = Object.freeze({
 });
 
 /**
- * Bevel radius of a body in inner-layer units (pitch 1). 2x2 and 3x3 keep their historical radii. A larger cube keeps the
- * millimeter radius of the 3x3 at the same cube edge (owner decision 2026-11-14): r = bodyRadius * edge / 3, where `edge` is the
- * edge of the whole cube in inner layers (N for the unit pitch, the sum of the layer widths with a layer profile).
+ * Radius of the edges that lie on one of the 12 edges of the whole cube, in inner-layer units (pitch 1). 2x2 and 3x3 keep their
+ * historical radii. A larger cube keeps the millimeter radius of the 3x3 at the same cube edge (owner decision 2026-11-14):
+ * r = bodyRadius * edge / 3, where `edge` is the edge of the whole cube in inner layers (N for the unit pitch, the sum of the
+ * layer widths with a profile).
  */
 export function bodyRadiusFor(size: number = 3, edge: number = size): number {
   const p = PRESENTATION_PRESET;
   return size === 2 ? p.size2BodyRadius : size <= 3 ? p.bodyRadius : p.bodyRadius * edge / 3;
+}
+/** Radius of every other edge of a cubie (two-radius model, owner decision 2026-11-14): 0.6 of the radius of the cube edges. */
+export function innerRadiusFor(size: number = 3, edge: number = size): number {
+  return PRESENTATION_PRESET.innerRadiusShare * bodyRadiusFor(size, edge);
+}
+/** How much wider an exterior cubie is made on its exterior side, so that its flat face is as large as that of an inner cubie: the extra rounding. */
+export function outerExtensionFor(size: number = 3, edge: number = size): number {
+  return bodyRadiusFor(size, edge) - innerRadiusFor(size, edge);
 }
 /** Sticker corner radius: the body radius rule with the sticker radius (2x2 keeps 0.055). */
 export function stickerRadiusFor(size: number = 3, edge: number = size): number {
@@ -80,12 +93,12 @@ export function stickerRadiusFor(size: number = 3, edge: number = size): number 
   return size <= 3 ? p.stickerRadius : p.stickerRadius * edge / 3;
 }
 /**
- * Side of a sticker on a cell of width `cell` (inner layers; `bodyRadius`: the radius of the BODY, whose flat part limits it): the preset share of the cell, and never wider than the flat part of
- * the body face less a 0.01 margin (a larger bevel radius shrinks the sticker; N <= 3 keeps 0.87 exactly).
+ * Side of a sticker on a cell of width `cell` (inner layers; `radius`: the radius of the edges at the sticker, the inner radius, whose flat part limits it): the preset
+ * share of the cell, and never wider than the flat part of the body face less a 0.01 margin.
  */
-export function stickerSideFor(cell: number, bodyRadius: number): number {
+export function stickerSideFor(cell: number, radius: number): number {
   const p = PRESENTATION_PRESET, side = p.stickerWidth * cell;
-  return bodyRadius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * bodyRadius - 0.01);
+  return radius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * radius - 0.01);
 }
 /** A rounded-rectangle sticker of the world size `width` x `height` with corner radius `radius` on both axes; UV spans 0..1 over its extent. */
 export function createStickerGeometry(width: number, height: number, radius: number, curveSegments: number = PRESENTATION_PRESET.stickerCurveSegments): THREE.ShapeGeometry {
@@ -112,28 +125,41 @@ export function createStickerGeometry(width: number, height: number, radius: num
   return sticker;
 }
 
-/** `size`: cube size N (default 3); `edge`: cube edge in inner layers when it is not N (layer profile). */
+/**
+ * Layer profile of the preset for the widths of an N-cube: a two-radius body per cubie (the preset gap; the large radius on the
+ * edges that lie on a cube edge, 0.6 of it on every other edge) and one sticker of the same size on every cell (the inner cell:
+ * the flat face of a cubie is the same size everywhere). `widths` decide the cell of each layer; the flat face of an exterior
+ * cubie is as large as that of an inner cubie when its outer layer is wider by `outerExtensionFor` than the inner layers
+ * (`presentationWidths`). `nominalEdge`: the edge that the radius rule uses (default the sum of the widths).
+ */
+export function presentationLayerProfile(widths: readonly number[], nominalEdge?: number): LayerProfile {
+  const p = PRESENTATION_PRESET, n = widths.length, edge = nominalEdge ?? widths.reduce((a, b) => a + b, 0);
+  const big = bodyRadiusFor(n, edge), small = innerRadiusFor(n, edge), sticker = stickerRadiusFor(n, edge), gap = 1 - p.bodyWidth;
+  const side = stickerSideFor(1, small);
+  return {
+    widths,
+    body: (cell, outer) => createTwoRadiusBody({ size: cell.map((c) => c - gap) as [number, number, number], outer, big, small, segments: p.bevelSegments }),
+    sticker: () => createStickerGeometry(side, side, sticker),
+  };
+}
+/** Layer widths of an N-cube of the preset without a profile: the outer layers wider by the extra rounding (see `presentationLayerProfile`). */
+export function presentationWidths(size: number): number[] {
+  return thickOuterLayerWidths(size, 1 + outerExtensionFor(size));
+}
+
+/**
+ * `size`: cube size N (default 3); `edge`: cube edge in inner layers when it is not N (layer profile). `layers`: the two-radius
+ * profile of an N-cube without a thick-layer profile; the scene uses it unless it is given its own `layers`.
+ */
 export function createPresentationGeometry(size?: number, edge?: number) {
   const p = PRESENTATION_PRESET;
   const body = new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth, p.bevelSegments, bodyRadiusFor(size, edge));
   const radius = stickerRadiusFor(size, edge);
-  const side = stickerSideFor(1, bodyRadiusFor(size, edge));
+  const side = stickerSideFor(1, innerRadiusFor(size, edge));
   const sticker = createStickerGeometry(side, side, radius);
-  return { body, core: new THREE.SphereGeometry(1, 48, 24), sticker, stickerOffset: p.stickerOffset };
-}
-
-/**
- * Layer profile of the preset for the widths of an N-cube: a body per cell (preset gap and bevel radius of the cube edge) and a
- * sticker per cell (right x up size of the cell, same corner radius on both axes), so no sticker is stretched.
- */
-export function presentationLayerProfile(widths: readonly number[]): LayerProfile {
-  const p = PRESENTATION_PRESET, n = widths.length, edge = widths.reduce((a, b) => a + b, 0);
-  const radius = bodyRadiusFor(n, edge), sticker = stickerRadiusFor(n, edge), gap = 1 - p.bodyWidth;
-  return {
-    widths,
-    body: (cell) => new RoundedBoxGeometry(cell[0] - gap, cell[1] - gap, cell[2] - gap, p.bevelSegments, Math.min(radius, (Math.min(...cell) - gap) / 2)),
-    sticker: (w, h) => createStickerGeometry(stickerSideFor(w, radius), stickerSideFor(h, radius), sticker),
-  };
+  const n = size ?? 3;
+  return { body, core: new THREE.SphereGeometry(1, 48, 24), sticker, stickerOffset: p.stickerOffset,
+    layers: edge === undefined && n >= 2 ? presentationLayerProfile(presentationWidths(n), n) : undefined };
 }
 
 export function createPlasticMaterial(color = "#202329", roughness = 0.45) {

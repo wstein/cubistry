@@ -12,9 +12,10 @@ const near = (a, b) => {
   assert.equal(a.length, b.length);
   a.forEach((x, i) => assert(Math.abs(x - b[i]) < 1e-6, `${a} != ${b}`));
 };
-function fixture(printed, spacing) {
+// The adapter mechanics (frames, turns, core) are checked on the historical unit-pitch cubie: `layers: undefined` drops the
+// two-radius profile that createPresentationGeometry brings (its own test is below).
+function fixture(printed, spacing, geometry = { ...createPresentationGeometry(), layers: undefined }) {
   const parent = new THREE.Group();
-  const geometry = createPresentationGeometry();
   const material = new THREE.MeshStandardMaterial();
   const adapter = new PhysicalCubeScene(parent, printed,
     new Map(printed.map(s => [s.id, material])), material, spacing, geometry);
@@ -23,14 +24,20 @@ function fixture(printed, spacing) {
     const stickers = new Map();
     parent.traverse(o => { if (o.userData.stickerId !== undefined) stickers.set(o.userData.stickerId, o); });
     assert.equal(stickers.size, printed.length);
+    // Two-radius profile: the exterior layers are wider by the extension e, so the center of an exterior cubie and its sticker move out by e / 2.
+    const coords = [...new Set(printed.map((s) => s.p[0]))].sort((x, y) => x - y), top = coords[coords.length - 1], step = coords.length > 1 ? coords[1] - coords[0] : 1;
+    const shift = (pose) => {
+      if (!geometry.layers) return pose.p.map((x, i) => x * spacing + pose.n[i] * geometry.stickerOffset);
+      const e = geometry.layers.widths[0] - 1;
+      return pose.p.map((x, i) => (x + Math.sign(x) * (Math.abs(Math.abs(x) - top) < 1e-9 ? e / 2 * step : 0)) * spacing + pose.n[i] * (geometry.stickerOffset + e / 2));
+    };
     for (const pose of poses) {
       const sticker = stickers.get(pose.id);
       const q = sticker.getWorldQuaternion(new THREE.Quaternion())
         .premultiply(parent.getWorldQuaternion(new THREE.Quaternion()).invert());
       near(new THREE.Vector3(0, 0, 1).applyQuaternion(q).toArray(), pose.n);
       near(new THREE.Vector3(0, 1, 0).applyQuaternion(q).toArray(), pose.up);
-      near(parent.worldToLocal(sticker.getWorldPosition(new THREE.Vector3())).toArray(),
-        pose.p.map((x, i) => x * spacing + pose.n[i] * geometry.stickerOffset));
+      near(parent.worldToLocal(sticker.getWorldPosition(new THREE.Vector3())).toArray(), shift(pose));
     }
   };
   return { parent, adapter, verify, geometry, material };
@@ -69,6 +76,21 @@ test("inherited size-3 calendar frames, center orientation and whole-cube turns 
     const turn = h.adapter.beginTurn(ids, axis, turns * Math.PI / 2);
     turn.update(1); h.verify(target); turn.dispose();
     h.adapter.sync(target); h.verify(target); state = target;
+  }
+  h.adapter.dispose(); h.material.dispose();
+});
+test("two-radius profile (the default geometry): sticker frames and positions stay exact through legal turns; exterior layers are wider by the extension", () => {
+  const { print } = createDesign("picture");
+  let state = initialState(print);
+  const h = fixture(stickerPoses(print, state), .5, createPresentationGeometry(2));
+  assert.ok(h.geometry.layers, "the default geometry brings the profile");
+  h.adapter.sync(stickerPoses(print, state)); h.verify(stickerPoses(print, state));
+  for (const token of ["R", "U'", "F2"]) {
+    const event = presentMove(state, parseMove(token));
+    const [axis, layer, direction] = FACE_LAYERS[event.move.face];
+    const turn = h.adapter.beginTurn(state.cubies.filter(c => c.position[axis] === layer).map(c => c.id), axis, direction * event.move.turns * Math.PI / 2);
+    turn.update(1); h.verify(stickerPoses(print, event.to)); turn.dispose();
+    state = event.to; h.adapter.sync(stickerPoses(print, state)); h.verify(stickerPoses(print, state));
   }
   h.adapter.dispose(); h.material.dispose();
 });
