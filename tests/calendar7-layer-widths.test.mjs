@@ -281,11 +281,13 @@ test("names layout bevel, two radii (owner decision 2026-11-14): the 12 cube edg
   assert.equal(layerProfileFor("standard"), undefined);
   assert.equal(NAMES_BEVEL_SEGMENTS, 2);
   const sides = (...plus) => [0, 1, 2].map((ax) => [plus.includes("-" + "xyz"[ax]), plus.includes("+" + "xyz"[ax])]);
-  for (const [cell, outer] of [[[1, 1, 1], NO_OUTER_SIDES], [[1.8, 1, 1], sides("+x")], [[1, 1.8, 1.8], sides("+y", "+z")], [[1.8, 1.8, 1.8], sides("+x", "+y", "+z")]]) {
+  // Vertices: 216 = 6 * (2 * 2 + 2) ** 2 where every border has one rounding extent; an edge piece and a corner cubie have borders whose corners differ (the seam
+  // edge that ends on a cube edge), which get the grid lines of both extents and of the ramp.
+  for (const [cell, outer, vertices] of [[[1, 1, 1], NO_OUTER_SIDES, 216], [[1.8, 1, 1], sides("+x"), 216], [[1, 1.8, 1.8], sides("+y", "+z"), 306], [[1.8, 1.8, 1.8], sides("+x", "+y", "+z"), 351]]) {
     const g = profile.body(cell, outer);
     const ref = createTwoRadiusBody({ size: namesBodySize(cell), outer, big: NAMES_BODY_RADIUS, small: NAMES_INNER_RADIUS, segments: NAMES_BEVEL_SEGMENTS });
     assert.equal(g.getAttribute("position").count, ref.getAttribute("position").count, `bevel segments of ${cell}`);
-    assert.equal(g.getAttribute("position").count, 6 * (2 * 2 + 2) ** 2, "two bevel segments: (2 * 2 + 2) lines per axis on each of the six faces");
+    assert.equal(g.getAttribute("position").count, vertices, `vertices of the body of ${cell} (216 with two bevel segments and one extent per border)`);
     g.computeBoundingBox();
     const box = g.boundingBox;
     for (let ax = 0; ax < 3; ax++) near(box.max.getComponent(ax) - box.min.getComponent(ax), cell[ax] - NAMES_GAP, 1e-6, `size ${cell} axis ${ax} (the gap is unchanged)`);
