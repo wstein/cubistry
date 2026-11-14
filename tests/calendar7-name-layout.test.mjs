@@ -117,24 +117,24 @@ test("name layout: the tile gaps follow the tracking (a middle tile fills its cu
 });
 
 // Per-font result of the solver (size, seam gap, tracking range over the tiles, in drawing px at the font's size), measured
-// 2026-11-11 (re-measured 2026-11-14 for the O2 bevel radius 0.1503 and the planar face UV: wider room per unit, ink kept off the hidden part of the bevel) on the unit grid with April as "AP" + "RIL" (the first tile has 1.3 units of content: the banner starts 0.5 inside
+// 2026-11-11 (re-measured 2026-11-14 for the two-radius bevel, 0.6 of O2 = 0.0902 at the seams between tiles, and the planar face UV: ink kept off the hidden part of the seam bevel, 14 px seam gap) on the unit grid with April as "AP" + "RIL" (the first tile has 1.3 units of content: the banner starts 0.5 inside
 // the cube edge, its ink keeps half a seam gap from the banner edge); a change of the metrics, the geometry or the rule has to
 // change this table on purpose.
 const PINNED = {
-  "noto": { size: 97.75, seamGap: 21.83, tracking: [-14.27, 1.83] },
-  "nunito": { size: 97.5, seamGap: 21.83, tracking: [-10.53, 0.02] },
-  "nunito-sans": { size: 93.75, seamGap: 21.83, tracking: [-5.84, 3.66] },
-  "quicksand": { size: 102.75, seamGap: 21.83, tracking: [-10.49, -3.01] },
-  "nova-oval": { size: 90.75, seamGap: 21.83, tracking: [-10.74, 11.65] },
-  "nova-square": { size: 97.5, seamGap: 21.83, tracking: [-11.8, 6.6] },
-  "nova-mono": { size: 125.25, seamGap: 21.83, tracking: [-8.89, -1.38] },
-  "comfortaa": { size: 90.25, seamGap: 21.83, tracking: [-10.56, 4.43] },
-  "varela-round": { size: 94.25, seamGap: 21.83, tracking: [-8, 1] },
-  "crete-round": { size: 88.75, seamGap: 21.83, tracking: [-1.15, 13.16] },
-  "dseg14classic-bold": { size: 87, seamGap: 21.83, tracking: [-3.72, -1.68] },
-  "dseg14classic-regular": { size: 87, seamGap: 21.83, tracking: [-3.72, -1.68] },
-  "dseg14modern-bold": { size: 86, seamGap: 21.83, tracking: [-2.59, -2.59] },
-  "dseg14modern-regular": { size: 86, seamGap: 21.83, tracking: [-2.59, -2.59] },
+  "noto": { size: 100.25, seamGap: 14.40, tracking: [-12.03, 3.16] },
+  "nunito": { size: 99, seamGap: 14.40, tracking: [-6.8, 2.26] },
+  "nunito-sans": { size: 97.5, seamGap: 14.40, tracking: [-6.17, 3.72] },
+  "quicksand": { size: 102.75, seamGap: 14.40, tracking: [-4.61, 0.68] },
+  "nova-oval": { size: 94.5, seamGap: 14.40, tracking: [-11.53, 11.92] },
+  "nova-square": { size: 99.75, seamGap: 17.06, tracking: [-11.66, 6.94] },
+  "nova-mono": { size: 125.25, seamGap: 14.40, tracking: [-3.57, 2.32] },
+  "comfortaa": { size: 90.25, seamGap: 14.40, tracking: [-4.74, 8.12] },
+  "varela-round": { size: 94.25, seamGap: 14.40, tracking: [-4.3, 4.7] },
+  "crete-round": { size: 92.25, seamGap: 14.40, tracking: [-1.18, 13.65] },
+  "dseg14classic-bold": { size: 87, seamGap: 16.53, tracking: [-1.09, 0.95] },
+  "dseg14classic-regular": { size: 87, seamGap: 16.53, tracking: [-1.09, 0.95] },
+  "dseg14modern-bold": { size: 86, seamGap: 16.34, tracking: [0, 0.13] },
+  "dseg14modern-regular": { size: 86, seamGap: 16.34, tracking: [0, 0.13] },
 };
 test("name layout: the per-font table (size, seam gap, tracking range) is pinned, no font is below its weekday size", () => {
   assert.deepEqual(Object.keys(PINNED), IDS);
@@ -167,8 +167,8 @@ test("name layout: an outer tile takes the mean tracking of the middle tiles, le
       else assert.ok(Math.abs(t.tracking - mean) < 1e-9 && reach >= -1e-9, `${id} ${t.label}: tracking ${t.tracking} equals the mean ${mean}`);
     }
   }
-  // re-measured for the O2 radius: the edge margin grew by the hidden part of the bevel, so more outer tiles are limited (each touches the margin, asserted above)
-  assert.deepEqual(limited.sort(), ["dseg14classic-bold RCH", "dseg14classic-regular RCH", "nova-mono ARY", "nova-mono BER", "nova-mono RCH", "nova-mono ULY", "nova-mono UNE", "nova-mono UST", "nunito-sans ARY"]);
+  // re-measured for the two-radius bevel: the seam margin follows the inner radius (0.0902), so Comfortaa UNE is limited as well (each limited tile touches the margin, asserted above)
+  assert.deepEqual(limited.sort(), ["comfortaa UNE", "dseg14classic-bold RCH", "dseg14classic-regular RCH", "nova-mono ARY", "nova-mono BER", "nova-mono RCH", "nova-mono ULY", "nova-mono UNE", "nova-mono UST", "nunito-sans ARY"]);
 });
 
 // Synthetic fonts: the real font with scaled glyph metrics (w: widths, h: heights), so the branches the 14 shipped fonts never take run.

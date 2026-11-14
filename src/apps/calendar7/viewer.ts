@@ -20,6 +20,7 @@ import {
   createPlasticMaterial,
   createPresentationGeometry,
   createPresentationStudio,
+  createTwoRadiusBody,
   createStickerMaterial,
   cubePresentationRadius,
   fitPresentationCamera,
@@ -42,7 +43,7 @@ import {
 import type { StageView } from "./player.ts";
 import { type HomeFace, faceEdgeFillsByHome, faceFillsByHome, homeFacesOf, schemeForHome, usesHomeTints } from "./home-tint.ts";
 import { type ColorScheme, type BannerStyle, DEFAULT_SCHEME, namesGround, parseBannerStyle, schemeById, withBannerStyle } from "./schemes.ts";
-import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, NAMES_BODY_RADIUS, NAMES_BEVEL_SEGMENTS, unitGridTileOf } from "./geometry.ts";
+import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, NAMES_BODY_RADIUS, NAMES_INNER_RADIUS, NAMES_BEVEL_SEGMENTS, unitGridTileOf } from "./geometry.ts";
 import { type Layout, type NameWords, NAME_WORDS, printNameWords } from "./layout.ts";
 import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface, type WrongCellContext } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
@@ -62,7 +63,7 @@ function lightGeometry(layout: Layout) {
   const p = PRESENTATION_PRESET;
   const width = bodyWidthFor(layout); // standard: the preset's .99; names: pitch minus 0.01 mm (geometry.ts)
   geometry.body.dispose();
-  return { ...geometry, body: new RoundedBoxGeometry(width, width, width, 1, p.bodyRadius) };
+  return { ...geometry, layers: undefined, body: new RoundedBoxGeometry(width, width, width, 1, p.bodyRadius) };
 }
 
 /**
@@ -72,7 +73,7 @@ function lightGeometry(layout: Layout) {
 export function layerProfileFor(layout: Layout): LayerProfile | undefined {
   const widths = layerWidthsOf(layout);
   if (!widths) return undefined;
-  return { widths, body: (cell) => { const [x, y, z] = namesBodySize(cell); return new RoundedBoxGeometry(x, y, z, NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS); } };
+  return { widths, body: (cell, outer) => createTwoRadiusBody({ size: namesBodySize(cell), outer, big: NAMES_BODY_RADIUS, small: NAMES_INNER_RADIUS, segments: NAMES_BEVEL_SEGMENTS }) };
 }
 
 /** The names layout maps its face textures planar (PhysicalSceneOptions.planarFaceUv: a cell edge lies where the cell edge is, the same pixels per unit everywhere); the standard layout keeps Three's arc-length UV its art is fitted to. */

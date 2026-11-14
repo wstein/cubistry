@@ -503,14 +503,14 @@ export const FACE_TEXT_SQUARE = 0.92;
 /** Scale of the sticker label about the texture center: the 86% text square becomes `FACE_TEXT_SQUARE` of the flat face. */
 export const FACE_SCALE = (FACE_FLAT * FACE_TEXT_SQUARE) / 0.86;
 /**
- * The same for a tile of the names layout (O2 bevel radius, owner decision 2026-11-14): the 192 px sticker drawing is fitted to the
- * visible face (`faceVisibleShare`: up to where the bevel is 45 degrees steep, 0.912 of the texture), so its 0.86 text square is
- * 0.784 of the cell. The flat part of a 1 x 1 face is only 0.699 of the texture (FACE_FLAT is 0.9106 at the radius 0.055): the
- * outer part of the text starts on the first part of the bevel (tilt below 17 degrees); a text square at 0.92 of the flat part
- * would be 23 % smaller than before and thinner than the 6 / 255 ink limit of tests/browser/calendar7-names-color.spec.mjs can
- * measure on screen.
+ * The same for a tile of the names layout (two-radius bevel, owner decision 2026-11-14): the 192 px sticker drawing is scaled to
+ * 0.912 of the texture, the visible share of a face at the radius of the cube edges (0.1503); the seams between tiles now have the
+ * inner radius 0.0902 and show 0.947 (`faceVisibleShare(1)`), but the drawing keeps its size: the digits and labels stay as they were
+ * at O2, the 0.86 text square is 0.784 of the cell (0.84 of the flat face of 0.82), and the ink share of the probe region of
+ * tests/browser/calendar7-names-color.spec.mjs (its median fill includes the ink pixels) stays where its production-effects limits were
+ * measured: at the scale 0.947 the median fill of Paper Red, Gruvbox Light and Rubik-Tint read 5 against the limit 4.
  */
-export const NAMES_FACE_SCALE = faceVisibleShare(1);
+export const NAMES_FACE_SCALE = 0.912;
 /** How the 3D view draws the labels: on sticker bodies (scheme A, default) or directly on the cubie faces. */
 export type Surface = "sticker" | "face";
 

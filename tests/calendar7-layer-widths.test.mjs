@@ -11,7 +11,7 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { PhysicalCubeScene, PRESENTATION_PRESET, createPlasticMaterial, createPresentationGeometry, thickOuterLayerWidths } from "@cubistry/cube-viewer";
 import {
   BODY_RADIUS, CALENDAR7_SIZE, CUBE_EDGE_MM_7X7, INNER_CUBIE_EDGE_MM, NAMES_CUBE_EDGE, NAMES_FACE_PX_PER_UNIT, NAMES_GAP, NAMES_GAP_MM,
-  NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS, NAMES_EDGE_INSET, OUTER_LAYER_WIDTH, bodyWidthFor, faceFlatShare, faceVisibleShare, facePixelsPerUnit, faceTileOf, halfEdgeOf, layerWidthsFor, layerWidthsOf, namesBodySize, outerLayerWidth,
+  NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS, NAMES_INNER_RADIUS, NAMES_EDGE_INSET, OUTER_LAYER_WIDTH, bodyWidthFor, faceFlatShare, faceVisibleShare, facePixelsPerUnit, faceTileOf, halfEdgeOf, layerWidthsFor, layerWidthsOf, namesBodySize, outerLayerWidth,
 } from "../src/apps/calendar7/geometry.ts";
 import { NAME_WORDS, nameAnchor, nameSlotOffset, nameTileShift } from "../src/apps/calendar7/layout.ts";
 import { FACE_SCALE, NAMES_FACE_SCALE, TEXTURE, drawFace, faceTransform, lineRect, nameLetterX, tileCanvasSize, tileGrid } from "../src/apps/calendar7/sticker-art.ts";
@@ -21,7 +21,7 @@ import { STICKERS, applyMoves } from "../src/apps/calendar7/engine.ts";
 import { parseState } from "../src/apps/calendar7/graph.ts";
 import { layerProfileFor, planarFaceUvFor } from "../src/apps/calendar7/viewer.ts";
 import { planarBodyUv } from "../packages/cube-viewer/src/body-artwork.ts";
-import { bodyRadiusFor } from "@cubistry/cube-viewer";
+import { bodyRadiusFor, innerRadiusFor, NO_OUTER_SIDES, createTwoRadiusBody } from "@cubistry/cube-viewer";
 
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what} ${a} != ${b}`);
 const F = 1.6;
@@ -82,7 +82,7 @@ test("facePixelsPerUnit / faceFlatShare match the real body geometry for every t
   for (const wx of [1, 1.2, 1.5, 1.8]) for (const wy of [1, 1.8]) {
     const [sx, sy] = [wx - NAMES_GAP, wy - NAMES_GAP];
     // the body as the viewer builds it, with the planar face UV of the stickerless names layout (PhysicalSceneOptions.planarFaceUv)
-    const g = planarBodyUv(layerProfileFor("names").body([wx, wy, wx]), [sx, sy, sx], new Set([0, 1, 2, 3, 4, 5]));
+    const g = planarBodyUv(layerProfileFor("names").body([wx, wy, wx], NO_OUTER_SIDES), [sx, sy, sx], new Set([0, 1, 2, 3, 4, 5]));
     const pos = g.getAttribute("position"), uv = g.getAttribute("uv"), nor = g.getAttribute("normal");
     // front face (+z): u along x, v along y
     const flat = { u0: Infinity, u1: -Infinity, x0: Infinity, x1: -Infinity, v0: Infinity, v1: -Infinity, y0: Infinity, y1: -Infinity };
@@ -216,7 +216,7 @@ test("letter and digit size in px per unit are the same in every tile (within 1.
   }
 });
 
-test("names layout, O2: a unit cell is exactly one unit (planar face UV), the sticker drawing fits the visible part of a face, only the names layout is planar", () => {
+test("names layout, two radii: a unit cell is exactly one unit (planar face UV), the sticker drawing stays inside the visible part of a face, only the names layout is planar", () => {
   assert.equal(planarFaceUvFor("names"), true);
   assert.equal(planarFaceUvFor("standard"), false);
   for (const [w, h, band] of [[1, 1, { l: 0, r: 0, t: 0, b: 0 }], [1, F, { l: 0, r: 0, t: F - 1, b: 0 }], [F, F, { l: F - 1, r: 0, t: F - 1, b: 0 }]]) {
@@ -228,11 +228,14 @@ test("names layout, O2: a unit cell is exactly one unit (planar face UV), the st
     // the unit cell: one unit from the cell edge to the real edge of the body (the canvas edge), less half the gap (the cell edge is on the pitch line)
     near((c.y1 - c.y0) / g.py, band.t ? 1 - NAMES_GAP / 2 : h - NAMES_GAP, 1e-9, `cell height of ${w} x ${h}`);
   }
-  // the sticker drawing (192 px, its text square is 0.86 of it) is fitted to the visible face (up to 45 degrees of the bevel); the bevel under the text square is tilted less than 17 degrees
-  near(NAMES_FACE_SCALE, faceVisibleShare(1), 1e-12);
+  // The sticker drawing (192 px, its text square is 0.86 of it) is scaled to 0.912, the visible face at the radius of the cube edges (0.1503); the seams have the inner radius 0.0902
+  // and show 0.947: the drawing stays inside the visible face, and the bevel under the text square is tilted less than 17 degrees (at the inner radius: less than 11).
+  const visibleAtCubeEdges = (1 - NAMES_GAP - 2 * (1 - Math.SQRT1_2) * NAMES_BODY_RADIUS) / (1 - NAMES_GAP);
+  near(NAMES_FACE_SCALE, 0.912, 1e-12); near(NAMES_FACE_SCALE, visibleAtCubeEdges, 5e-4, "the visible share at the radius of the cube edges");
+  assert.ok(NAMES_FACE_SCALE < faceVisibleShare(1), "the visible face at the seams is larger than the drawing");
   const half = NAMES_FACE_SCALE * 0.86 / 2, flat = faceFlatShare(1) / 2;
   assert.ok(half < faceVisibleShare(1) / 2 - 0.04, "the text square keeps at least 4 % of the cell inside the visible face");
-  assert.ok(Math.asin(Math.min(1, (half - flat) / NAMES_BODY_RADIUS)) < 17 * Math.PI / 180, "the bevel under the text square is tilted less than 17 degrees");
+  assert.ok(Math.asin(Math.min(1, (half - flat) / NAMES_INNER_RADIUS)) < 17 * Math.PI / 180, "the bevel under the text square is tilted less than 17 degrees");
 });
 
 // ---- layer turns on the real print: pivot rotation = engine pose, with the profile ----
@@ -266,23 +269,25 @@ test("names print on the profile: every layer turn (21 generators x 3 exponents,
   assert.equal(n, 63);
 });
 
-test("names layout bevel: O2, the millimeter radius of a 3x3 at the cube edge (0.1503 = 0.055 * 8.2 / 3) on a body of every size, as in the shared viewer", () => {
+test("names layout bevel, two radii (owner decision 2026-11-14): the 12 cube edges have O2 (0.1503 = 0.055 * 8.2 / 3), every other edge 0.6 of it, on a body of every size, as in the shared viewer", () => {
   near(NAMES_BODY_RADIUS, 0.055 * 8.2 / 3, 1e-12);
   near(NAMES_BODY_RADIUS, bodyRadiusFor(CALENDAR7_SIZE, NAMES_CUBE_EDGE), 1e-12);
-  near(NAMES_EDGE_INSET, (1 - Math.SQRT1_2) * NAMES_BODY_RADIUS, 1e-12);
+  near(NAMES_INNER_RADIUS, 0.6 * NAMES_BODY_RADIUS, 1e-12);
+  near(NAMES_INNER_RADIUS, innerRadiusFor(CALENDAR7_SIZE, NAMES_CUBE_EDGE), 1e-12, "the shared viewer's inner radius");
+  near(NAMES_EDGE_INSET, (1 - Math.SQRT1_2) * NAMES_INNER_RADIUS, 1e-12, "the seam inset follows the inner radius");
   assert.equal(BODY_RADIUS, PRESENTATION_PRESET.bodyRadius, "the standard layout keeps the preset radius");
   const profile = layerProfileFor("names");
   assert.deepEqual(profile.widths, layerWidthsFor(7));
   assert.equal(layerProfileFor("standard"), undefined);
   assert.equal(NAMES_BEVEL_SEGMENTS, 2);
-  for (const cell of [[1, 1, 1], [1.8, 1, 1], [1, 1.8, 1.8], [1.8, 1.8, 1.8]]) {
-    const g = profile.body(cell), p = g.parameters;
-    assert.equal(p.radius, NAMES_BODY_RADIUS, `radius of ${cell}`);
-    assert.equal(g.getAttribute("position").count, new RoundedBoxGeometry(p.width, p.height, p.depth, NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS).getAttribute("position").count, `bevel segments of ${cell}`);
-    assert.equal(g.getAttribute("position").count, new RoundedBoxGeometry(p.width, p.height, p.depth, 2, NAMES_BODY_RADIUS).getAttribute("position").count, "two bevel segments");
-    near(p.width, cell[0] - NAMES_GAP, 1e-12); near(p.height, cell[1] - NAMES_GAP, 1e-12); near(p.depth, cell[2] - NAMES_GAP, 1e-12);
+  const sides = (...plus) => [0, 1, 2].map((ax) => [plus.includes("-" + "xyz"[ax]), plus.includes("+" + "xyz"[ax])]);
+  for (const [cell, outer] of [[[1, 1, 1], NO_OUTER_SIDES], [[1.8, 1, 1], sides("+x")], [[1, 1.8, 1.8], sides("+y", "+z")], [[1.8, 1.8, 1.8], sides("+x", "+y", "+z")]]) {
+    const g = profile.body(cell, outer);
+    const ref = createTwoRadiusBody({ size: namesBodySize(cell), outer, big: NAMES_BODY_RADIUS, small: NAMES_INNER_RADIUS, segments: NAMES_BEVEL_SEGMENTS });
+    assert.equal(g.getAttribute("position").count, ref.getAttribute("position").count, `bevel segments of ${cell}`);
+    assert.equal(g.getAttribute("position").count, 6 * (2 * 2 + 2) ** 2, "two bevel segments: (2 * 2 + 2) lines per axis on each of the six faces");
     g.computeBoundingBox();
     const box = g.boundingBox;
-    near(box.max.x - box.min.x, cell[0] - NAMES_GAP, 1e-6);
+    for (let ax = 0; ax < 3; ax++) near(box.max.getComponent(ax) - box.min.getComponent(ax), cell[ax] - NAMES_GAP, 1e-6, `size ${cell} axis ${ax} (the gap is unchanged)`);
   }
 });

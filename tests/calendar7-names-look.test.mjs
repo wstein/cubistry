@@ -7,7 +7,7 @@ import assert from "node:assert/strict";
 import { createHash } from "node:crypto";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
-import { PRESENTATION_PRESET, PhysicalCubeScene, createPlasticMaterial } from "@cubistry/cube-viewer";
+import { PRESENTATION_PRESET, PhysicalCubeScene, createPlasticMaterial, NO_OUTER_SIDES } from "@cubistry/cube-viewer";
 import { NAME_WORDS } from "../src/apps/calendar7/layout.ts";
 import { NAMES_WHITE, SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { FACE_FLAT, FACE_SCALE, NAMES_FACE_SCALE, LINE_SCALE, TEXTURE, drawFace, drawSticker, nameGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
@@ -172,7 +172,7 @@ test("names layout: the gap between cubies is 0.01 mm, stated in scene units (in
   assert.ok(Math.abs(1 - (g.boundingBox.max.x - g.boundingBox.min.x) - NAMES_GAP) < 1e-6);
 });
 test("names layout: the face pixels per unit of the letter grid match the real body geometry (planar face UV)", () => {
-  const w = NAMES_BODY_WIDTH, g = planarBodyUv(layerProfileFor("names").body([1, 1, 1]), [w, w, w], new Set([0, 1, 2, 3, 4, 5]));
+  const w = NAMES_BODY_WIDTH, g = planarBodyUv(layerProfileFor("names").body([1, 1, 1], NO_OUTER_SIDES), [w, w, w], new Set([0, 1, 2, 3, 4, 5]));
   const pos = g.getAttribute("position"), uv = g.getAttribute("uv"), nor = g.getAttribute("normal");
   let u0 = Infinity, u1 = -Infinity, x0 = Infinity, x1 = -Infinity;
   for (let i = 0; i < pos.count; i++) if (Math.abs(nor.getZ(i) - 1) < 1e-6 && Math.abs(pos.getZ(i) - NAMES_BODY_WIDTH / 2) < 1e-6) {
@@ -330,6 +330,10 @@ test("face light: a bevel belongs to the face it is nearer to (face cosine), a f
   assert.ok(shader.vertexShader.includes("vC7Axes = vec3( normalize( normalMatrix[ 0 ] ).z, normalize( normalMatrix[ 1 ] ).z, normalize( normalMatrix[ 2 ] ).z );"));
   assert.ok(shader.fragmentShader.includes("min( geometryNormal.z, c7FaceCos )") && shader.fragmentShader.includes("pow( abs( vC7Obj ), vec3( 4.0 ) )") && /varying vec3 vC7Axes;/.test(shader.fragmentShader), "the fragment weight uses the lesser of fragment and face cosine, with the power of the reference");
   assert.equal(FACE_SHARE_POWER, 4);
+  // a three.js without the include of the vertex shader is refused (the fragment chunks are guarded the same way)
+  const other = new THREE.MeshPhysicalMaterial();
+  patchFaceLight(other, faceLightUniform());
+  assert.throws(() => other.onBeforeCompile({ vertexShader: "void main() {}", fragmentShader: shader.fragmentShader, uniforms: {} }), /changed its vertex shader/);
 });
 
 // ---- soft shoulder (names-tone.ts) ----

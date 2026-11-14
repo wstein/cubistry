@@ -50,9 +50,15 @@ export const NAMES_CUBE_EDGE = layerWidthsFor(CALENDAR7_SIZE).reduce((sum, w) =>
  * tests/calendar7-layer-widths.test.mjs compares). The standard layout keeps BODY_RADIUS.
  */
 export const NAMES_BODY_RADIUS = BODY_RADIUS * NAMES_CUBE_EDGE / 3;
-/** Distance (inner layers) from the texture edge of a face to the end of its visible part: where the bevel is 45 degrees steep, r (1 - cos 45). */
-export const NAMES_EDGE_INSET = (1 - Math.SQRT1_2) * NAMES_BODY_RADIUS;
-/** Bevel segments of a body of the names layout: the radius is 2.7 times larger, one segment would be a visible chamfer. */
+/**
+ * Radius of every other edge of a cubie of the names layout (two-radius model, owner decision 2026-11-14): 0.6 of the radius of
+ * the 12 cube edges. A seam between two cubies, and so the grooves of the tiles on a face, has this radius; only the edges on the
+ * cube edges have `NAMES_BODY_RADIUS`. tests/calendar7-layer-widths.test.mjs compares both with the shared viewer.
+ */
+export const NAMES_INNER_RADIUS = 0.6 * NAMES_BODY_RADIUS;
+/** Distance (inner layers) from the texture edge of a face to the end of its visible part at a seam: where the bevel is 45 degrees steep, r (1 - cos 45) of the inner radius. */
+export const NAMES_EDGE_INSET = (1 - Math.SQRT1_2) * NAMES_INNER_RADIUS;
+/** Bevel segments of a body of the names layout: the radius of the cube edges is 2.7 times larger than the preset, one segment would be a visible chamfer. */
 export const NAMES_BEVEL_SEGMENTS = 2;
 /**
  * Physical edge of the 7x7 in mm: the middle of the 61.5 to 70 mm range of common 7x7 cubes (an assumption, not measured on
@@ -69,8 +75,8 @@ export const NAMES_GAP = NAMES_GAP_MM / INNER_CUBIE_EDGE_MM;
 export const NAMES_BODY_WIDTH = 1 - NAMES_GAP;
 /** Body size of a names-layout cubie with the layer widths `cell`: every width minus the gap. */
 export const namesBodySize = (cell: readonly number[]): [number, number, number] => cell.map(w => w - NAMES_GAP) as [number, number, number];
-/** Bevel radius of a body of the names layout (`NAMES_BODY_RADIUS`, but never more than half of the thinnest side, as RoundedBoxGeometry clamps it). */
-export const bevelRadius = (width: number): number => Math.min(NAMES_BODY_RADIUS, width / 2);
+/** Bevel radius at a seam of a body of the names layout (`NAMES_INNER_RADIUS`, but never more than half of the thinnest side). */
+export const bevelRadius = (width: number): number => Math.min(NAMES_INNER_RADIUS, width / 2);
 /**
  * Texture pixels per scene unit of a body face of an extent `w` (in inner layers) whose texture is `pixels` wide. The names layout
  * maps its face textures planar (PhysicalSceneOptions.planarFaceUv: u = position / body width + 0.5), so the scale is the same on the
