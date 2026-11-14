@@ -131,7 +131,7 @@ for (const scheme of ["paper-red", "paper-blue", "dracula", "high-contrast"]) te
   expect(by("blank")).toHaveLength(32);
   for (const r of [...by("band"), ...by("month")]) { expect(r.want).toBe(sch.band); expect(r.lineWant).toBe(sch.line); expect(r.lines).toBe(sch.line !== null); }
   for (const r of by("blank")) { expect(r.want).toBe(sch.empty); expect(r.lines).toBe(false); }
-  // The fill color covers at least a fifth of the canvas of every banner tile (the banner is 1.2 high of at most 1.6, minus the lettering); a white-fill scheme has the white ground as its fill.
+  // The fill color covers at least a fifth of the canvas of every banner tile (the banner is 1.0 high of at most 1.6, minus the lettering); a white-fill scheme has the white ground as its fill.
   if (sch.band !== W) for (const r of [...by("band"), ...by("month")]) expect(r.fillShare, `${r.cls} ${r.text}`).toBeGreaterThanOrEqual(0.25);
   if (scheme === "paper-red") expect(by("band")[0].want).not.toBe(by("blank")[0].want);
 });

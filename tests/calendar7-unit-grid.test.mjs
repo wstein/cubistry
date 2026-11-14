@@ -126,7 +126,7 @@ test("every front tile, font and built-in drawing: white margin ground, the fill
       // month row: 0.2 white at the top of the cubie (band f - 1 = 0.6 less 0.4 of the banner above the cell row), banner 1.0 tall, 0.4 white below it
       near(f.center.y + F / 2 - lt.y, 0.2, 1e-9, `${tag} top strip`);
       near(rb.y - (f.center.y - F / 2), 0.4, 1e-9, `${tag} bottom strip`);
-      near(lt.y - rb.y, NAMES_BANNER_HEIGHT, 1e-9, `${tag} banner height 1.2`);
+      near(lt.y - rb.y, NAMES_BANNER_HEIGHT, 1e-9, `${tag} banner height NAMES_BANNER_HEIGHT`);
       near(lt.y - rb.y, 1.0, 1e-9, `${tag} banner height 1.0 (literal)`);
       near(lt.y, 3.9, 1e-9, `${tag} banner top`); near(rb.y, 2.9, 1e-9, `${tag} banner bottom`);
       // the banner is inset by 0.3 (f - 1 - overhang 0.3 at f = 1.6) from the cube edges, not by the 0.6 band of the other rows
