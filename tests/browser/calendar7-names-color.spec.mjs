@@ -63,7 +63,7 @@ async function sample(page, scheme, tilted = false, production = false, plastici
       const lo = at(fx(rect.x0), fy(rect.y1)), hi = at(fx(rect.x1), fy(rect.y0)), mid = at(fx((rect.x0 + rect.x1) / 2), fy((rect.y0 + rect.y1) / 2));
       const W = Math.abs(hi.x - lo.x) * 0.5 * cv.width, H = Math.abs(hi.y - lo.y) * 0.5 * cv.height;
       const cx = (mid.x * 0.5 + 0.5) * cv.width, cy = (1 - (mid.y * 0.5 + 0.5)) * cv.height;
-      // The probe stays on the flat face as before: the O2 bevel (0.1503) leaves 0.699 of the cell flat (0.9106 at 0.055), so the width share follows the flat share and the height stays above the underline.
+      // The probe stays on the flat face as before: the cell keeps 0.819 flat with the inner radius 0.0902 (0.699 at the single radius 0.1503 of the former O2 model, 0.9106 at 0.055), so the width share follows the flat share and the height stays above the underline.
       const share = tilted ? 0.3 : 0.8 * faceFlatShare(1) / 0.9106, shareY = tilted ? 0.3 : 0.7, w = Math.round(W * share), h = Math.round(H * shareY), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
       const d = ctx.getImageData(x0, y0, w, h).data, pix = [];
       for (let k = 0; k < w * h; k++) pix.push([d[4 * k], d[4 * k + 1], d[4 * k + 2]]);

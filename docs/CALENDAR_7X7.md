@@ -530,7 +530,7 @@ cannot restore stickers and are not overwritten. Other apps retain their own
 construction choices. Body dimensions, bevels, spacing and camera fitting are
 unchanged; the 0.93-width/0.09-radius study remains a comparison only.
 
-(Standard layout; the names layout uses `NAMES_FACE_SCALE` = `faceVisibleShare(1)` = 0.912, see the name-tile bullet.) The face texture is centered and scaled by `FACE_SCALE`. `FACE_FLAT` (0.9106)
+(Standard layout; the names layout uses the constant `NAMES_FACE_SCALE` = 0.912, the visible share at the cube-edge radius 0.1503; `faceVisibleShare(1)` at the inner radius 0.0902 is 0.947 and is not used there, see the name-tile bullet.) The face texture is centered and scaled by `FACE_SCALE`. `FACE_FLAT` (0.9106)
 is the measured flat part of the existing body face in texture space; the label
 text square is `FACE_TEXT_SQUARE` = 0.92 of that flat part, so `FACE_SCALE` is
 0.9106 * 0.92 / 0.86. The ground fills the whole texture. The original Noto Sans

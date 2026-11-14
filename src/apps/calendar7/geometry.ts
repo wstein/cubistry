@@ -45,7 +45,7 @@ export const CALENDAR7_SIZE = 7;
 /** Total edge of the 7x7 in units of an inner layer: (N - 2) + 2 f = 5 + 2 * 1.6 = 8.2. */
 export const NAMES_CUBE_EDGE = layerWidthsFor(CALENDAR7_SIZE).reduce((sum, w) => sum + w, 0);
 /**
- * Bevel radius of every body of the names layout (owner decision 2026-11-14, option O2): the millimeter radius of a 3x3 at the
+ * Bevel radius of the 12 cube edges of the names layout (owner decision 2026-11-14, two radii; every other edge has `NAMES_INNER_RADIUS`): the millimeter radius of a 3x3 at the
  * same cube edge, BODY_RADIUS * edge / 3 = 0.055 * 8.2 / 3 = 0.1503 inner layers (the shared viewer's `bodyRadiusFor`, which
  * tests/calendar7-layer-widths.test.mjs compares). The standard layout keeps BODY_RADIUS.
  */
