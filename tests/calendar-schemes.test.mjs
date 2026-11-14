@@ -4,7 +4,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { validateDesign } from "../src/apps/calendar/model.ts";
-import { stickerArt, stickerSvg, CAL3_SCHEMES, CAL3_EXCLUDED, DEFAULT_CAL3_SCHEME, cal3SchemeById, paintSticker } from "../src/apps/calendar/artwork.ts";
+import { stickerArt, stickerSvg, CAL3_SCHEMES, CAL3_EXCLUDED, DEFAULT_CAL3_SCHEME, cal3SchemeById, paintSticker, stickerRole } from "../src/apps/calendar/artwork.ts";
 import { mountCalendar } from "../src/apps/calendar/mount.ts";
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { contrast } from "./calendar7-contrast.mjs";
@@ -61,17 +61,18 @@ test("every label class of every 3x3 scheme passes the contrast gates", () => {
   }
 });
 
-test("German: only the S weekday sticker (slot 0) carries the weekend cue, in non-default schemes", () => {
-  const sc = cal3SchemeById("classic");
-  for (const id of ["de-a", "de-a-unpadded"])
-    for (const s of designs[id].printing) {
-      const cue = s.image === "S" && s.slot === 0;
-      const art = stickerArt(s, sc);
-      assert.equal(art.color === sc.roles.weekend.ink && art.ground === sc.roles.weekend.ground, cue, `${id} ${s.slot}:${s.image}`);
-      if (cue) assert.equal(art.weight, 800);
-      assert.equal(stickerArt(s).color === "#ba302c", false);
-    }
-  assert.equal(designs["de-a"].printing.filter((s) => s.image === "S" && s.slot === 0).length, 1);
+test("German has no weekend-tinted sticker in any scheme: every sticker is its plain weekday, day or month class", () => {
+  for (const sc of CAL3_SCHEMES)
+    for (const id of ["de-a", "de-a-unpadded"])
+      for (const s of designs[id].printing) {
+        const art = stickerArt(s, sc);
+        const plainRole = /^[0-9]$/.test(s.image) ? "day" : s.slot < 3 ? "weekday" : "month";
+        assert.equal(art.color, sc.roles[plainRole].ink, `${sc.id} ${id} ${s.slot}:${s.image}`);
+        assert.equal(art.ground, sc.roles[plainRole].ground);
+        assert.equal(art.weight, 600);
+        assert.equal(stickerRole(s), plainRole);
+      }
+  assert.equal("scue" in DEFAULT_CAL3_SCHEME.roles, false);
 });
 
 test("English: SAT and both SUN use the weekend token; other stickers do not", () => {

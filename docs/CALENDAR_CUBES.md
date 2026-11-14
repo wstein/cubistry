@@ -21,7 +21,7 @@ This is source artwork, not a date-driven rendering override. German A retains
 its original artwork: its O sticker is shared by MO, DO and SO, and the exact
 fixed-layout fully red/bold requirement has a separate conditional impossibility
 proof under Research `055b38f`. A different German treatment requires an explicit
-layout or styling decision; a partial red S is never substituted silently: the default print and its export do not use it, and the screen themes below use it as a named cue.
+layout or styling decision; a partial red S is not substituted (owner decided not to apply it, 2026-11-14).
 
 ### Screen color themes
 
@@ -31,9 +31,7 @@ Rubik-Tint, which needs the home faces of the 7x7 names data. The default theme 
 the print export and the pinned print files use; a theme changes the screen textures only and never the solver goal (which
 compares image and orientation, not color). There is no month band in the 3x3 themes: colors only (band deferred).
 
-With a theme (not with the default), the German S sticker of the weekday slot 0 (the first letter of SA and SO) takes the weekend
-token. This is a deliberate, documented partial cue, not the fully red/bold German weekend requirement above: the O of SA/SO is
-shared with MO and DO and stays plain, and the S of SEP is a month sticker and stays plain. In English, SAT and both SUN
+German has no weekend cue in any theme: its weekday stickers keep the plain weekday ink. In English, SAT and both SUN
 stickers take the weekend token. Weekend labels are large bold text and are gated at 3:1; every other label class is gated
 at 4.5:1 (`tests/calendar-schemes.test.mjs`).
 

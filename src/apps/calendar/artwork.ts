@@ -1,8 +1,8 @@
 import type { Sticker } from "./model.ts";
 import { SCHEMES, underlineInk, type ColorScheme } from "../calendar7/schemes.ts";
 
-/** Label classes of a 3x3 calendar sticker. `scue` is the German S of SA/SO; it equals `weekday` in the default scheme. */
-export type StickerRole = "day" | "weekday" | "month" | "weekend" | "scue";
+/** Label classes of a 3x3 calendar sticker. German has no weekend class: its weekday stickers are plain in every scheme. */
+export type StickerRole = "day" | "weekday" | "month" | "weekend";
 export interface RoleInk {
   readonly ink: string;
   readonly ground: string;
@@ -30,7 +30,6 @@ export const DEFAULT_CAL3_SCHEME: Cal3Scheme = Object.freeze({
     weekday: plain("#25343e"),
     month: plain("#925a32"),
     weekend: plain("#ba302c", 800),
-    scue: plain("#25343e"),
   }),
 });
 
@@ -49,7 +48,7 @@ function fromCalendar7(s: ColorScheme): Cal3Scheme {
     id: s.id,
     name: s.name,
     ground: s.dayFill,
-    roles: Object.freeze({ day: on(s.dayInk), weekday: on(s.weekdayInk), month: on(underlineInk(s)), weekend, scue: weekend }),
+    roles: Object.freeze({ day: on(s.dayInk), weekday: on(s.weekdayInk), month: on(underlineInk(s)), weekend }),
   });
 }
 
@@ -62,11 +61,10 @@ export function cal3SchemeById(id: string | null | undefined): Cal3Scheme {
   return CAL3_SCHEMES.find((s) => s.id === id) ?? DEFAULT_CAL3_SCHEME;
 }
 
-/** The label class of a sticker. German SA/SO share the S sticker of weekday slot 0; the cue is deliberately partial. */
+/** The label class of a sticker. Only English SAT/SUN are weekend stickers. */
 export function stickerRole(s: Pick<Sticker, "image" | "slot">): StickerRole {
   if (s.slot === 0 && ["SAT", "SUN"].includes(s.image)) return "weekend";
   if (/^[0-9]$/.test(s.image)) return "day";
-  if (s.slot === 0 && s.image === "S") return "scue";
   return s.slot < 3 ? "weekday" : "month";
 }
 
