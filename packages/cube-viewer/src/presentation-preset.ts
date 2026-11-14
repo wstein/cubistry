@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import type { LayerProfile } from "./physical-scene.ts";
 
 /** Bounded presentation quality, shared by every current 2×2/3×3 consumer.
  * Shared cube geometry and two bounded shadow maps per scene (key and shadow fill). */
@@ -64,30 +65,75 @@ export const PRESENTATION_PRESET = Object.freeze({
   shadowFillShadowIntensity: 0.55,
 });
 
-export function createPresentationGeometry(size?: number) {
+/**
+ * Bevel radius of a body in inner-layer units (pitch 1). 2x2 and 3x3 keep their historical radii. A larger cube keeps the
+ * millimeter radius of the 3x3 at the same cube edge (owner decision 2026-11-14): r = bodyRadius * edge / 3, where `edge` is the
+ * edge of the whole cube in inner layers (N for the unit pitch, the sum of the layer widths with a layer profile).
+ */
+export function bodyRadiusFor(size: number = 3, edge: number = size): number {
   const p = PRESENTATION_PRESET;
-  const body = new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth,
-    p.bevelSegments, size === 2 ? p.size2BodyRadius : p.bodyRadius);
-  const h = p.stickerWidth / 2, r = p.stickerRadius;
+  return size === 2 ? p.size2BodyRadius : size <= 3 ? p.bodyRadius : p.bodyRadius * edge / 3;
+}
+/** Sticker corner radius: the body radius rule with the sticker radius (2x2 keeps 0.055). */
+export function stickerRadiusFor(size: number = 3, edge: number = size): number {
+  const p = PRESENTATION_PRESET;
+  return size <= 3 ? p.stickerRadius : p.stickerRadius * edge / 3;
+}
+/**
+ * Side of a sticker on a cell of width `cell` (inner layers): the preset share of the cell, and never wider than the flat part of
+ * the body face less a 0.01 margin (a larger bevel radius shrinks the sticker; N <= 3 keeps 0.87 exactly).
+ */
+export function stickerSideFor(cell: number, radius: number): number {
+  const p = PRESENTATION_PRESET, side = p.stickerWidth * cell;
+  return radius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * radius - 0.01);
+}
+/** A rounded-rectangle sticker of the world size `width` x `height` with corner radius `radius` on both axes; UV spans 0..1 over its extent. */
+export function createStickerGeometry(width: number, height: number, radius: number, curveSegments: number = PRESENTATION_PRESET.stickerCurveSegments): THREE.ShapeGeometry {
+  const hx = width / 2, hy = height / 2, r = radius;
   const shape = new THREE.Shape();
-  shape.moveTo(-h + r, -h);
-  shape.lineTo(h - r, -h);
-  shape.quadraticCurveTo(h, -h, h, -h + r);
-  shape.lineTo(h, h - r);
-  shape.quadraticCurveTo(h, h, h - r, h);
-  shape.lineTo(-h + r, h);
-  shape.quadraticCurveTo(-h, h, -h, h - r);
-  shape.lineTo(-h, -h + r);
-  shape.quadraticCurveTo(-h, -h, -h + r, -h);
-  const sticker = new THREE.ShapeGeometry(shape, p.stickerCurveSegments);
+  shape.moveTo(-hx + r, -hy);
+  shape.lineTo(hx - r, -hy);
+  shape.quadraticCurveTo(hx, -hy, hx, -hy + r);
+  shape.lineTo(hx, hy - r);
+  shape.quadraticCurveTo(hx, hy, hx - r, hy);
+  shape.lineTo(-hx + r, hy);
+  shape.quadraticCurveTo(-hx, hy, -hx, hy - r);
+  shape.lineTo(-hx, -hy + r);
+  shape.quadraticCurveTo(-hx, -hy, -hx + r, -hy);
+  const sticker = new THREE.ShapeGeometry(shape, curveSegments);
   // ShapeGeometry defaults to world-coordinate UVs. Preserve the complete
   // immutable image frame: local +x is image right and local +y is print up.
   const positions = sticker.getAttribute("position");
   const uv = sticker.getAttribute("uv");
   for (let i = 0; i < uv.count; i++)
-    uv.setXY(i, THREE.MathUtils.clamp(positions.getX(i) / p.stickerWidth + 0.5, 0, 1),
-      THREE.MathUtils.clamp(positions.getY(i) / p.stickerWidth + 0.5, 0, 1));
+    uv.setXY(i, THREE.MathUtils.clamp(positions.getX(i) / width + 0.5, 0, 1),
+      THREE.MathUtils.clamp(positions.getY(i) / height + 0.5, 0, 1));
+  sticker.userData.size = [width, height]; // exact (the float32 positions are not)
+  return sticker;
+}
+
+/** `size`: cube size N (default 3); `edge`: cube edge in inner layers when it is not N (layer profile). */
+export function createPresentationGeometry(size?: number, edge?: number) {
+  const p = PRESENTATION_PRESET;
+  const body = new RoundedBoxGeometry(p.bodyWidth, p.bodyWidth, p.bodyWidth, p.bevelSegments, bodyRadiusFor(size, edge));
+  const radius = stickerRadiusFor(size, edge);
+  const side = stickerSideFor(1, radius);
+  const sticker = createStickerGeometry(side, side, radius);
   return { body, core: new THREE.SphereGeometry(1, 48, 24), sticker, stickerOffset: p.stickerOffset };
+}
+
+/**
+ * Layer profile of the preset for the widths of an N-cube: a body per cell (preset gap and bevel radius of the cube edge) and a
+ * sticker per cell (right x up size of the cell, same corner radius on both axes), so no sticker is stretched.
+ */
+export function presentationLayerProfile(widths: readonly number[]): LayerProfile {
+  const p = PRESENTATION_PRESET, n = widths.length, edge = widths.reduce((a, b) => a + b, 0);
+  const radius = bodyRadiusFor(n, edge), sticker = stickerRadiusFor(n, edge), gap = 1 - p.bodyWidth;
+  return {
+    widths,
+    body: (cell) => new RoundedBoxGeometry(cell[0] - gap, cell[1] - gap, cell[2] - gap, p.bevelSegments, Math.min(radius, (Math.min(...cell) - gap) / 2)),
+    sticker: (w, h) => createStickerGeometry(stickerSideFor(w, sticker), stickerSideFor(h, sticker), sticker),
+  };
 }
 
 export function createPlasticMaterial(color = "#202329", roughness = 0.45) {
