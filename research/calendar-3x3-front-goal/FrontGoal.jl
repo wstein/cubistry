@@ -441,6 +441,7 @@ end
 function hval(h::Heuristic, ti::AbstractVector{Int}, cup::Int)
     best = 0
     for (i, pdb) in enumerate(h.pdbs)
+        MUT == "first_table_only" && i > 1 && continue
         v = pdb.dist[ti[i]+1+TSIZE*(cup-1)]
         v == 0xff && return 255
         v > best && (best = Int(v))
@@ -475,6 +476,7 @@ function dfs!(S::Search, depth::Int, bound::Int, last_face::Int)::Bool
         f == last_face && continue
         # opposite faces commute: only allow the order R-before-L, U-before-D, F-before-B
         iseven(last_face) && last_face > 0 && f == last_face - 1 && continue
+        MUT == "forbid_opposite" && last_face > 0 && f == (isodd(last_face) ? last_face + 1 : last_face - 1) && continue
         for i in 1:S.npdb
             S.ti[depth+2, i] = Int(S.tables[i][m, S.ti[depth+1, i]+1])
         end
@@ -517,7 +519,7 @@ function solve_front(h::Heuristic, pose::Pose; maxdepth::Int = 12, node_limit::I
     end
     total_nodes = 0
     best_word = ""; best_rot = 99; found_bound = -1
-    for bound in 0:maxdepth
+    for bound in 0:(MUT == "short_depth" ? maxdepth - 1 : maxdepth)
         for (ci, S) in enumerate(searches)
             root_hs[ci] > bound && continue
             S.aborted = false
@@ -529,7 +531,7 @@ function solve_front(h::Heuristic, pose::Pose; maxdepth::Int = 12, node_limit::I
             if ok
                 w = cands[ci][1]
                 rots = isempty(w) ? 0 : length(split(w))
-                if rots < best_rot
+                if rots < best_rot || MUT == "last_found"
                     best_rot = rots
                     best_word = join(filter(!isempty, [w, join((MOVES[S.path[i]] for i in 1:bound), " ")]), " ")
                     found_bound = bound
