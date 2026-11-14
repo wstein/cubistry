@@ -3,16 +3,16 @@
 // dark band. The owner saw a light streak on the bevel of the top front edge (dark scheme) and a dark band on the bevel of the lower
 // edge (white faces), harder than the faces on both sides. The real app page (production effects, shadow map on) is turned to several
 // views; the points of the quarter circle of the middle cubie of a cube edge are projected to the canvas and read from the frame.
-// The neighbours are the two flat faces: the point NEIGHBOUR_OFFSET (cube units) beyond the start and the end of the arc, on the face (a face
+// The neighbors are the two flat faces: the point NEIGHBOR_OFFSET (cube units) beyond the start and the end of the arc, on the face (a face
 // that is turned away is not read; the end of the visible arc stands in for it). Requirement, within TOLERANCE: along the visible part of the
-// arc no sample is darker than the darker neighbour and none is brighter than the brighter one (no band, no intermediate maximum).
+// arc no sample is darker than the darker neighbor and none is brighter than the brighter one (no band, no intermediate maximum).
 import { test, expect } from "@playwright/test";
 import { openApp } from "./calendar7-face-probe.mjs";
 
 test.use({ viewport: { width: 1500, height: 1500 }, deviceScaleFactor: 2 }); // the bevel arc is about 20 px long
 
 const TOLERANCE = 6; // of 255
-const NEIGHBOUR_OFFSET = 0.01; // 2.6 px at 2x: the flat face next to the bevel, before the art of the tile
+const NEIGHBOR_OFFSET = 0.01; // 2.6 px at 2x: the flat face next to the bevel, before the art of the tile
 const SCHEMES = ["dracula", "paper-red", "classic"];
 // [pitch, rotation about y]: from above (0.22 start view, 0.45), from below (-0.3), head on and turned.
 const VIEWS = [[0.22, 0], [0.45, 0], [0.22, 0.6], [0.45, 0.6], [-0.3, 0], [-0.3, 0.6]];
@@ -52,15 +52,15 @@ function arcProfile(page, { pitch, rotY, a, b }) {
     // The flat faces next to the bevel: face a at its start (moving into the face, direction -b), face b at its end (direction -a).
     const start = read(a.map((x, i) => (h - R) * (x + b[i]) + R * a[i] - offset * b[i]), a), end = read(a.map((x, i) => (h - R) * (x + b[i]) + R * b[i] - offset * a[i]), b);
     return { samples, start, end };
-  }, { pitch, rotY, a, b, offset: NEIGHBOUR_OFFSET });
+  }, { pitch, rotY, a, b, offset: NEIGHBOR_OFFSET });
 }
 
 /** Violations of the requirement, as text (empty: fine). */
 export function bevelViolations(luma, start, end, tolerance = TOLERANCE) {
   const ends = [start ?? luma[0], end ?? luma[luma.length - 1]], lo = Math.min(...ends), hi = Math.max(...ends), out = [];
   const min = Math.min(...luma), max = Math.max(...luma);
-  if (min < lo - tolerance) out.push(`dark band: ${min} below the darker neighbour ${lo}`);
-  if (max > hi + tolerance) out.push(`stripe: ${max} above the brighter neighbour ${hi}`);
+  if (min < lo - tolerance) out.push(`dark band: ${min} below the darker neighbor ${lo}`);
+  if (max > hi + tolerance) out.push(`stripe: ${max} above the brighter neighbor ${hi}`);
   return out;
 }
 
