@@ -61,7 +61,7 @@ const body = (cell) => new RoundedBoxGeometry(cell[0] - GAP, cell[1] - GAP, cell
 const unitBody = () => new RoundedBoxGeometry(1 - GAP, 1 - GAP, 1 - GAP, 1, R);
 function build(n, widths, extra = {}) {
   const fr = frames(n), parent = new THREE.Group();
-  const geometry = { ...createPresentationGeometry(), body: unitBody() };
+  const geometry = { ...createPresentationGeometry(), layers: undefined, body: unitBody() };
   const basic = new THREE.MeshStandardMaterial();
   const scene = new PhysicalCubeScene(parent, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, geometry, new Map(), widths ? { layers: { widths, body }, ...extra } : extra);
   scene.sync(fr);
@@ -155,13 +155,13 @@ test("without the option the scene has no profile: unit pitch, centers at the la
 test("core: centered, radius from the whole edge (N - 2) + 2 f, with the profile; unchanged without", () => {
   for (const [n, f] of CASES) {
     const fr = frames(n), parent = new THREE.Group(), widths = thickOuterLayerWidths(n, f);
-    const geometry = { ...createPresentationGeometry(), body: unitBody() }, basic = new THREE.MeshStandardMaterial();
+    const geometry = { ...createPresentationGeometry(), layers: undefined, body: unitBody() }, basic = new THREE.MeshStandardMaterial();
     new PhysicalCubeScene(parent, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, geometry, new Map(), { layers: { widths, body } });
     const core = parent.children.find((c) => c.userData.plasticCore);
     near(core.scale.x, ((n - 2 + 2 * f) / 2) * 0.8, 1e-9, "core radius");
     assert.deepEqual(core.position.toArray(), [0, 0, 0]);
     const plain = new THREE.Group();
-    new PhysicalCubeScene(plain, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, { ...createPresentationGeometry(), body: unitBody() }, new Map());
+    new PhysicalCubeScene(plain, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, { ...createPresentationGeometry(), layers: undefined, body: unitBody() }, new Map());
     near(plain.children.find((c) => c.userData.plasticCore).scale.x, ((n - 1) / 2 + 0.5) * 0.8, 1e-9);
   }
 });
@@ -233,7 +233,7 @@ function miterScene(p, faces) {
   const fr = faces.map(([name], k) => ({ id: k + 1, cubie: 1, p, n: NAME[name], up: upOf(NAME[name]) }));
   const mats = new Map(fr.map((f) => [f.id, new THREE.MeshStandardMaterial()]));
   const root = new THREE.Group();
-  const geometry = { ...createPresentationGeometry(), body: unitBody() };
+  const geometry = { ...createPresentationGeometry(), layers: undefined, body: unitBody() };
   const scene = new PhysicalCubeScene(root, fr, mats, createPlasticMaterial("#23272e", 0.55), 1, geometry, new Map(faces.map(([, c], k) => [k + 1, c])),
     { bodyColor: BODY, coreColor: BODY, miterCutFaces: true, layers: { widths, body } });
   scene.setConstruction("stickerless");
@@ -286,8 +286,8 @@ test("disposal: every body geometry the profile factory made (one per cell size)
   const widths = thickOuterLayerWidths(7, 1.8), made = [], disposed = new Set();
   const recording = (cell) => { const g = body(cell); g.addEventListener("dispose", () => disposed.add(g)); made.push(g); return g; };
   const fr = frames(7), parent = new THREE.Group(), basic = new THREE.MeshStandardMaterial();
-  const scene = new PhysicalCubeScene(parent, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, { ...createPresentationGeometry(), body: unitBody() }, new Map(), { layers: { widths, body: recording } });
-  assert.equal(made.length, 7, "one geometry per cell size of a surface cubie: f or 1 in each axis, not 1 x 1 x 1");
+  const scene = new PhysicalCubeScene(parent, fr, new Map(fr.map((s) => [s.id, basic])), basic, 1, { ...createPresentationGeometry(), layers: undefined, body: unitBody() }, new Map(), { layers: { widths, body: recording } });
+  assert.equal(made.length, 26, "one geometry per cell size and outer sides of a surface cubie: 8 corners, 12 edge pieces, 6 face pieces (a two-radius body knows which of its faces are exterior)");
   assert.equal(disposed.size, 0);
   scene.dispose();
   assert.equal(disposed.size, made.length, "all sized bodies are disposed");

@@ -8,7 +8,7 @@ import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import {
   PhysicalCubeScene, createPresentationGeometry, thickOuterLayerWidths, layerCenters, layerEdge,
-  presentationLayerProfile, bodyRadiusFor, stickerRadiusFor, stickerSideFor,
+  presentationLayerProfile, bodyRadiusFor, innerRadiusFor, presentationWidths, stickerRadiusFor, stickerSideFor,
 } from "@cubistry/cube-viewer";
 import { PROJECTED_FACES, FACE_KEYS } from "../packages/cube-viewer/src/projected-uv.ts";
 
@@ -42,9 +42,10 @@ function faceTextures() {
   }
   return faces;
 }
-function build(n, { widths, double = false, plastic = new THREE.MeshPhysicalMaterial({ color: "#1b2431" }), colors } = {}) {
+// `historical`: the unit-pitch cubie (`layers: undefined`, the path of the Calendar7 standard layout); without it the default two-radius profile of the preset.
+function build(n, { widths, double = false, plastic = new THREE.MeshPhysicalMaterial({ color: "#1b2431" }), colors, historical = true } = {}) {
   const fr = frames(n, double), parent = new THREE.Group();
-  const geometry = { ...createPresentationGeometry(double ? 2 : undefined), body: unitBody() };
+  const geometry = historical ? { ...createPresentationGeometry(double ? 2 : undefined), layers: undefined, body: unitBody() } : createPresentationGeometry(double ? 2 : n);
   const originals = new Map(fr.map((s) => { const m = new THREE.MeshPhysicalMaterial({ color: "#fffdf6" }); m.map = new THREE.Texture({ width: 2, height: 2 }); return [s.id, m]; }));
   const scene = new PhysicalCubeScene(parent, fr, originals, plastic, double ? 0.5 : 1, geometry, colors ?? new Map(fr.map((s) => [s.id, "#fffdf6"])),
     widths ? { layers: { widths, body: profileBody } } : {});
@@ -317,14 +318,28 @@ test("O2 radii, stickered projected: the window of a sticker is its own size (na
   for (const [n, f] of [[5, 1.1], [7, 1.6]]) {
     const widths = thickOuterLayerWidths(n, f), { scene, fr, edge, stickers } = buildPreset(n, widths), IMG = edge;
     scene.setPictureProjection({ faces: faceTextures() });
-    const r = bodyRadiusFor(n, edge), h = (n - 1) / 2;
+    const r = innerRadiusFor(n, edge), side = stickerSideFor(1, r), h = (n - 1) / 2;
     for (const s of fr) {
       const { up } = PROJECTED_FACES[faceOf(s.n)], map = stickers.get(s.id).material.map;
       const right = [up[1] * s.n[2] - up[2] * s.n[1], up[2] * s.n[0] - up[0] * s.n[2], up[0] * s.n[1] - up[1] * s.n[0]];
       const cellOf = (d) => widths[Math.round(s.p[d.findIndex((c) => c !== 0)] + h)];
-      near(map.repeat.x, stickerSideFor(cellOf(right), r) / IMG, 1e-12, `${n} repeat x`); near(map.repeat.y, stickerSideFor(cellOf(up), r) / IMG, 1e-12, `${n} repeat y`);
+      near(map.repeat.x, side / IMG, 1e-12, `${n} repeat x`); near(map.repeat.y, side / IMG, 1e-12, `${n} repeat y`); // one sticker size on every cell
     }
-    assert.ok(stickerSideFor(1, r) < 0.87, "the sticker is narrower than the old 0.87 share");
+    assert.ok(side < 0.87 && side > 0.79, "the sticker is narrower than the 0.87 share where the flat face of the inner radius requires it, never below 0.79");
+    scene.dispose();
+  }
+});
+
+test("default two-radius profile (Projected): the image spans the whole extended face; every sticker window is its own size on its real cell, inside 0..1", () => {
+  for (const n of [2, 3, 5]) {
+    const { scene, fr, stickers } = build(n, { historical: false }), faces = faceTextures(), widths = presentationWidths(n);
+    scene.setPictureProjection({ faces });
+    const edge = widths.reduce((a, b) => a + b, 0), side = stickerSideFor(1, innerRadiusFor(n));
+    for (const s of fr) {
+      const map = stickers.get(s.id).material.map;
+      near(map.repeat.x, side / edge, 1e-12, `N=${n} repeat x`); near(map.repeat.y, side / edge, 1e-12, `N=${n} repeat y`);
+      assert.ok(map.offset.x >= 0 && map.offset.x + map.repeat.x <= 1 + 1e-12 && map.offset.y >= 0 && map.offset.y + map.repeat.y <= 1 + 1e-12, `N=${n} window inside the image`);
+    }
     scene.dispose();
   }
 });

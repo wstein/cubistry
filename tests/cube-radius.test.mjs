@@ -4,12 +4,15 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
+import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
 import { faceUvAxes } from "../packages/cube-viewer/src/cut-faces.ts";
 import {
-  PRESENTATION_PRESET as P, bodyRadiusFor, stickerRadiusFor, stickerSideFor, createStickerGeometry, createPresentationGeometry,
+  PRESENTATION_PRESET as P, bodyRadiusFor, innerRadiusFor, stickerRadiusFor, stickerSideFor, createStickerGeometry, createPresentationGeometry,
   presentationLayerProfile, thickOuterLayerWidths, layerEdge, PhysicalCubeScene, createPlasticMaterial, createStickerMaterial,
 } from "../packages/cube-viewer/src/index.ts";
 
+// Three's rounded box (arc-length UV): the planar-UV option and its cut-face rule are about this body; the two-radius body is planar by itself.
+const roundedProfile = (widths) => ({ widths, body: (cell) => new RoundedBoxGeometry(cell[0] - 0.01, cell[1] - 0.01, cell[2] - 0.01, 3, 0.055 * layerEdge(widths) / 3) });
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what}: ${a} != ${b}`);
 const UNIFORM = { 2: 0.03, 3: 0.055, 4: 0.055 * 4 / 3, 5: 0.055 * 5 / 3, 6: 0.055 * 6 / 3, 7: 0.055 * 7 / 3 };
 const PROFILE = { 5: 1.1, 7: 1.6 }; // OUTER_LAYER_WIDTH of Calendar7
@@ -31,12 +34,12 @@ test("body radius with a layer profile follows the edge (sum of the widths): 0.0
   near(bodyRadiusFor(7, 8.2), 0.1503, 1e-4);
 });
 
-test("createPresentationGeometry uses the per-N radius on body and sticker; N <= 3 geometry is unchanged", () => {
+test("createPresentationGeometry: the reference body has the per-N radius of the cube edges, the sticker is limited by the inner radius; N <= 3 stickers are unchanged", () => {
   for (const n of [2, 3, 4, 5, 6, 7]) {
     const g = createPresentationGeometry(n);
     near(g.body.parameters.radius, UNIFORM[n], 1e-12, `body radius N=${n}`);
     g.sticker.computeBoundingBox();
-    near(g.sticker.boundingBox.max.x, stickerSideFor(1, bodyRadiusFor(n)) / 2, 1e-6, `sticker half width N=${n}`);
+    near(g.sticker.boundingBox.max.x, stickerSideFor(1, innerRadiusFor(n)) / 2, 1e-6, `sticker half width N=${n} (the inner radius limits it)`);
   }
   for (const n of [2, 3]) { const g = createPresentationGeometry(n); g.sticker.computeBoundingBox(); near(g.sticker.boundingBox.max.x, 0.435, 1e-6); }
   near(createPresentationGeometry().body.parameters.radius, 0.055, 0);
@@ -44,8 +47,8 @@ test("createPresentationGeometry uses the per-N radius on body and sticker; N <=
 
 test("the sticker stays on the flat part of its body for every N and every layer-profile cell", () => {
   for (const [n, f] of [[2, 1], [3, 1], [4, 1], [5, 1.1], [6, 1.3], [7, 1.6], [7, 1]]) {
-    const r = bodyRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)));
-    for (const cell of [1, f]) assert.ok(stickerSideFor(cell, bodyRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)))) <= cell - (1 - P.bodyWidth) - 2 * r + 1e-12, `N=${n} cell ${cell}`);
+    const r = innerRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)));
+    for (const cell of [1, f]) assert.ok(stickerSideFor(cell, r) <= cell - (1 - P.bodyWidth) - 2 * r + 1e-12, `N=${n} cell ${cell}`);
   }
 });
 
@@ -59,15 +62,11 @@ test("sticker radius is the same on both axes of a non-square sticker (no ellipt
   near(lo, 0, 1e-6); near(hi, 1, 1e-6);
 });
 
-test("scene with presentationLayerProfile: every cell body has the O2 radius, every sticker its own cell size at scale 1", () => {
+test("scene with presentationLayerProfile: one sticker size on every cell (the inner cell's), at scale 1; the bodies are the two-radius cubies", () => {
   for (const [n, f] of Object.entries(PROFILE)) {
     const widths = thickOuterLayerWidths(Number(n), f), edge = layerEdge(widths), profile = presentationLayerProfile(widths);
-    const R = bodyRadiusFor(Number(n), edge);
-    for (const cell of [[f, f, f], [f, 1, 1], [1, 1, 1], [f, f, 1]]) near(profile.body(cell).parameters.radius, R, 1e-12, `N=${n} cell ${cell}`);
-    // outer corner sticker (f x f): square, side stickerSideFor(f)
-    const s = profile.sticker(f, 1); s.computeBoundingBox();
-    near(s.boundingBox.max.x * 2, stickerSideFor(f, bodyRadiusFor(Number(n), edge)), 1e-6);
-    near(s.boundingBox.max.y * 2, stickerSideFor(1, bodyRadiusFor(Number(n), edge)), 1e-6);
+    const side = stickerSideFor(1, innerRadiusFor(Number(n), edge));
+    for (const [w, h] of [[f, 1], [1, 1], [f, f]]) { const s = profile.sticker(w, h); s.computeBoundingBox(); near(s.boundingBox.max.x * 2, side, 1e-6); near(s.boundingBox.max.y * 2, side, 1e-6); }
   }
   const widths = thickOuterLayerWidths(5, 1.1), profile = presentationLayerProfile(widths), root = new THREE.Group();
   const tex = new THREE.Texture(), mat = createStickerMaterial(tex), g = createPresentationGeometry(5);
@@ -77,13 +76,13 @@ test("scene with presentationLayerProfile: every cell body has the O2 radius, ev
   assert.equal(stickers.length, 2);
   for (const s of stickers) { assert.deepEqual(s.scale.toArray(), [1, 1, 1]); s.geometry.computeBoundingBox(); }
   const corner = stickers.find((s) => s.userData.stickerId === 1), mid = stickers.find((s) => s.userData.stickerId === 2);
-  near(corner.geometry.boundingBox.max.x * 2, stickerSideFor(1.1, bodyRadiusFor(5, 5.2)), 1e-6);
-  near(mid.geometry.boundingBox.max.x * 2, stickerSideFor(1, bodyRadiusFor(5, 5.2)), 1e-6);
+  const side = stickerSideFor(1, innerRadiusFor(5, 5.2));
+  near(corner.geometry.boundingBox.max.x * 2, side, 1e-6); near(mid.geometry.boundingBox.max.x * 2, side, 1e-6);
   scene.dispose?.();
 });
 
-test("planarFaceUv (stickerless only): the exterior faces take UV linear in position over the body, other looks keep Three's arc-length UV", () => {
-  const widths = thickOuterLayerWidths(5, 1.1), profile = presentationLayerProfile(widths);
+test("planarFaceUv (stickerless only): on three's rounded box the exterior faces take UV linear in position over the body, other looks keep the arc-length UV (the two-radius body is planar by itself)", () => {
+  const widths = thickOuterLayerWidths(5, 1.1), profile = { widths, body: (cell) => new RoundedBoxGeometry(cell[0] - 0.01, cell[1] - 0.01, cell[2] - 0.01, 3, 0.055) }; // three's rounded box: arc-length UV
   const fr = [{ id: 1, cubie: 1, p: [0, 0, 2], n: [0, 0, 1], up: [0, 1, 0] }, { id: 2, cubie: 2, p: [-2, 2, 2], n: [0, 0, 1], up: [0, 1, 0] }];
   const read = (planar, stickerless) => {
     const root = new THREE.Group(), mat = createStickerMaterial(new THREE.Texture());
@@ -110,7 +109,7 @@ test("planarFaceUv (stickerless only): the exterior faces take UV linear in posi
 
 test("planarFaceUv: a cut face is planar too, so its edge stops sit where the exterior art ends (texture fraction along a shared edge)", () => {
   for (const [n, f] of [[5, 1.1], [7, 1.6]]) {
-    const widths = thickOuterLayerWidths(n, f), profile = presentationLayerProfile(widths), edge = layerEdge(widths);
+    const widths = thickOuterLayerWidths(n, f), profile = roundedProfile(widths), edge = layerEdge(widths);
     const fr = [{ id: 1, cubie: 1, p: [0, 0, (n - 1) / 2], n: [0, 0, 1], up: [0, 1, 0] }, { id: 2, cubie: 2, p: [-(n - 1) / 2, (n - 1) / 2, (n - 1) / 2], n: [0, 0, 1], up: [0, 1, 0] }];
     const root = new THREE.Group(), mat = createStickerMaterial(new THREE.Texture());
     const scene = new PhysicalCubeScene(root, fr, new Map(fr.map((s) => [s.id, mat])), createPlasticMaterial(), 1, createPresentationGeometry(n, edge), new Map(), { layers: profile, planarFaceUv: true, miterCutFaces: true, bodyColor: "#202329" });
@@ -133,7 +132,7 @@ test("planarFaceUv: a cut face is planar too, so its edge stops sit where the ex
 });
 
 test("planarFaceUv: every one of the six face groups of a cut-face body is planar (UV linear in position along both tangent axes)", () => {
-  const widths = thickOuterLayerWidths(7, 1.6), profile = presentationLayerProfile(widths), edge = layerEdge(widths);
+  const widths = thickOuterLayerWidths(7, 1.6), profile = roundedProfile(widths), edge = layerEdge(widths);
   const fr = [{ id: 1, cubie: 1, p: [-3, 3, 3], n: [0, 0, 1], up: [0, 1, 0] }, { id: 2, cubie: 2, p: [0, 0, 3], n: [0, 0, 1], up: [0, 1, 0] }];
   const root = new THREE.Group(), mat = createStickerMaterial(new THREE.Texture());
   const scene = new PhysicalCubeScene(root, fr, new Map(fr.map((s) => [s.id, mat])), createPlasticMaterial(), 1, createPresentationGeometry(7, edge), new Map(), { layers: profile, planarFaceUv: true, miterCutFaces: true, bodyColor: "#202329" });

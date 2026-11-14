@@ -39,11 +39,12 @@ import {
   configurePresentationRenderer,
 } from "./presentation-preset.ts";
 export {
-  PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial, bodyRadiusFor, stickerRadiusFor, stickerSideFor,
+  PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial, bodyRadiusFor, innerRadiusFor, outerExtensionFor, presentationWidths, stickerRadiusFor, stickerSideFor,
   createStickerGeometry, presentationLayerProfile, createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
 export { CUT_TEXTURE_SIZE, cutColorAt, cutFaceEdges, cutPatternKey, faceUvAxes, flatCutColor, paintCutPattern, type CutEdge, type CutEdgeColor, type EdgeProfile, type EdgeStop, type FaceUvAxes } from "./cut-faces.ts";
 export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type PictureProjection, type FaceEdgeColors, type FaceEdgeName, type LayerProfile, type PhysicalSceneOptions, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";
+export { createTwoRadiusBody, edgeRadius, cornerRho, NO_OUTER_SIDES, type OuterSides, type TwoRadiusBodyOptions } from "./two-radius-body.ts";
 export { layerCenters, layerEdge, layerIndexOf, layerPlanes, thickOuterLayerWidths, uniformLayerWidths, validateLayerWidths, type LayerWidths } from "./layer-widths.ts";
 import { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
 import { bindLightingSwitches, type LightingSwitches } from "./lighting-switches.ts";

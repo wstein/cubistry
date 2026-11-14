@@ -7,7 +7,7 @@ import { validateCounterDesign } from "../src/apps/counter/design.ts";
 import { validateCertifiedCounter } from "../src/apps/counter/certified.ts";
 import { overriddenSticker } from "../packages/cube-viewer/src/facelet-image.ts";
 import { rotationHarness } from "./helpers/rotation-harness.mjs";
-import { CubeViewer } from "@cubistry/cube-viewer";
+import { CubeViewer, outerExtensionFor } from "@cubistry/cube-viewer";
 import { createDesign } from "../src/apps/playground/model.ts";
 import { initialState, presentMove, parseMove } from "@cubistry/cube-mechanics";
 import { stateEquals } from "@cubistry/cube-core";
@@ -35,12 +35,15 @@ test("configured size-2 viewers use the narrower body bevel without moving stick
     const shell = [...h.viewer.cube.bodies.values()][0].children[0];
     const p = shell.geometry.getAttribute("position"), n = shell.geometry.getAttribute("normal");
     const x = [];
-    for (let i = 0; i < p.count; i++) if (n.getZ(i) > .999999) x.push(p.getX(i));
+    for (let i = 0; i < p.count; i++) if (n.getZ(i) < -.999999) x.push(p.getX(i)); // the first body is the corner (-1,-1,-1): its exterior face is -z
+    // two-radius body: this corner cubie has the radius 0.03 on its cube edges and 0.018 on the seams; its flat face is as large as an inner cubie would have
+    assert(Math.abs((Math.max(...x) - Math.min(...x)) - (.99 + outerExtensionFor(2) - 0.03 - 0.018)) < 1e-6);
     assert(1 - (Math.max(...x) - Math.min(...x)) <= .071);
     const stickers = [];
     h.scene.traverse(o => { if (o.userData.stickerId !== undefined) stickers.push(o); });
     assert.equal(stickers.length, 24);
-    for (const sticker of stickers) assert(Math.abs(sticker.position.length() - .502) < 1e-10);
+    // every cubie of a 2x2 is exterior in all three axes: its cell is wider by the extension, the sticker sits on its face
+    for (const sticker of stickers) assert(Math.abs(sticker.position.length() - (.502 + outerExtensionFor(2) / 2)) < 1e-10);
   } finally { h.viewer.destroy(); }
 });
 async function withMotion(reduced, action) {
@@ -62,7 +65,7 @@ test("reconfiguration disposes old shared geometry, materials and images without
       if (object.material.map) textures.add(object.material.map);
     }
   });
-  assert.equal(geometries.size, 3);
+  assert.equal(geometries.size, 10, "8 corner bodies (the two-radius cubie knows its corner), the sticker and the core");
   let disposedGeometry = 0, disposedMaterial = 0, disposedTexture = 0;
   for (const geometry of geometries) geometry.addEventListener("dispose", () => disposedGeometry++);
   for (const material of materials) material.addEventListener("dispose", () => disposedMaterial++);

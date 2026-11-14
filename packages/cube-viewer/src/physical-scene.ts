@@ -3,7 +3,8 @@ import * as THREE from "three";
 import { bodyArtworkKey, orientBodyArtwork, planarBodyUv, sourceFaceIndex } from "./body-artwork.ts";
 import type { Construction } from "./appearance.ts";
 import { cross, demand, dot, type Vec3 } from "@cubistry/cube-core";
-import { layerCenters, layerEdge, layerIndexOf, type LayerWidths, validateLayerWidths } from "./layer-widths.ts";
+import type { OuterSides } from "./two-radius-body.ts";
+import { layerCenters, layerEdge, type LayerWidths, validateLayerWidths } from "./layer-widths.ts";
 import { PROJECTED_FACES, STICKER_SHARE, faceOfNormal, stickerWindow, type FaceKey, type StickerWindow } from "./projected-uv.ts";
 import { type CutEdgeColor, cutFaceEdges, type EdgeProfile, type EdgeStop, cutPatternKey, cutPatternTexture, type FaceUvAxes, faceUvAxes, flatCutColor } from "./cut-faces.ts";
 
@@ -52,12 +53,13 @@ export interface StickerlessBodyOptions {
 /**
  * Layer-width profile (opt-in): the cubies are boxes of the layer widths of their position instead of unit cubes. The
  * absent profile is the historical unit pitch, byte for byte. `body` builds the body geometry of a cubie of the given cell
- * size (the layer widths of its position); the caller owns the gap and the bevel. The scene disposes what `body` returns.
+ * size (the layer widths of its position) and of the sides of the cube it touches (`outer[axis][side]`, side 0 = -, 1 = +: the
+ * cubie lies in the first or last layer of that axis); the caller owns the gap and the bevel. The scene disposes what `body` returns.
  * The positions of the frames stay layer coordinates of the mechanics (unit steps, centered).
  */
 export interface LayerProfile {
   readonly widths: LayerWidths;
-  readonly body: (cell: readonly [number, number, number]) => THREE.BufferGeometry;
+  readonly body: (cell: readonly [number, number, number], outer: OuterSides) => THREE.BufferGeometry;
   /**
    * Optional sticker geometry for a face of the cell extents `width` (right) x `height` (up), in scene units. Absent: the unit
    * sticker scaled by the cell (a corner radius that stretches with the cell). The scene owns and disposes what it returns.
@@ -128,6 +130,8 @@ export class PhysicalCubeScene {
   private readonly geometries: THREE.BufferGeometry[];
   private readonly parent: THREE.Scene | THREE.Group;
   private readonly spacing: number;
+  /** Step of the layer coordinates `p` between two layers. */
+  private pitch = 1;
   /** Layer profile: the center of every layer along an axis (scene units, before spacing); null: unit pitch. */
   private readonly layers: { widths: LayerWidths; centers: number[]; body: LayerProfile["body"]; sticker?: LayerProfile["sticker"] } | null;
   private readonly plastic: THREE.Material;
@@ -137,7 +141,7 @@ export class PhysicalCubeScene {
     materials: ReadonlyMap<number, THREE.Material>,
     plastic: THREE.Material,
     spacing: number,
-    geometry: { body: THREE.BufferGeometry; core?: THREE.BufferGeometry; sticker: THREE.BufferGeometry; stickerOffset: number },
+    geometry: { body: THREE.BufferGeometry; core?: THREE.BufferGeometry; sticker: THREE.BufferGeometry; stickerOffset: number; layers?: LayerProfile },
     faceColors: ReadonlyMap<number, string> = new Map(),
     options: PhysicalSceneOptions = {},
   ) {
@@ -156,9 +160,13 @@ export class PhysicalCubeScene {
     // The core belongs to construction, never a selected frame color.
     this.coreMaterial = this.neutralPlastic(coreColor) as THREE.MeshStandardMaterial;
     this.spacing = spacing;
-    if (options.layers) validateLayerWidths(options.layers.widths);
-    this.layers = options.layers ? { widths: options.layers.widths, centers: layerCenters(options.layers.widths), body: options.layers.body, sticker: options.layers.sticker } : null;
     this.axisCoordinates = [0, 1, 2].map((axis) => [...new Set(printed.map((s) => s.p[axis]))].sort((a, b) => a - b));
+    // The profile of the caller, else the profile the geometry brings (the two-radius cubie of the preset) when it fits the cube.
+    const profile = options.layers ?? (geometry.layers && this.axisCoordinates.every((c) => c.length === geometry.layers!.widths.length) ? geometry.layers : undefined);
+    if (profile) validateLayerWidths(profile.widths);
+    // The layer coordinates of the mechanics step by `pitch` (1, or 2 where the viewer halves them with its spacing).
+    this.pitch = this.axisCoordinates[0].length > 1 ? this.axisCoordinates[0][1] - this.axisCoordinates[0][0] : 1;
+    this.layers = profile ? { widths: profile.widths, centers: layerCenters(profile.widths), body: profile.body, sticker: profile.sticker } : null;
     this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
       demand(materials.has(s.id), "Missing printed sticker material");
@@ -168,11 +176,12 @@ export class PhysicalCubeScene {
         const sourceFaces = printed.filter(face => face.cubie === s.cubie);
         // Layer profile: the cell (layer widths of the position at construction, in the local axes of the body) decides the box.
         const cell = this.cellAt(s.p);
-        const cellKey = cell ? cell.join(",") : "";
+        const outerSides = this.outerSidesAt(s.p);
+        const cellKey = cell ? cell.join(",") + "|" + outerSides!.flat().map(Number).join("") : "";
         let base = geometry.body;
         if (cell) {
           let sized = this.cellBodies.get(cellKey);
-          if (!sized) { sized = this.layers!.body(cell); this.cellBodies.set(cellKey, sized); this.geometries.push(sized); }
+          if (!sized) { sized = this.layers!.body(cell, outerSides!); this.cellBodies.set(cellKey, sized); this.geometries.push(sized); }
           base = sized;
         }
         const key = cellKey + "|" + bodyArtworkKey(sourceFaces);
@@ -267,7 +276,7 @@ export class PhysicalCubeScene {
         lo[axis] = Math.min(lo[axis], s.p[axis] * spacing); hi[axis] = Math.max(hi[axis], s.p[axis] * spacing);
       }
       // Layer profile: the core is centered in the cube whose edge is the sum of the layer widths.
-      const half = this.layers ? layerEdge(this.layers.widths) * spacing / 2 : Math.max(...hi.map((v, axis) => (v - lo[axis]) / 2)) + 0.5;
+      const half = this.layers ? layerEdge(this.layers.widths) * this.pitch * spacing / 2 : Math.max(...hi.map((v, axis) => (v - lo[axis]) / 2)) + 0.5;
       const core = new THREE.Mesh(geometry.core, plastic);
       core.userData.plasticCore = true;
       core.castShadow = core.receiveShadow = true;
@@ -281,12 +290,25 @@ export class PhysicalCubeScene {
   /** Layer profile: the box (layer widths of the position `p`) of a cubie; null without a profile. */
   private cellAt(p: Vec3): [number, number, number] | null {
     const layers = this.layers;
-    return layers ? p.map(c => layers.widths[layerIndexOf(layers.widths.length, c)]) as [number, number, number] : null;
+    return layers ? p.map((c, axis) => layers.widths[this.layerIndex(axis, c)]) as [number, number, number] : null;
+  }
+  /** Layer index of the layer coordinate `c` along `axis` (the position among the layers that carry a printed face). */
+  private layerIndex(axis: number, c: number): number {
+    const i = this.axisCoordinates[axis].indexOf(c);
+    demand(i >= 0, "Layer coordinate outside the cube");
+    return i;
+  }
+  /** Layer profile: which faces of the cubie at `p` are exterior faces of the cube (first or last layer per axis); null without a profile. */
+  private outerSidesAt(p: Vec3): OuterSides | null {
+    const layers = this.layers;
+    if (!layers) return null;
+    const n = layers.widths.length;
+    return p.map((c, axis) => { const i = this.layerIndex(axis, c); return [i === 0, i === n - 1]; }) as unknown as OuterSides;
   }
   /** Layer profile: the scene position (before spacing) of the cubie center at the layer coordinates `p`. */
   private worldAt(p: Vec3): Vec3 {
     const layers = this.layers;
-    return layers ? p.map(c => layers.centers[layerIndexOf(layers.widths.length, c)]) as unknown as Vec3 : p;
+    return layers ? p.map((c, axis) => layers.centers[this.layerIndex(axis, c)] * this.pitch) as unknown as Vec3 : p;
   }
   /** Live screen-only formatting follows its existing source material, including
    * image overrides during turns. Texture ownership remains with the caller. */

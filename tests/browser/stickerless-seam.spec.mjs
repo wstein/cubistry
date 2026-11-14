@@ -8,8 +8,10 @@ const KEY = "cubistry-viewer-appearance-v1:/index.html";
 const SIZES = [800, 1200, 2000];
 
 async function measure(page, size) {
-  return await page.evaluate((size) => {
-    const v = window.__playgroundViewer, N = 2, half = N / 2;
+  return await page.evaluate(async (size) => {
+    // Two-radius cubies (owner decision 2026-11-14): the outer layers of the 2x2 are wider by the extension, so the cube edge is N + 2 e and the image spans it.
+    const { outerExtensionFor } = await import("/packages/cube-viewer/src/presentation-preset.ts");
+    const v = window.__playgroundViewer, N = 2 + 2 * outerExtensionFor(2), half = N / 2;
     v.renderer.setAnimationLoop(null);
     v.renderer.setPixelRatio(1); v.renderer.setSize(size, size, false);
     v.camera.aspect = 1; v.fitCamera();
