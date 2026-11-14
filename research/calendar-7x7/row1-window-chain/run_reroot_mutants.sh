@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Source mutants of reroot_measure_lib.jl: each mutated copy must make the named test set of test_reroot_measure.jl fail.
-# Usage: [ONLY=name] MUTANT_TMP=<dir> run_reroot_mutants.sh [julia]    (about 12 s each, 14 mutants; MUTANT_TMP must exist and is not /tmp)
+# Usage: [ONLY=name] MUTANT_TMP=<dir> run_reroot_mutants.sh [julia]    (about 12 s each, 22 mutants; MUTANT_TMP must exist and is not /tmp)
 set -u
 here=$(cd "$(dirname "$0")" && pwd); julia=${1:-julia}; bad=0; n=0
 base=${MUTANT_TMP:-${TMPDIR:-}}
@@ -14,7 +14,7 @@ run() { # name, test set that must fail, exact text, replacement (literal, no pa
   if [[ "$src" != *"$old"* ]]; then echo "NOT APPLIED $name"; bad=1; rm -rf "$t"; return; fi
   printf '%s\n' "${src/"$old"/"$new"}" > "$t/row1-window-chain/reroot_measure_lib.jl"
   out=$(cd "$t" && "$julia" --startup-file=no "$t/row1-window-chain/test_reroot_measure.jl" 2>&1); rc=$?
-  if [ $rc -ne 0 ] && printf '%s\n' "$out" | grep -F "$set" | grep -Eq '\|[[:space:]]+[0-9]+[[:space:]]+[0-9]+[[:space:]]+[0-9]+[[:space:]]+[0-9.]+s'; then echo "KILLED   $name ($set)"
+  if [ $rc -ne 0 ] && printf '%s\n' "$out" | grep -F "$set" | grep -Eq '\|[[:space:]]+[0-9]+([[:space:]]+[0-9]+){2,3}[[:space:]]+[0-9.]+s'; then echo "KILLED   $name ($set)"
   else echo "SURVIVED $name (expected failure in: $set, rc=$rc)"; bad=1; fi
   rm -rf "$t"
 }
@@ -32,5 +32,13 @@ run seam-cancel-sign         "re-root cost"                 'seam_cancel(P,rest,
 run sums-mismatch-ignored    "frozen inputs"                'sha256_file(p)==m[1] || error("sha256 mismatch for $(m[2])")' 'true'
 run selection-keeps-measured "edge selection"               't.id∉measured && t.id∉be' 't.id∉be'
 run selection-rank-offset    "edge selection"               'idx=unique([1+round(Int,(k-1)*(m-1)/(n-1)) for k in 1:n])' 'idx=unique([1+floor(Int,(k-1)*(m-1)/(n-1)) for k in 1:n])'
+run best-ref-maximum         "better reference length"      'best_ref(stored,root,wide)=minimum(' 'best_ref(stored,root,wide)=maximum('
+run best-ref-without-stored  "better reference length"      'for x in (stored,root,wide) if x!==nothing)' 'for x in (root,wide,root) if x!==nothing)'
+run cost-vs-best-sign        "better reference length"      'cost_vs_best(streamed,best)=streamed-best' 'cost_vs_best(streamed,best)=best-streamed'
+run cost-vs-best-from-free   "better reference length"      'cost_vs_best(streamed,best_ref) : "-"' 'cost_vs_best(streamed,free_htm) : "-"'
+run ref-columns-swapped      "better reference length"      'cellv(ref_root),cellv(ref_wide),cellv(best_ref)' 'cellv(ref_wide),cellv(ref_root),cellv(best_ref)'
+run ref-width-default-1x     "better reference length"      'return 2*width)' 'return width)'
+run ref-width-cap            "better reference length"      '1<=w<=400 || error("ref_width must be 1-400")' 'true'
+run missing-ref-as-zero      "better reference length"      'cellv(x)=x===nothing ? "-" : string(x)' 'cellv(x)=x===nothing ? "0" : string(x)'
 [ $n -ge 1 ] || { echo "no mutant selected (ONLY=${ONLY:-})" >&2; exit 2; }
 exit $bad
