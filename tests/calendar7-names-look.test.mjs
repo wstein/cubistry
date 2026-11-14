@@ -243,6 +243,95 @@ test("exposure: the studio has only the light types the irradiance counts, and a
   assert.equal(namesExposure(scene, new THREE.Quaternion(), cam), 1);
 });
 
+// ---- light per face: the face that looks at the camera is lit as before, the others get the share (names-face-light.ts) ----
+import { FRONT_FROM, FRONT_TO, NAMES_DIRECTIONAL_SHARE, faceIrradiance, faceLightChunks, frontWeight } from "../src/apps/calendar7/names-face-light.ts";
+const faceNormal = (axis, q) => new THREE.Vector3(...axis).applyQuaternion(q);
+const FACES = { up: [0, 1, 0], front: [0, 0, 1], right: [1, 0, 0], left: [-1, 0, 0] };
+const VIEWS = [[0, 0], [0.22, 0.3], [0.3, 0.5], [0.45, 0.5], [0.95, 0.5]]; // [pitch, yaw]: the studio views of the washout report
+
+test("face light: the weight is 1 for a face that looks at the camera, the share at grazing and below, and rises smoothly in between", () => {
+  assert.equal(NAMES_DIRECTIONAL_SHARE, 0.08);
+  assert.equal(frontWeight(1), 1);
+  assert.equal(frontWeight(FRONT_TO), 1);
+  assert.equal(frontWeight(0.8), 1);
+  assert.equal(frontWeight(FRONT_FROM), 0);
+  for (const d of [0, 0.2, -0.5, -1]) assert.equal(frontWeight(d), 0, String(d));
+  let prev = 0;
+  for (let d = FRONT_FROM; d <= FRONT_TO; d += 0.005) { const w = frontWeight(d); assert.ok(w >= prev - 1e-12 && w <= 1, String(d)); assert.ok(w - prev < 0.06, `no step at ${d}`); prev = w; }
+  assert.ok(FRONT_TO <= 0.8 && FRONT_TO > 0.6, "a face within 37 degrees of the camera is front: the start view and its turned views");
+  assert.ok(FRONT_TO - FRONT_FROM >= 0.25, "a wide range: a turn changes the light slowly");
+});
+
+test("face light: the face that looks at the camera has exactly the studio's irradiance, the other faces about that of the front face at the least (0.97) and at most 1.15 times it", () => {
+  const scene = studioScene(), cam = camera();
+  for (const [p, y] of VIEWS.slice(0, 4)) {
+    const q = turned(y, p), mainFront = irradiance(scene, faceNormal(FACES.front, q));
+    assert.ok(Math.abs(faceIrradiance(scene, faceNormal(FACES.front, q), q, cam) - mainFront) < 1e-9, `front at pitch ${p}`);
+    for (const k of ["up", "right"]) {
+      const n = faceNormal(FACES[k], q), now = faceIrradiance(scene, n, q, cam);
+      if (n.z < 0.2) continue; // looks away from the camera
+      assert.ok(now <= 1.15 * mainFront && now >= 0.97 * mainFront, `${k} at pitch ${p}: ${now} against the front's ${mainFront}`);
+    }
+  }
+  // Steep view: the top face is the face that looks at the camera and keeps the studio's light; the front face is lit like the others.
+  const q = turned(0.5, 0.95), top = faceNormal(FACES.up, q);
+  assert.equal(frontWeight(top.z), 1);
+  assert.ok(Math.abs(faceIrradiance(scene, top, q, cam) - irradiance(scene, top)) < 1e-9);
+  assert.ok(frontWeight(faceNormal(FACES.front, q).z) < 0.5, "the front face is not the face that looks at the camera there");
+});
+
+test("face light: the irradiance of every face is continuous while the cube turns about y and about x (no step, no pop)", () => {
+  const scene = studioScene(), cam = camera(), step = (rot, from, to, face) => {
+    let worst = 0, prev = null;
+    for (let a = from; a <= to + 1e-9; a += 0.01) {
+      const q = rot(a), n = faceNormal(FACES[face], q);
+      if (n.z < 0.1) { prev = null; continue; }
+      const v = faceIrradiance(scene, n, q, cam);
+      if (prev !== null) worst = Math.max(worst, Math.abs(v - prev));
+      prev = v;
+    }
+    return worst;
+  };
+  // Largest change per 0.01 rad of turn of the irradiance a face gets (the studio's own change is up to 0.1 for the front face at a pitch);
+  // a hard switch between front and not front changes it by 1 or more.
+  for (const face of Object.keys(FACES)) for (const [name, rot, from, to] of [["yaw", (a) => turned(a, 0.3), -1.3, 1.3], ["pitch", (a) => turned(0.3, a), -1.3, 1.3]]) {
+    const worst = step(rot, from, to, face);
+    assert.ok(worst < 0.25, `${face} ${name}: largest step of 0.01 rad ${worst}`);
+  }
+});
+
+test("face light: the three.js light chunks take the face light at the three places, and a changed chunk is refused", () => {
+  const { begin, end } = faceLightChunks();
+  assert.ok(begin.includes("c7Direct = mix( c7FaceLight.x, 1.0, c7W )") && begin.includes("directLight.color *= c7Direct;") && begin.includes("c7DirSum"));
+  assert.ok(end.includes("irradiance += vec3( ( 1.0 - c7W ) * max( 0.0, c7FaceLight.y - c7Base ) );") && end.indexOf("c7Base") < end.indexOf("RE_IndirectDiffuse( irradiance,"));
+  const at = begin.indexOf("directLight.color *= c7Direct;");
+  assert.ok(at > 0 && begin.indexOf("directionalLightShadows[ i ]", at) > at, "in the directional loop, before its shadow factor");
+  assert.throws(() => faceLightChunks("vec3 other;", THREE.ShaderChunk.lights_fragment_end), /changed its light chunk/);
+  assert.throws(() => faceLightChunks(THREE.ShaderChunk.lights_fragment_begin, "nothing"), /changed its light chunk/);
+});
+
+// ---- soft shoulder (names-tone.ts) ----
+import { SHOULDER_GLSL, SHOULDER_START, installNamesToneMapping, shoulder } from "../src/apps/calendar7/names-tone.ts";
+test("shoulder: identity up to 0.9 (front tokens unchanged), continuous, rising and below 1 for 1.3; white renders within 4 of 255", () => {
+  assert.ok(SHOULDER_START >= 0.9 && SHOULDER_START < 1, "the start must be late enough to leave the front tokens alone");
+  for (let x = 0; x <= 0.9; x += 0.01) assert.equal(shoulder(x), x, String(x));
+  assert.ok(Math.abs(shoulder(SHOULDER_START + 1e-9) - SHOULDER_START) < 1e-6, "continuous at the start");
+  let prev = -1;
+  for (let x = 0; x <= 2; x += 0.005) { const y = shoulder(x); assert.ok(y > prev - 1e-12 && y <= 1, `${x}`); prev = y; }
+  assert.ok(shoulder(1.3) < 1 && shoulder(1.1) < shoulder(1.3), "rolls off instead of clipping at 1");
+  const srgb = (v) => 255 * (v <= 0.0031308 ? 12.92 * v : 1.055 * v ** (1 / 2.4) - 0.055);
+  assert.ok(255 - srgb(shoulder(1)) <= 4, `white renders ${srgb(shoulder(1))}`);
+});
+
+test("shoulder: the shader chunk of three.js carries the same start, and the install is idempotent", () => {
+  assert.ok(SHOULDER_GLSL.includes(SHOULDER_START.toFixed(4)));
+  installNamesToneMapping(); installNamesToneMapping();
+  const chunk = THREE.ShaderChunk.tonemapping_pars_fragment;
+  assert.ok(chunk.includes("toneMappingExposure;") && chunk.includes(SHOULDER_GLSL));
+  assert.equal(chunk.split("vec3 CustomToneMapping").length - 1, 1, "one definition");
+  assert.ok(chunk.includes("vec3 LinearToneMapping") && chunk.includes("vec3 NeutralToneMapping"), "the other tone mappings are untouched");
+});
+
 // ---- plasticity of the names layout (names-plasticity.ts) ----
 import { DEFAULT_PLASTICITY, MIN_SHADOW_STRENGTH, clampPlasticity, floorOpacityFactor, parsePlasticity, plasticityGain, plasticityParts } from "../src/apps/calendar7/names-plasticity.ts";
 test("plasticity: 0 is the flat look, the parts grow with it, the default is in range, parsing and clamping", () => {

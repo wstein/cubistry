@@ -2,7 +2,7 @@
 import * as THREE from "three";
 
 /**
- * Exposure of the names layout (renderer.toneMappingExposure at Linear tone mapping): the inverse of the radiance a white
+ * Exposure of the names layout (renderer.toneMappingExposure at the soft shoulder tone mapping of names-tone.ts, a plain exposure scale up to 0.95): the inverse of the radiance a white
  * diffuse surface gets from the scene lights on the face that looks at the camera, so that face shows its albedo and a color
  * token renders as itself, with the paper white as the reference. three.js lights give an albedo times irradiance / pi.
  *
@@ -59,20 +59,31 @@ export function irradianceOf(lighting: Lighting, n: THREE.Vector3): number {
 }
 export const irradiance = (scene: THREE.Object3D, n: THREE.Vector3): number => irradianceOf(collectLights(scene), n);
 
+/** The six cube faces turned by `rotation` (the presentation quaternion) with their weight for the camera (the smooth weighting of the header). */
+export function cameraFaces(rotation: THREE.Quaternion, camera: THREE.Camera): { n: THREE.Vector3; w: number }[] {
+  const toCamera = camera.position.clone().normalize(), out: { n: THREE.Vector3; w: number }[] = [];
+  for (const [x, y, z] of AXES) {
+    const n = new THREE.Vector3(x, y, z).applyQuaternion(rotation), w = Math.max(0, n.dot(toCamera)) ** FACE_WEIGHT_POWER;
+    if (w > 0) out.push({ n, w });
+  }
+  return out;
+}
+
+/** Irradiance of the directional lights alone on the unit normal `n` (the part of `irradianceOf` that a shadow map darkens). */
+export function directionalIrradianceOf(lighting: Lighting, n: THREE.Vector3): number {
+  let sum = 0;
+  for (const d of lighting.directionals) sum += d.amount * Math.max(0, n.dot(d.to));
+  return sum;
+}
+
 /**
  * The exposure for a cube turned by `rotation` (the presentation quaternion) seen by `camera` (looking at the origin).
  * 1 (the shared value) when no light reaches the faces, instead of an infinite exposure.
  */
 export function namesExposure(scene: THREE.Object3D, rotation: THREE.Quaternion, camera: THREE.Camera): number {
-  const lighting = collectLights(scene), toCamera = camera.position.clone().normalize(), n = new THREE.Vector3();
+  const lighting = collectLights(scene);
   let weights = 0, weighted = 0;
-  for (const [x, y, z] of AXES) {
-    n.set(x, y, z).applyQuaternion(rotation);
-    const w = Math.max(0, n.dot(toCamera)) ** FACE_WEIGHT_POWER;
-    if (w === 0) continue;
-    weights += w;
-    weighted += w * irradianceOf(lighting, n);
-  }
+  for (const { n, w } of cameraFaces(rotation, camera)) { weights += w; weighted += w * irradianceOf(lighting, n); }
   const mean = weights > 0 ? weighted / weights : 0;
   return mean > 1e-6 ? Math.PI / mean : 1;
 }

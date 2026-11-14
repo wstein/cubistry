@@ -162,7 +162,7 @@ for (const layout of ["names", "standard", "names-demo", "names-any", "bogus"]) 
     await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveCount(0);
 });
 
-test("the renderer uses Linear tone mapping at the face-following exposure in the names layout only and is the shared Neutral at 1 in the standard layout, also after switching back", async ({ page }) => {
+test("the renderer uses the soft shoulder (Custom) tone mapping at the face-following exposure in the names layout only and is the shared Neutral at 1 in the standard layout, also after switching back", async ({ page }) => {
   await page.goto("/licenses.html");
   const seen = await page.evaluate(async () => {
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
@@ -191,10 +191,10 @@ test("the renderer uses Linear tone mapping at the face-following exposure in th
     viewer.destroy();
     return out;
   });
-  const NEUTRAL = 7, LINEAR = 1; // THREE.NeutralToneMapping, THREE.LinearToneMapping
+  const NEUTRAL = 7, CUSTOM = 5; // THREE.NeutralToneMapping, THREE.CustomToneMapping (the soft shoulder of names-tone.ts)
   expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.1);
   expect(seen.namesHeadOn).toBeCloseTo(1.217, 2);
-  expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: LINEAR, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
+  expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: CUSTOM, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
 });
 
 test("viewer wiring: names layout colors the cut faces per adjacent tile (flat colors and miter textures), the rest near-white, with thick outer layers (bodies, tiles, core, camera) and follows a scheme switch; the standard layout has none of it", async ({ page }) => {
@@ -353,4 +353,65 @@ test("turning the cube changes the names exposure through the render loop (no ma
   expect(seen.start).toBeGreaterThan(seen.headOn + 0.1);
   expect(Math.abs(seen.steep - seen.headOn)).toBeGreaterThan(0.05);
   expect(seen.standard).toBe(1);
+});
+
+test("the studio lights keep the intensities of a fresh viewer in the names layout and after switching back to the standard layout (the face light is in the materials, not in the lights)", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const lights = () => { const l = []; viewer.scene.traverse((o) => { if (o.isLight) l.push(`${o.type} ${o.intensity.toFixed(6)}`); }); return l.sort(); };
+    const out = { fresh: lights() };
+    viewer.configure(names.printing, names.pose, "face", "names");
+    out.names = lights();
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    out.standard = lights();
+    viewer.configure(names.printing, names.pose, "face", "names");
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    out.again = lights();
+    viewer.destroy();
+    return out;
+  });
+  expect(seen.fresh.length).toBeGreaterThanOrEqual(6);
+  expect(seen.names).toEqual(seen.fresh);
+  expect(seen.standard).toEqual(seen.fresh);
+  expect(seen.again).toEqual(seen.fresh);
+});
+
+test("only the names layout carries the face light: its materials are patched and the uniform is on; the standard layout has neither", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const count = () => { let patched = 0, total = 0; viewer.presentation.traverse((o) => { if (!o.isMesh) return; for (const m of [].concat(o.material)) { total++; if (m.userData.c7FaceLight) patched++; } }); return { patched, total }; };
+    const out = {};
+    viewer.configure(names.printing, names.pose, "face", "names");
+    viewer.syncExposure();
+    out.names = { ...count(), uniform: viewer.faceLight.value.toArray().slice(0, 2) };
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    viewer.syncExposure();
+    out.standard = { ...count(), uniform: viewer.faceLight.value.toArray().slice(0, 2) };
+    viewer.destroy();
+    return out;
+  });
+  expect(seen.names.total).toBeGreaterThan(100);
+  expect(seen.names.patched).toBe(seen.names.total); // every material of the cube
+  expect(seen.names.uniform[0]).toBeCloseTo(0.08, 6); // the share, and the target irradiance (the second value) is set
+  expect(seen.names.uniform[1]).toBeGreaterThan(0.5);
+  expect(seen.standard.patched).toBe(0);
+  expect(seen.standard.uniform).toEqual([1, 0]); // the studio's light on every face
 });
