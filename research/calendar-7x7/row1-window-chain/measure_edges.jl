@@ -10,8 +10,12 @@
 #      again from the state after P (solve_edge, same parameters). The streamed route is P followed by that solve; its length against
 #      the unconstrained length is the length cost (reroot.tsv).
 #   julia --threads=4 measure_edges.jl OUTDIR PRINT CHAIN ID[,ID...] [key=value ...]
-#   keys: width lambda library corew finish_depth nsnap (as the producer), reroot (1), commits (1,10,30,60), deadline_s (no re-root solve
-#   starts after this many seconds since the start of the script; default none)
+#   keys: width lambda library corew finish_depth nsnap (as the producer), reroot (1), commits (1,10,30,60), ref_width (width of the wide
+#   reference beam; default 2 x width, at most 400), deadline_s (no re-root or reference solve starts after this many seconds since the
+#   start of the script; default none)
+#   Reference lengths per edge (reroot=1): ref_root_htm = a fresh unconstrained beam run from the root (P = 0, same configuration; shows
+#   the spread of the solver), ref_wide_htm = the same with width ref_width; best_ref_htm = min(stored, ref_root, ref_wide).
+#   reroot.tsv: cost_htm = streamed - free (as before), cost_vs_best_htm = streamed - best_ref_htm.
 @assert length(ARGS)>=4 "usage: measure_edges.jl OUTDIR PRINT CHAIN ID[,ID...] [key=value ...]"
 isempty(get(ENV,"CAL7_WINDOW_MONTHS","")) && error("set CAL7_WINDOW_MONTHS")
 const CAL=normpath(joinpath(@__DIR__,".."))
@@ -47,19 +51,21 @@ w=copy(params0.orbit_weights);w[11]=parse(Float64,get(opts,"corew","100"))
 params=G.Params(lambda=params0.lambda,width=params0.width,fanout=params0.fanout,maxdepth=params0.maxdepth,patience=params0.patience,strict=true,prune_incumbent=params0.prune_incumbent,orbit_weights=w)
 lib=G.build_library(action,a,spec);catalogs=P.chain_catalogues(action)
 lib=merge_macros(lib,catalog_macros(catalogs,action,gens));index=build_index(lib);cats=orbit_cats(catalogs,gens)
-println("setup ",round(time()-T0;digits=1)," s, library ",length(lib)," threads ",Threads.nthreads()," width ",params.width," lambda ",params.lambda," reroot ",DO_REROOT," commits ",THRESHOLDS);flush(stdout)
+const REF_WIDTH=RM.parse_ref_width(get(opts,"ref_width",""),params.width)
+params_wide=G.Params(lambda=params.lambda,width=REF_WIDTH,fanout=params.fanout,maxdepth=params.maxdepth,patience=params.patience,strict=true,prune_incumbent=params.prune_incumbent,orbit_weights=params.orbit_weights)
+println("setup ",round(time()-T0;digits=1)," s, library ",length(lib)," threads ",Threads.nthreads()," width ",params.width," lambda ",params.lambda," reroot ",DO_REROOT," commits ",THRESHOLDS," ref_width ",REF_WIDTH);flush(stdout)
 
 const lcp=RM.lcp;const lcp_all=RM.lcp_all
 htm(w)=G.M.htm(w)
 qtm(w)=sum((q==2 ? 2 : 1 for (g,q) in P.macro_moves(w) if g%7!=0);init=0)
-solve(st,g)=solve_edge(source,st,g,action,a,gens,lib,index,cats,params;finish_depth=parse(Int,get(opts,"finish_depth","3")),nsnap=parse(Int,get(opts,"nsnap","6")),tight=true,finish=true)
+solve(st,g;p=params)=solve_edge(source,st,g,action,a,gens,lib,index,cats,p;finish_depth=parse(Int,get(opts,"finish_depth","3")),nsnap=parse(Int,get(opts,"nsnap","6")),tight=true,finish=true)
 advance(state,moves)=(for (gg,q) in moves;for _ in 1:(q==-1 ? 3 : q);state=P.compose(state,gens[gg]);end;end;state)
 
 edges=RM.read_chain_edges(read(chainpath,String))
 byid=Dict(e.id=>e for e in edges)
 for id in ids;haskey(byid,id) || error("edge $id is not in the chain");isempty(byid[id].wrong) || error("edge $id is a best-effort edge (wrong cells); solve_edge does not produce it");end
 summary=open(joinpath(out,"summary.tsv"),"w")
-println(summary,join(("id","month","stored_htm","stored_method","new_htm","new_method","same_moves","same_end","solve_s","beam_s","iters","word0_htm","first_commit_iter","first_commit_s","iter_p_ge_10","t_p_ge_10","iter_p_ge_half","t_p_ge_half","A_final_htm","A_last_htm","A_viol","B_retract_iters","B_retract_sum_htm","B_retract_max_htm","B_retract_vs_final_htm","C_last_htm","C_viol","qtm_final"),'\t'));flush(summary)
+println(summary,join(("id","month","stored_htm","stored_method","new_htm","new_method","same_moves","same_end","solve_s","beam_s","iters","word0_htm","first_commit_iter","first_commit_s","iter_p_ge_10","t_p_ge_10","iter_p_ge_half","t_p_ge_half","A_final_htm","A_last_htm","A_viol","B_retract_iters","B_retract_sum_htm","B_retract_max_htm","B_retract_vs_final_htm","C_last_htm","C_viol","qtm_final",RM.SUMMARY_REF_COLUMNS...),'\t'));flush(summary)
 reroot=open(joinpath(out,"reroot.tsv"),"w")
 println(reroot,join(RM.REROOT_COLUMNS,'\t'));flush(reroot)
 
@@ -91,6 +97,13 @@ for e in edges
         m=P.chain_metrics(word,action)
         fin=r.word   # the word as improve_word returns it (before macro_normalize)
         h0=htm(w0[]);n=length(recs)
+        # reference lengths: a fresh solve from the root (P = 0) and a solve with a wider beam; skipped after the deadline
+        ref_root=nothing;ref_wide=nothing
+        if DO_REROOT
+            if time()-T0<=DEADLINE;rr=solve(state,g);ref_root=rr.word===nothing ? nothing : rr.htm;end
+            if time()-T0<=DEADLINE;rw=solve(state,g;p=params_wide);ref_wide=rw.word===nothing ? nothing : rw.htm;end
+        end
+        best_ref=RM.best_ref(parse(Int,f[4]),ref_root,ref_wide)
         open(joinpath(out,"iter-$(id)-$(mon).tsv"),"w") do io
             println(io,"depth\tt_s\tbeam\tA_len\tA_htm\tA_qtm\tA_prefix_of_final\tB_len\tB_htm\tB_retract_htm\tC_htm\tbest_cost\tcost1")
             prevB=Int[]
@@ -108,14 +121,15 @@ for e in edges
         Bfin=n>0 ? htm(recs[n].B)-htm(recs[n].B[1:lcp(recs[n].B,fin)]) : 0
         tt(k)=isnothing(k) ? "-" : string(round(recs[k].t;digits=1))
         println(summary,join((id,mon,f[4],"?",m.htm,r.method,same_moves,same_end,round(solve_s;digits=1),round(tbeam[];digits=1),n,h0,something(fc,"-"),tt(fc),something(p10,"-"),tt(p10),something(ph,"-"),tt(ph),
-            n>0 ? htm(fin[1:lcp(recs[n].A,fin)]) : 0,n>0 ? Ah[n] : 0,viol,count(>(0),rts),sum(rts;init=0),maximum(rts;init=0),Bfin,n>0 ? Ch[n] : 0,violC,m.qtm),'\t'));flush(summary)
+            n>0 ? htm(fin[1:lcp(recs[n].A,fin)]) : 0,n>0 ? Ah[n] : 0,viol,count(>(0),rts),sum(rts;init=0),maximum(rts;init=0),Bfin,n>0 ? Ch[n] : 0,violC,m.qtm,RM.ref_cells(ref_root,ref_wide,best_ref)...,REF_WIDTH),'\t'));flush(summary)
         println("edge ",id," ",ym," stored HTM ",f[4]," new HTM ",m.htm," method ",r.method," same_moves=",same_moves," same_end=",same_end," solve ",round(solve_s;digits=1)," s beam ",round(tbeam[];digits=1)," s iters ",n);flush(stdout)
         if DO_REROOT
             ev=RM.commit_events([rc.A for rc in recs],htm);cps=RM.commit_points(ev,THRESHOLDS)
+            println("edge ",id," reference lengths: stored ",f[4]," free ",r.htm," root ",ref_root," wide(",REF_WIDTH,") ",ref_wide," best ",best_ref);flush(stdout)
             println("edge ",id," commit events ",length(ev)," commit points ",[(c.iter,c.htm) for c in cps]);flush(stdout)
             for (k,c) in enumerate(cps)
                 Pw=c.prefix;t0=time()
-                row(;rest_htm=-1,streamed=-1,merged=-1,seam=0,method="none",status)=RM.reroot_row(;id,month=mon,k,iter=c.iter,t_s=recs[c.iter].t,p_htm=htm(Pw),free_htm=r.htm,rest_htm,streamed,merged,seam,method,resolve_s=time()-t0,status)
+                row(;rest_htm=-1,streamed=-1,merged=-1,seam=0,method="none",status)=RM.reroot_row(;id,month=mon,k,iter=c.iter,t_s=recs[c.iter].t,p_htm=htm(Pw),free_htm=r.htm,rest_htm,streamed,merged,seam,method,resolve_s=time()-t0,status,ref_root,ref_wide,best_ref)
                 if time()-T0>DEADLINE
                     println(reroot,row(;status="deadline"));flush(reroot);continue
                 end
