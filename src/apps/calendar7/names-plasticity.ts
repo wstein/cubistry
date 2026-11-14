@@ -44,10 +44,14 @@ export function plasticityParts(plasticity: number): PlasticityParts {
 }
 
 /** Exposure factor that gives back the radiance the plasticity takes from a flat area. */
-/** `shadowMap`: whether the renderer's shadow map is on (the repo's test mode turns it off: then the faces lose nothing to shadows). */
-export function plasticityGain(plasticity: number, shadowMap = true): number {
+/**
+ * `shadowMap`: whether the renderer's shadow map is on (the repo's test mode turns it off: then the faces lose nothing to shadows).
+ * `directionalShare`: the share of the directional lights that the layout keeps (NAMES_DIRECTIONAL_SHARE; 1 for the studio as it is):
+ * the shadow map darkens only the directional part of the light, so the shadow loss scales with it.
+ */
+export function plasticityGain(plasticity: number, shadowMap = true, directionalShare = 1): number {
   const parts = plasticityParts(plasticity);
-  const shadow = parts.faceShadows && shadowMap ? 1 - SHADOW_LOSS * parts.shadowStrength : 1;
+  const shadow = parts.faceShadows && shadowMap ? 1 - SHADOW_LOSS * directionalShare * parts.shadowStrength : 1;
   return 1 / (shadow * (1 - SPECULAR_LOSS * parts.specular - CLEARCOAT_LOSS * parts.clearcoat));
 }
 
