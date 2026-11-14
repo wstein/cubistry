@@ -1,0 +1,15 @@
+complete=true
+stop_reason=-
+edges_total=1428
+edges_new=64
+chain_end=2019-01
+direction=backward
+chain_start=1900-01
+greedy_edges=0
+plan_end=1900-01
+root_month=2019-01
+rooted=false
+bridge_edges=0
+layout_sha256=e9a409eab9f0b94f05aff626efc564472fcf6271cbae42f85a2de84713c2b62a
+best_effort_edges=13
+seconds=1580.2

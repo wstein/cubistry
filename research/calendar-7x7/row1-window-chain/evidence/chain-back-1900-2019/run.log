@@ -1,0 +1,78 @@
+chain catalog orbit=1 count=1008
+chain catalog orbit=2 count=4048
+chain catalog orbit=3 count=4048
+chain catalog orbit=4 count=1760
+chain catalog orbit=5 count=4048
+chain catalog orbit=6 count=4048
+chain catalog orbit=7 count=4048
+chain catalog orbit=8 count=4048
+chain catalog orbit=9 count=4048
+chain catalog orbit=10 count=4048
+setup 35.1 s, library 673464 threads 4
+edge 1366 1905-04 finish1 HTM 153 QTM 172 25.5 s
+edge 1367 1905-03 beam HTM 140 QTM 161 25.6 s
+edge 1368 1905-02 beam HTM 28 QTM 39 9.3 s
+edge 1369 1905-01 beam HTM 117 QTM 145 16.9 s
+edge 1370 1904-12 finish2 HTM 121 QTM 142 36.1 s
+edge 1371 1904-11 beam HTM 92 QTM 111 23.7 s
+edge 1372 1904-10 beam HTM 96 QTM 118 24.0 s
+edge 1373 1904-09 beam HTM 120 QTM 137 18.4 s
+edge 1374 1904-08 beam HTM 101 QTM 130 37.6 s
+edge 1375 1904-07 beam HTM 113 QTM 141 24.4 s
+edge 1376 1904-06 beam HTM 164 QTM 197 19.9 s
+edge 1377 1904-05 beam HTM 117 QTM 132 40.0 s
+edge 1378 1904-04 beam HTM 93 QTM 111 26.8 s
+edge 1379 1904-03 beam HTM 112 QTM 134 22.5 s
+edge 1380 1904-02 finish1 HTM 117 QTM 134 18.1 s
+edge 1381 1904-01 beam HTM 95 QTM 121 26.7 s
+edge 1382 1903-12 beam HTM 104 QTM 126 32.3 s
+edge 1383 1903-11 beam HTM 131 QTM 142 23.5 s
+edge 1384 1903-10 beam HTM 119 QTM 143 21.8 s
+edge 1385 1903-09 beam HTM 89 QTM 105 36.1 s
+edge 1386 1903-08 finish1 HTM 140 QTM 152 22.9 s
+edge 1387 1903-07 finish1 HTM 129 QTM 154 13.6 s
+edge 1388 1903-06 beam HTM 141 QTM 165 31.7 s
+edge 1389 1903-05 beam HTM 112 QTM 133 20.7 s
+edge 1390 1903-04 beam HTM 86 QTM 102 15.8 s
+edge 1391 1903-03 beam HTM 115 QTM 145 20.9 s
+best-effort month 1903-02: wrong cell (7, 1) shows 29 (art stickers [2, 3])
+edge 1392 1903-02 beam HTM 29 QTM 34 5.7 s
+edge 1393 1903-01 beam HTM 122 QTM 143 26.5 s
+edge 1394 1902-12 beam HTM 133 QTM 155 38.5 s
+edge 1395 1902-11 finish1 HTM 139 QTM 155 14.9 s
+edge 1396 1902-10 beam HTM 110 QTM 126 14.0 s
+edge 1397 1902-09 finish1 HTM 127 QTM 147 14.9 s
+edge 1398 1902-08 beam HTM 103 QTM 122 41.7 s
+edge 1399 1902-07 beam HTM 127 QTM 147 24.0 s
+edge 1400 1902-06 beam HTM 114 QTM 141 17.7 s
+edge 1401 1902-05 finish1 HTM 127 QTM 141 16.5 s
+edge 1402 1902-04 beam HTM 99 QTM 114 25.1 s
+edge 1403 1902-03 beam HTM 115 QTM 127 20.9 s
+edge 1404 1902-02 finish1 HTM 32 QTM 37 10.1 s
+edge 1405 1902-01 beam HTM 131 QTM 153 24.9 s
+edge 1406 1901-12 beam HTM 122 QTM 144 16.7 s
+edge 1407 1901-11 beam HTM 135 QTM 151 32.2 s
+edge 1408 1901-10 beam HTM 113 QTM 146 41.7 s
+edge 1409 1901-09 beam HTM 117 QTM 132 29.8 s
+edge 1410 1901-08 beam HTM 113 QTM 130 21.0 s
+edge 1411 1901-07 beam HTM 123 QTM 147 19.3 s
+edge 1412 1901-06 beam HTM 122 QTM 145 21.3 s
+edge 1413 1901-05 beam HTM 118 QTM 141 21.8 s
+edge 1414 1901-04 beam HTM 152 QTM 174 33.4 s
+edge 1415 1901-03 beam HTM 115 QTM 143 29.8 s
+edge 1416 1901-02 beam HTM 23 QTM 30 21.6 s
+edge 1417 1901-01 beam HTM 140 QTM 167 21.9 s
+edge 1418 1900-12 beam HTM 100 QTM 119 18.7 s
+edge 1419 1900-11 beam HTM 93 QTM 112 26.7 s
+edge 1420 1900-10 beam HTM 127 QTM 152 27.1 s
+edge 1421 1900-09 beam HTM 128 QTM 142 55.0 s
+edge 1422 1900-08 beam HTM 105 QTM 133 24.6 s
+edge 1423 1900-07 beam HTM 124 QTM 151 28.0 s
+edge 1424 1900-06 beam HTM 109 QTM 128 26.6 s
+edge 1425 1900-05 beam HTM 129 QTM 156 17.6 s
+edge 1426 1900-04 beam HTM 107 QTM 126 26.7 s
+edge 1427 1900-03 beam HTM 120 QTM 131 25.4 s
+edge 1428 1900-02 beam HTM 28 QTM 30 7.5 s
+edge 1429 1900-01 beam HTM 141 QTM 170 19.2 s
+RESULT complete=true greedy=0 stop=- edges_total=1428 chain_end=1900-01 seconds=1580.2
+exported 1428 edges to /home/runner/work/cubistry/cubistry/out/chain
