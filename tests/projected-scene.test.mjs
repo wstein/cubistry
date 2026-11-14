@@ -293,8 +293,8 @@ test("a projection that throws leaves the arc-length body UV in place (the plana
   scene.dispose();
 });
 
-// O2 radii (owner decision 2026-11-14): the preset profile gives every cell the bevel radius of the cube edge and every sticker
-// its own size, so the planar UV of the stickerless faces and the window of a projected sticker follow the new radius.
+// Two radii (owner decision 2026-11-14): the preset profile gives the edges on a cube edge the large radius and every other edge
+// 0.6 of it, and every sticker one size, so the planar UV of the stickerless faces and the window of a projected sticker follow the new radius.
 function buildPreset(n, widths) {
   const edge = layerEdge(widths), fr = frames(n), parent = new THREE.Group(), profile = presentationLayerProfile(widths);
   const geometry = createPresentationGeometry(n, edge);

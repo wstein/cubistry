@@ -111,25 +111,33 @@ The shared 2×2 viewer uses smaller 0.03-unit body bevels. The narrower bevel
 reduces the apparent groove between adjacent front faces while retaining the
 0.01-unit physical shell clearance. Body width, center pitch, sticker size and
 sticker offset are unchanged. The 3x3 and callers that omit a size keep the
-0.055-unit bevel on the cube edges. A cube larger than 3x3 keeps the millimeter bevel radius of the
-3x3 at the same cube edge (owner decision 2026-11-14): `bodyRadiusFor(N, edge)` =
-0.055 * edge / 3, with `edge` = N, or the sum of the layer widths with a profile
-(5x5 0.092 or 0.095 with f 1.1, 7x7 0.128 or 0.150 with f 1.6).
+0.055-unit bevel on the cube edges. A cube larger than 3x3 keeps the millimeter
+bevel radius of the 3x3 at the same cube edge (owner decision 2026-11-14):
+`bodyRadiusFor(N, edge)` = 0.055 * edge / 3, with `edge` = N, or the sum of the
+layer widths with a profile (5x5 0.092 or 0.095 with f 1.1, 7x7 0.128 or 0.150
+with f 1.6).
 
-Two radii (owner decision 2026-11-14, `createTwoRadiusBody`). The shell clearance stays 0.01 in every
-format. The 12 cube edges keep the radius above (2x2 0.03, 3x3 0.055, 5x5 0.095, 7x7 0.150); every other
-cubie edge has `innerRadiusShare` = 0.6 times it (0.018, 0.033, 0.057, 0.090 with the f profile edges 5.2 and 8.2; 0.055 and 0.077 on a 5x5 and 7x7 of edge N). An edge is large only where
-two exterior faces of the cube meet; the rounding of an exterior face along its other borders is small.
-The exterior layers are wider by the extension e = (1 - 0.6) * radius (`outerExtensionFor`) so that the
-flat face of an exterior cubie equals that of an inner cubie; `createPresentationGeometry(size).layers`
-delivers the profile [1 + e, 1, ..., 1 + e] and an explicit `layers` option (Calendar7: f = 1.6) replaces
-it without further widening. The sticker is one size on every cell: `stickerSideFor` = min(0.87, flat part
-less 0.01) = 0.87 on 2x2 to 5x5 of edge N, 0.826 on a 7x7 of edge N (inner radius 0.077), 0.80 with the f = 1.6 profile (inner radius 0.0902).
-The same bodies serve the stickered and the stickerless cube. The face UV stays linear in position.
-`presentationLayerProfile` builds body and sticker per cell and passes whether a face is exterior. The option
-`planarFaceUv` maps the exterior and the cut faces of a stickerless cube linear in
-position (Three's arc-length UV stays the default). Layer turns preserve the separating axis coordinate, so
-the shell clearance remains positive throughout quarter and half turns.
+Two radii (owner decision 2026-11-14, `createTwoRadiusBody`). The shell
+clearance stays 0.01 in every format. The 12 cube edges keep the radius above
+(2x2 0.03, 3x3 0.055, 5x5 0.092 or 0.095, 7x7 0.128 or 0.150); every other cubie
+edge has `innerRadiusShare` = 0.6 times it (0.018, 0.033, 0.055 or 0.057,
+0.077 or 0.090; the second value with the f profile edges 5.2 and 8.2). An edge
+is large only where two exterior faces of the cube meet; the rounding of an
+exterior face along its other borders is small. The exterior layers are wider by
+the extension e = (1 - 0.6) * radius (`outerExtensionFor`) so that the flat face
+of an exterior cubie equals that of an inner cubie;
+`createPresentationGeometry(size).layers` delivers the profile
+[1 + e, 1, ..., 1 + e] and an explicit `layers` option (Calendar7: f = 1.6)
+replaces it without further widening. The sticker is one size on every cell:
+`stickerSideFor` = min(0.87, flat part less 0.01) = 0.87 on 2x2 to 5x5 of edge N,
+0.826 on a 7x7 of edge N (inner radius 0.077), 0.80 with the f = 1.6 profile
+(inner radius 0.0902). The same bodies serve the stickered and the stickerless
+cube. The face UV stays linear in position. `presentationLayerProfile` builds
+body and sticker per cell and passes whether a face is exterior. The option
+`planarFaceUv` maps the exterior and the cut faces of a stickerless cube linear
+in position (Three's arc-length UV stays the default). Layer turns preserve the
+separating axis coordinate, so the shell clearance remains positive throughout
+quarter and half turns.
 
 **Core ball (supersedes per-cubie box cores).** The former per-cubie plastic box
 cores are removed. Each cube has one static core ball at its center, diameter
