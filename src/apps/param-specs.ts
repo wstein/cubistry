@@ -103,6 +103,8 @@ export const PARAM_SPECS: Readonly<Record<string, ParamSpec>> = {
   plasticity: { parse: num(0, 1) },
   banner: { parse: oneOf(["theme", "rounded", "square", "underline", "boxed", "rounded-box"]) },
   size: { parse: int(2, 7) },
+  // Picture mapping of the Picture Cube: Projected (default) or the tile-per-sticker mapping of earlier links.
+  pictures: { parse: oneOf(["projected", "per-sticker"]) },
   // CI Quality Cube (src/apps/status/params.ts): the quarter-turn time is `speed`; the category states are a one-time request.
   build: { parse: state, perMode: true },
   test: { parse: state, perMode: true },

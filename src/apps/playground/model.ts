@@ -19,6 +19,7 @@ import type { AssetManifest } from "@cubistry/cube-assets";
 import { pictureImages } from "./picture-assets.ts";
 import { pastelImages } from "./pastel-assets.ts";
 import { THEMES, sliceFaceSet, type FaceSet, type ThemeId } from "./themes.ts";
+import { pastelFaces, pictureFaces } from "./face-sets.ts";
 /** "upload" is the user's own face set; it is created with `createDesign("upload", set)`. */
 export const UPLOAD_STYLE = "upload";
 export type Style = "classic" | "picture" | "pastel" | ThemeId | typeof UPLOAD_STYLE;
@@ -124,7 +125,9 @@ export function createDesign(style: Style, custom?: FaceSet) {
       queue.push(applyMoves(state, parseAlg(word)));
   }
   if (equivalents.length !== 24) throw Error("Invalid complete frame catalog");
-  return deepFreeze({ style, print, assets, target, equivalents });
+  // The whole face images for the Projected picture mode; the classic colors have none.
+  const wholeFaces: FaceSet["faces"] | undefined = style === "picture" ? pictureFaces : style === "pastel" ? pastelFaces : theme?.faces;
+  return deepFreeze({ style, print, assets, target, equivalents, faces: wholeFaces });
 }
 export type PlaygroundDesign = ReturnType<typeof createDesign>;
 export function classify(design: PlaygroundDesign, state: CubeState) {

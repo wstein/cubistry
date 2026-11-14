@@ -45,7 +45,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     group: "apps",
     help: "docs/PICTURE_PLAYGROUND.md",
     // Sizes 3 to 7 are listed in the size control but not playable yet (docs/PICTURE_PLAYGROUND.md).
-    params: ["size"],
+    params: ["size", "pictures"],
   },
   {
     id: "hm-clock",

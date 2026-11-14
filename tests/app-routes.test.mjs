@@ -275,9 +275,11 @@ test("the Calendar design is a per-mode value: it leaves with the Calendar and n
   }
 });
 
-test("playground is a registered mode that owns size; the pending entry is gone and size is read, not foreign", () => {
+test("playground is a registered mode that owns size and pictures; the pending entry is gone and both are read, not foreign", () => {
   const m = MODE_CATALOG.find((x) => x.id === "playground");
-  assert.deepEqual([...m.params], ["size"]);
+  assert.deepEqual([...m.params], ["size", "pictures"]);
+  assert.deepEqual(parseRoute("?app=playground&pictures=per-sticker", registry, "clock").foreign, []);
+  assert.equal(to(`${base}?app=playground&pictures=per-sticker`, "playground", "counter").has("pictures"), false);
   assert.equal("playground" in PENDING_APP_PARAMS, false);
   assert.equal(m.title, "Picture Cube");
   assert.equal(m.help, "docs/PICTURE_PLAYGROUND.md");

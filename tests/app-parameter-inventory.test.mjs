@@ -73,7 +73,7 @@ const INVENTORY = [
   row(["banner"], "src/apps/calendar7/mount.ts", ["calendar7"], /BANNER_PARAM = "banner"/),
   row(["font"], "src/apps/calendar7/mount.ts", ["calendar7"]),
   // The Picture Cube mode of the host (src/apps/playground/mount.ts).
-  row(["size"], "src/apps/playground/mount.ts", ["playground"]),
+  row(["size", "pictures"], "src/apps/playground/mount.ts", ["playground"]),
   row(["speed"], "src/apps/status/params.ts", ["ci"]),
   row(["build", "test", "analyze", "review"], "src/apps/status/params.ts", ["ci"], /params\.get\(\s*category\.id\s*\)/),
 ];
