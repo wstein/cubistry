@@ -1,7 +1,7 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // The whole face images of a design for the Projected picture mode. They are loaded with the same bounded, hash-pinned asset
-// loader as the tiles, but in a second call (own pixel budget: the tiles of a face already count a full face each) and
-// handed to the viewer under the asset ids `face_U` to `face_B` next to the tile images.
+// loader as the tiles, but in one call per face (own pixel budget each: the loader counts a whole image twice, and the tiles of a face
+// already count a full face each) and handed to the viewer under the asset ids `face_U` to `face_B` next to the tile images.
 import type { LoadedAssets } from "@cubistry/cube-assets";
 import { faceImageAssetId, FACE_KEYS, type FaceKey } from "@cubistry/cube-viewer";
 import type { FaceSet } from "./themes.ts";
