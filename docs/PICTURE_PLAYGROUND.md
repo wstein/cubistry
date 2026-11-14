@@ -52,37 +52,49 @@ or endpoint mismatch freezes the controller without committing the failed turn;
 the UI explicitly requires reload and shows Unknown goal badges. No recovery
 pose is guessed.
 
-## Picture mapping: Projected and Per sticker
+## Picture looks: Stickerless and Projected
 
-The Appearance panel has a **Pictures** choice next to Construction (it is not a Construction entry). It shows only when the
-loaded design has the whole image of all six faces; the built-in designs, the picture themes and your own pictures have them,
-Classic colors do not.
+The Appearance panel has two checkboxes, **Stickerless** and **Projected** (they replace the Construction and Picture mapping
+selects). Projected shows only when the loaded design has the whole image of all six faces; the built-in designs, the picture
+themes and your own pictures have them, Classic colors and the 3x3 picture page do not. Exactly three looks are valid:
 
-- **Projected** (the default). The cube is lit by six beamers, one per face (U R F D L B). Each projects its face's own image
-  face-on (orthographic) onto that face only. Only the stickers carry the image; bodies, bevels and the gaps between stickers
-  stay plastic, so the image runs continuously across the sticker area and the gaps cut it away. Helper line in the menu:
-  "Image projected across each face; only stickers carry it."
-- **Per sticker**. The earlier mapping: every sticker shows its own tile of the face image (the tile assets of the print),
-  unchanged.
+| Look | Stickerless | Projected | What it shows |
+| --- | --- | --- | --- |
+| A. Stickered, not projected | off | off | Every sticker shows its own tile of the face image (the tile assets of the print), unchanged. |
+| B. Stickered, projected (default) | off | on | Same rounded stickers as A, white, the face image projected from six sides; the gaps and bevels cut it away. |
+| C. Stickerless | on | on (locked) | Always projected: the body faces carry the image to the face edge; only seams and bevels stay plastic. |
 
-The image covers the face extent minus one gap width g on each side. For uniform layers a sticker is 0.87 of its cell, so
-g = 0.13 pitch and the image side is n - 2g (n = 2 to 7). With the layer-width profile (thick outer layers, for example 1.2 on
-5x5 and 1.8 on 7x7) the face extent is the sum of the layer widths, a sticker is 0.87 of its own cell, and g is the mean of the
-n - 1 real gaps between neighboring stickers, (1 - 0.87) (w_i + w_i+1) / 2. The rule is the pure module
+While Stickerless is checked, Projected is checked and disabled. Helper line under Projected: "Image projected across each face;
+only stickers carry it."
+
+The cube is lit by six beamers, one per face (U R F D L B). Each projects its face's own image face-on (orthographic) onto that
+face only. The image rectangle is the full face extent (the sum of the layer widths, so the thick-outer-layer profile works
+unchanged): no margin, the image reaches the sticker edge on the outer border (g = 0). A sticker covers 0.87 of its cell
+and a body face 0.99, so both lie inside the image; only the gaps, bevels and seams cut it away. The outline of a sticker is the
+sticker geometry (rounded as in A): the image window uses the sticker's own UV and there is no mask, no square outline and no
+plastic-colored margin inside the sticker. The rule is the pure module
 [`projected-uv.ts`](../packages/cube-viewer/src/projected-uv.ts) (tests: `tests/projected-uv.test.mjs`).
 
 Nothing is prerendered. The viewer keeps one texture per face (the face image, loaded once through the bounded asset loader
-as `face_U` to `face_B`) and gives every sticker a UV window of it (a texture transform, sampled and filtered on the GPU).
-The window belongs to the sticker, so the image stays on the sticker when layers turn, for solved and scrambled states. Outside
-the image (the margin, and the rim of the outer stickers) the shader shows the plastic color. Stickerless works with both modes:
-the exterior body faces carry the same window (the UV of a body face covers 0.99 of its cell, a small approximation across the
-bevel).
+as `face_U` to `face_B`) and gives every sticker or body face a UV window of it (a texture transform, sampled and filtered on
+the GPU). The window belongs to the sticker, so the image stays on the sticker when layers turn, for solved and scrambled
+states. The UV of a body face covers 0.99 of its cell, a small approximation across the bevel.
 
-Setting and migration. The mode is stored with the Appearance settings only when you choose it (`pictureMode` in the
-version-1 record). Settings and links that never named a mode have no choice and show Projected; an explicit stored choice
-stays. The URL parameter `pictures=projected|per-sticker` names the mode explicitly, beats a stored choice and is itself
-beaten by a later choice in the menu; an unknown value is ignored. Existing links (no `pictures`) stay valid and now show
-Projected unless a choice was stored.
+Setting and migration. The stored record keeps its format (`construction` and, only when you chose it, `pictureMode` in the
+version-1 record) and so does the URL parameter `pictures=projected|per-sticker`; nothing is rewritten. How an old record or
+link maps to the looks:
+
+| Construction | Stored `pictureMode` | `pictures=` | Look shown |
+| --- | --- | --- | --- |
+| stickered | none | none | B (default) |
+| stickered | `projected` | none | B |
+| stickered | `per-sticker` | none | A (explicit choice stays) |
+| stickered | any | `per-sticker` | A (the URL beats a stored choice) |
+| stickered | any | `projected` | B |
+| stickerless | any or none | any or none | C (stickerless implies projected) |
+
+The URL value is itself beaten by a later choice in the menu; an unknown value is ignored. A stored per-sticker choice is kept
+while Stickerless is on and applies again when Stickerless is unchecked.
 
 ## Solver capability and failure states
 

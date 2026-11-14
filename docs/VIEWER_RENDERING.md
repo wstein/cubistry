@@ -290,9 +290,10 @@ screen-only leading-zero override through turns, cancellation and resets. A
 map-presence change invalidates the shader. The core and cut materials are
 independent of selected Frame Color in Stickerless, preventing color leakage.
 
-**Pictures** (picture cubes only) selects the mapping of face images: **Projected** (default, one texture per face and a UV
-window per sticker, plastic outside the image) or **Per sticker** (the tile of each sticker). The choice is independent of
-Construction. See "Picture mapping" in [PICTURE_PLAYGROUND.md](PICTURE_PLAYGROUND.md).
+**Projected** (picture cubes only, a checkbox next to **Stickerless**) selects the mapping of face images: on (default) one
+texture per face and a UV window per sticker, the image reaching the face edge with no margin and no mask; off, the tile of
+each sticker. Stickerless is always projected, so Projected is then checked and disabled. See "Picture looks" in
+[PICTURE_PLAYGROUND.md](PICTURE_PLAYGROUND.md).
 
 The optional frame-color picker accepts a six-digit hex color and can reset to
 the loaded style's default. It remains visible but disabled in Stickerless and
