@@ -137,4 +137,40 @@ end
     none=RM.reroot_row(; id=7,month="2020-01",k=2,iter=5,t_s=1.5,p_htm=3,free_htm=10,rest_htm=-1,streamed=-1,merged=-1,seam=0,method="none",resolve_s=3.25,status="none")
     @test split(none,'\t')[findfirst(==("cost_htm"),RM.REROOT_COLUMNS)]=="-"
 end
+
+@testset "better reference length (best_ref = min of stored, root re-solve, wide re-solve)" begin
+    @test RM.best_ref(134,97,100)==97
+    @test RM.best_ref(134,140,98)==98
+    @test RM.best_ref(134,nothing,nothing)==134
+    @test RM.best_ref(134,nothing,120)==120
+    @test RM.best_ref(15,15,nothing)==15
+    @test RM.best_ref(14,20,30)==14                                   # the stored length can be the best
+    @test RM.cost_vs_best(97,97)==0 && RM.cost_vs_best(104,97)==7 && RM.cost_vs_best(90,97)==-7
+    @test RM.ref_cells(100,nothing,100)==["100","-","100"]
+    @test RM.ref_cells(nothing,nothing,134)==["-","-","134"]
+    @test RM.SUMMARY_REF_COLUMNS==["ref_root_htm","ref_wide_htm","best_ref_htm","ref_wide_width"]
+    @test RM.parse_ref_width("",40)==80 && RM.parse_ref_width("60",40)==60 && RM.parse_ref_width(" ",3)==6
+    for bad in ("0","-5","401","x","1.5")
+        @test_throws ErrorException RM.parse_ref_width(bad,40)
+    end
+    @test_throws ErrorException RM.parse_ref_width("",201)             # twice the width must stay <= 400
+    # the old columns keep their positions, the new ones are appended
+    c=RM.REROOT_COLUMNS
+    @test c[1:16]==["id","month","commit","iter","t_s","p_htm","free_htm","rest_htm","streamed_htm","cost_htm","share","merged_htm","seam_cancel","method","resolve_s","status"]
+    @test c[17:end]==["ref_root_htm","ref_wide_htm","best_ref_htm","cost_vs_best_htm"]
+    kw=(id=166,month="2032-10",k=1,iter=6,t_s=6.2,p_htm=1,free_htm=134,rest_htm=96,streamed=97,merged=97,seam=0,method="beam",resolve_s=23.0,status="ok")
+    f(r)=split(r,'\t')
+    r=f(RM.reroot_row(;kw...,ref_root=100,ref_wide=98,best_ref=98))
+    @test length(r)==length(c)
+    @test r[findfirst(==("cost_vs_best_htm"),c)]=="-1" && r[findfirst(==("cost_htm"),c)]=="-37"
+    @test r[findfirst(==("ref_root_htm"),c)]=="100" && r[findfirst(==("ref_wide_htm"),c)]=="98" && r[findfirst(==("best_ref_htm"),c)]=="98"
+    r=f(RM.reroot_row(;kw...,ref_root=nothing,ref_wide=nothing,best_ref=134))
+    @test r[findfirst(==("ref_root_htm"),c)]=="-" && r[findfirst(==("cost_vs_best_htm"),c)]=="-37"
+    r=f(RM.reroot_row(;kw...,streamed=-1,rest_htm=-1,merged=-1,method="none",status="none",ref_root=100,ref_wide=98,best_ref=98))
+    @test r[findfirst(==("cost_vs_best_htm"),c)]=="-" && r[findfirst(==("best_ref_htm"),c)]=="98"
+    # the existing keyword calls without reference values still work (references default to missing; best defaults to free_htm)
+    r=f(RM.reroot_row(;kw...))
+    @test length(r)==length(c) && r[findfirst(==("best_ref_htm"),c)]=="134" && r[findfirst(==("cost_vs_best_htm"),c)]=="-37"
+end
+
 println("mutations: not run (opt-in; run_reroot_mutants.sh)")

@@ -91,11 +91,27 @@ function reroot_cost(P,rest,free_htm,htm;norm=identity)
     (p_htm=ph,rest_htm=rh,streamed=s,cost=s-free_htm,share=s==0 ? NaN : ph/s,seam=seam_cancel(P,rest,norm))
 end
 
-const REROOT_COLUMNS=["id","month","commit","iter","t_s","p_htm","free_htm","rest_htm","streamed_htm","cost_htm","share","merged_htm","seam_cancel","method","resolve_s","status"]
+# Reference lengths of an edge (stored = the stored chain edge, root = re-root from the root, i.e. a fresh beam run with the same
+# configuration; wide = a beam run with a larger width). best_ref = the smallest of them; a missing value (nothing: skipped or failed) is ignored.
+best_ref(stored,root,wide)=minimum(x for x in (stored,root,wide) if x!==nothing)
+cost_vs_best(streamed,best)=streamed-best
+const SUMMARY_REF_COLUMNS=["ref_root_htm","ref_wide_htm","best_ref_htm","ref_wide_width"]
+cellv(x)=x===nothing ? "-" : string(x)
+ref_cells(root,wide,best)=[cellv(root),cellv(wide),cellv(best)]
+function parse_ref_width(s,width)
+    s=strip(s)
+    isempty(s) && (2*width<=400 || error("twice the width exceeds 400");return 2*width)
+    occursin(r"^[0-9]+$",s) || error("ref_width: a positive integer")
+    w=parse(Int,s);1<=w<=400 || error("ref_width must be 1-400");w
+end
+
+const REROOT_COLUMNS=["id","month","commit","iter","t_s","p_htm","free_htm","rest_htm","streamed_htm","cost_htm","share","merged_htm","seam_cancel","method","resolve_s","status",
+    "ref_root_htm","ref_wide_htm","best_ref_htm","cost_vs_best_htm"]
 fmt(x::Real)=x isa Integer ? string(x) : string(round(x;digits=3))
-function reroot_row(;id,month,k,iter,t_s,p_htm,free_htm,rest_htm,streamed,merged,seam,method,resolve_s,status)
+function reroot_row(;id,month,k,iter,t_s,p_htm,free_htm,rest_htm,streamed,merged,seam,method,resolve_s,status,ref_root=nothing,ref_wide=nothing,best_ref=free_htm)
     ok=status=="ok"
-    join((id,month,k,iter,fmt(t_s),p_htm,free_htm,ok ? rest_htm : "-",ok ? streamed : "-",ok ? streamed-free_htm : "-",ok ? fmt(p_htm/streamed) : "-",ok ? merged : "-",ok ? seam : "-",method,fmt(resolve_s),status),'\t')
+    join((id,month,k,iter,fmt(t_s),p_htm,free_htm,ok ? rest_htm : "-",ok ? streamed : "-",ok ? streamed-free_htm : "-",ok ? fmt(p_htm/streamed) : "-",ok ? merged : "-",ok ? seam : "-",method,fmt(resolve_s),status,
+        cellv(ref_root),cellv(ref_wide),cellv(best_ref),ok && best_ref!==nothing ? cost_vs_best(streamed,best_ref) : "-"),'\t')
 end
 
 # --- frozen inputs ----------------------------------------------------------------------------------------------------------
