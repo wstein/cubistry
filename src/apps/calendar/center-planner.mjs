@@ -14,6 +14,8 @@ import {
 } from "./model.ts";
 import { createTransitionOptimizer } from "./transition/planner.mjs";
 import corrections from "./transition/center-corrections.json" with { type: "json" };
+/** Node limit of one center-aware search attempt; the portfolio runs at most two attempts. */
+export const CENTER_SEARCH_MAX_NODES = 1000000;
 const order = ["U", "L", "F", "R", "B", "D"],
   serialization = ["U", "R", "F", "D", "L", "B"];
 const normals = {
@@ -168,7 +170,11 @@ export function referencesForPlan(context, word) {
 const total = (word) => tokens(word).length;
 /** The existing checked direct route remains the upper bound and failure path. */
 export function tryCenterAware(context, directWord, options = {}) {
-  const { maximumNodes = 100000, maximumDepth = 24, threshold = 14 } = options;
+  const {
+    maximumNodes = CENTER_SEARCH_MAX_NODES,
+    maximumDepth = 24,
+    threshold = 14,
+  } = options;
   need(
     Number.isInteger(threshold) && threshold >= 0 && threshold <= 1000,
     "Invalid center threshold",
@@ -239,7 +245,7 @@ export function tryCenterPortfolio(
   onCandidate,
 ) {
   const started = performance.now();
-  const maximumNodes = options.maximumNodes ?? 100000;
+  const maximumNodes = options.maximumNodes ?? CENTER_SEARCH_MAX_NODES;
   const attempts = [];
   let improvementSkippedReason;
   let best = tryCenterAware(context, directWord, options);
@@ -353,8 +359,9 @@ export async function createPlanner({ design, options = {} }) {
       solverStatus: planner.lastResult.status ?? "not-attempted",
       directMoves: total(baseline.word),
       chosenMoves: total(planner.lastResult.word),
-      maximumNodes: options.maximumNodes ?? 100000,
-      maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
+      maximumNodes: options.maximumNodes ?? CENTER_SEARCH_MAX_NODES,
+      maximumTotalNodes:
+        (options.maximumNodes ?? CENTER_SEARCH_MAX_NODES) * maximumAttempts,
       maximumAttempts,
       centerRepairJoinPolicy: "cyclic-with-verified-half-inverse-v1",
       centerRepairVersion: corrections.version,
@@ -407,10 +414,11 @@ export async function createPlanner({ design, options = {} }) {
           ? "default-v1"
           : "default-then-shorter-cap18-v2",
     maximumAttempts,
-    maximumTotalNodes: (options.maximumNodes ?? 100000) * maximumAttempts,
+    maximumTotalNodes:
+      (options.maximumNodes ?? CENTER_SEARCH_MAX_NODES) * maximumAttempts,
     package: "@puzlwerk/solver-3x3-picture@0.1.0",
     upstream: "08e079f3bc211777d8980f75ec6a7f61979dd2ac",
-    maximumNodes: options.maximumNodes ?? 100000,
+    maximumNodes: options.maximumNodes ?? CENTER_SEARCH_MAX_NODES,
     maximumDepth: options.maximumDepth ?? 24,
     threshold: options.threshold ?? 14,
   };
