@@ -110,6 +110,10 @@ function candidates!(out::Vector{Int32},stamp::Vector{Int32},tick::Int32,pr::G.P
     out
 end
 
+# Read-only measurement hook (research/calendar-7x7/row1-window-chain/measure_edges.jl). Default nothing: no call, no change of any result.
+# A hook gets (:iter,depth,next beam,incumbent,snapshots) after every beam iteration and (:done,core prefix word,nothing,incumbent,snapshots)
+# before the candidates of solve_edge are built; it must not modify its arguments.
+const BEAMLOG=Ref{Any}(nothing)
 function beam_fast(state,word0,pr::G.Problem,library::Vector{G.Macro},index::MacroIndex,a,params::G.Params;log=devnull)
     @assert params.strict "indexed beam implements the strict mode only"
     occ0=G.occupants(state)
@@ -167,6 +171,7 @@ function beam_fast(state,word0,pr::G.Problem,library::Vector{G.Macro},index::Mac
             isnothing(best) && (stall=[x for x in pr.constrained if !G.satisfied(pr,beam[1].occ,x)])
             break
         end
+        BEAMLOG[]===nothing || BEAMLOG[](:iter,depth,next,best,snapshots)
         beam=next
         current=minimum(n.unsat for n in next)
         if current<bestunsat;bestunsat=current;lastimprovement=depth
@@ -305,6 +310,7 @@ function solve_edge(source,start,target,action,a,gens,lib,index,cats,params;fini
     prefix=G.P.chain_core_prefix(source,start,target,action)
     pr,_=strict_problem(source,target,action,params.orbit_weights;tight)
     res=beam_fast(prefix.state,prefix.word,pr,lib,index,a,params)
+    BEAMLOG[]===nothing || BEAMLOG[](:done,prefix.word,nothing,res.best,res.snapshots)
     cands=Tuple{Vector{Int},String}[]
     isnothing(res.best) || push!(cands,(G.M.improve_word(res.best.word,a),"beam"))
     for u in (finish ? first(sort!(collect(keys(res.snapshots))),nsnap) : Int[])
