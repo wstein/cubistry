@@ -55,7 +55,7 @@ test("unknown, null and missing scheme ids give the default; the catalog is the 
 test("every label class of every 3x3 scheme passes the contrast gates", () => {
   for (const sc of CAL3_SCHEMES.slice(1)) {
     for (const role of ["day", "weekday", "month"]) assert.ok(contrast(sc.roles[role].ink, sc.roles[role].ground) >= 4.5, `${sc.id} ${role} ${contrast(sc.roles[role].ink, sc.roles[role].ground)}`);
-    // SAT/SUN and the German S are large bold (82 px and 168 px, weight 800): the 3:1 gate of the Calendar7 weekend labels.
+    // SAT/SUN are large bold (82 px, weight 800): the 3:1 gate of the Calendar7 weekend labels.
     assert.ok(contrast(sc.roles.weekend.ink, sc.roles.weekend.ground) >= 3, `${sc.id} weekend`);
     assert.equal(sc.roles.weekend.weight, 800);
   }
@@ -250,4 +250,10 @@ test("the chosen scheme survives configure (a DE/EN switch): stickers and sticke
     assert.equal(painted.includes("#fffdf6"), false, "no sticker painted with the default ground");
     assert.equal(viewer.cube.bodyColor, "#282a36", "stickerless body color is the scheme ground");
   } finally { delete globalThis.document; delete globalThis.matchMedia; }
+});
+
+test("Classic month chip override is pinned: ground #d9b36a, ink #3d2005", () => {
+  const classic = cal3SchemeById("classic");
+  assert.equal(classic.roles.month.ground, "#d9b36a");
+  assert.equal(classic.roles.month.ink, "#3d2005");
 });
