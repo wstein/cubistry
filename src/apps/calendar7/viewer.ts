@@ -42,7 +42,7 @@ import {
 import type { StageView } from "./player.ts";
 import { type HomeFace, faceEdgeFillsByHome, faceFillsByHome, homeFacesOf, schemeForHome, usesHomeTints } from "./home-tint.ts";
 import { type ColorScheme, type BannerStyle, DEFAULT_SCHEME, namesGround, parseBannerStyle, schemeById, withBannerStyle } from "./schemes.ts";
-import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, unitGridTileOf } from "./geometry.ts";
+import { CALENDAR7_SIZE, outerLayerWidth, bodyWidthFor, STANDARD_EXPOSURE, halfEdgeOf, layerWidthsOf, namesBodySize, NAMES_BODY_RADIUS, NAMES_BEVEL_SEGMENTS, unitGridTileOf } from "./geometry.ts";
 import { type Layout, type NameWords, NAME_WORDS, printNameWords } from "./layout.ts";
 import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLASTIC, tileCanvasSize, tileEdgeColors, tileRoles, type Surface, type WrongCellContext } from "./sticker-art.ts";
 import type { LoadedFont } from "./fonts.ts";
@@ -70,8 +70,11 @@ function lightGeometry(layout: Layout) {
 export function layerProfileFor(layout: Layout): LayerProfile | undefined {
   const widths = layerWidthsOf(layout);
   if (!widths) return undefined;
-  return { widths, body: (cell) => { const [x, y, z] = namesBodySize(cell); return new RoundedBoxGeometry(x, y, z, 1, PRESENTATION_PRESET.bodyRadius); } };
+  return { widths, body: (cell) => { const [x, y, z] = namesBodySize(cell); return new RoundedBoxGeometry(x, y, z, NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS); } };
 }
+
+/** The names layout maps its face textures planar (PhysicalSceneOptions.planarFaceUv: a cell edge lies where the cell edge is, the same pixels per unit everywhere); the standard layout keeps Three's arc-length UV its art is fitted to. */
+export const planarFaceUvFor = (layout: Layout): boolean => layout === "names";
 
 /** Body color of the cut faces and the core: the day fill; the names layout shows it as its near-white. */
 const bodyFill = (scheme: ColorScheme, layout: Layout): string => (layout === "names" ? namesGround(scheme.dayFill) : scheme.dayFill);
@@ -471,7 +474,7 @@ export class Calendar7Viewer implements StageView {
       lightGeometry(layout),
       faceColors,
       // Stickerless: the body is the day background (owner decision); with stickers it is the plastic frame between them.
-      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", faceEdgeColors: this.edgeFills(printing, layout), layers: layerProfileFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
+      { bodyColor: bodyFill(this.scheme, layout), coreColor: bodyFill(this.scheme, layout), miterCutFaces: layout === "names", faceEdgeColors: this.edgeFills(printing, layout), layers: layerProfileFor(layout), planarFaceUv: planarFaceUvFor(layout) }, // names layout: cut faces colored as on a real cube (cut-faces.ts)
     );
     // A sticker is a flat sheet on its body: it needs no shadow of its own (halves the shadow pass).
     this.presentation.traverse((o) => {

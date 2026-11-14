@@ -17,6 +17,7 @@ import { anyDatePageHtml, anyDateModel, dateFormHtml, HIDDEN_SHEET_CLASS, NO_STA
 import { checkPose, stateDigest } from "../src/apps/calendar7/engine.ts";
 import { frontFailure, frontFailures } from "../src/apps/calendar7/display.ts";
 import { drawWrongCell, HATCH_LINES, WRONG_CELL, wrongCellRect } from "../src/apps/calendar7/sticker-art.ts";
+import { faceFlatShare } from "../src/apps/calendar7/geometry.ts";
 import { ANY_DISPLAY_ONLY_NOTICE, NAMES_ANY_LABEL, NAMES_ANY_LOAD_NOTICE, parseLayout, parseLayoutMode } from "../src/apps/calendar7/layout.ts";
 import { parseDisplays, parseState } from "../src/apps/calendar7/graph.ts";
 import { chainRange, monthLabel } from "../src/apps/calendar7/month-view.ts";
@@ -359,7 +360,8 @@ test("the differing sticker keeps its artwork and receives translucent hatching 
     assert.equal(calls("fillRect").length, 0, "the actual sticker background is never covered");
     assert.equal(calls("strokeRect").length, 0, "no red box or outline");
     assert.deepEqual(calls("rect")[0].slice(1), [face.x, face.y, face.w, face.h]);
-    assert.ok(face.y < h * .15 && face.y + face.h > h * .85, "the hatch spans the flat face top to bottom, not a strip");
+    const edge = h * (1 - faceFlatShare(tile?.h ?? 1)) / 2; // the flat part ends where the bevel starts
+    assert.ok(face.y <= edge + 1e-9 && face.y + face.h >= h - edge - 1e-9, "the hatch spans the flat face top to bottom, not a strip");
     assert.ok(calls("moveTo").length >= 2 * HATCH_LINES, "a readable hatch over the whole face");
     assert.deepEqual(log.filter(l => l[0] === "set" && l[1] === "strokeStyle").map(l => l[2]), [WRONG_CELL.halo, WRONG_CELL.hatch]);
     assert.equal(calls("stroke").length, 2, "paired light and dark strokes work on either theme");

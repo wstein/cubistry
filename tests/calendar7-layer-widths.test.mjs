@@ -11,15 +11,17 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { PhysicalCubeScene, PRESENTATION_PRESET, createPlasticMaterial, createPresentationGeometry, thickOuterLayerWidths } from "@cubistry/cube-viewer";
 import {
   BODY_RADIUS, CALENDAR7_SIZE, CUBE_EDGE_MM_7X7, INNER_CUBIE_EDGE_MM, NAMES_CUBE_EDGE, NAMES_FACE_PX_PER_UNIT, NAMES_GAP, NAMES_GAP_MM,
-  OUTER_LAYER_WIDTH, bodyWidthFor, faceFlatShare, facePixelsPerUnit, faceTileOf, halfEdgeOf, layerWidthsFor, layerWidthsOf, namesBodySize, outerLayerWidth,
+  NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS, NAMES_EDGE_INSET, OUTER_LAYER_WIDTH, bodyWidthFor, faceFlatShare, faceVisibleShare, facePixelsPerUnit, faceTileOf, halfEdgeOf, layerWidthsFor, layerWidthsOf, namesBodySize, outerLayerWidth,
 } from "../src/apps/calendar7/geometry.ts";
 import { NAME_WORDS, nameAnchor, nameSlotOffset, nameTileShift } from "../src/apps/calendar7/layout.ts";
-import { FACE_SCALE, TEXTURE, drawFace, faceTransform, lineRect, nameLetterX, tileCanvasSize } from "../src/apps/calendar7/sticker-art.ts";
+import { FACE_SCALE, NAMES_FACE_SCALE, TEXTURE, drawFace, faceTransform, lineRect, nameLetterX, tileCanvasSize, tileGrid } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { STICKERS, applyMoves } from "../src/apps/calendar7/engine.ts";
 import { parseState } from "../src/apps/calendar7/graph.ts";
-import { layerProfileFor } from "../src/apps/calendar7/viewer.ts";
+import { layerProfileFor, planarFaceUvFor } from "../src/apps/calendar7/viewer.ts";
+import { planarBodyUv } from "../packages/cube-viewer/src/body-artwork.ts";
+import { bodyRadiusFor } from "@cubistry/cube-viewer";
 
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what} ${a} != ${b}`);
 const F = 1.6;
@@ -79,7 +81,8 @@ test("nameAnchor: the first tile of a word is anchored right, the last left, the
 test("facePixelsPerUnit / faceFlatShare match the real body geometry for every tile size (uv extent of the flat part, both axes)", () => {
   for (const wx of [1, 1.2, 1.5, 1.8]) for (const wy of [1, 1.8]) {
     const [sx, sy] = [wx - NAMES_GAP, wy - NAMES_GAP];
-    const g = new RoundedBoxGeometry(sx, sy, sx, 1, PRESENTATION_PRESET.bodyRadius);
+    // the body as the viewer builds it, with the planar face UV of the stickerless names layout (PhysicalSceneOptions.planarFaceUv)
+    const g = planarBodyUv(layerProfileFor("names").body([wx, wy, wx]), [sx, sy, sx], new Set([0, 1, 2, 3, 4, 5]));
     const pos = g.getAttribute("position"), uv = g.getAttribute("uv"), nor = g.getAttribute("normal");
     // front face (+z): u along x, v along y
     const flat = { u0: Infinity, u1: -Infinity, x0: Infinity, x1: -Infinity, v0: Infinity, v1: -Infinity, y0: Infinity, y1: -Infinity };
@@ -148,7 +151,7 @@ test("a 1 x 1 tile draws what the no-tile drawing draws; the standard layout and
   const t = faceTransform();
   assert.deepEqual([t.cx, t.cy, t.kx, t.ky], [96, 96, FACE_SCALE, FACE_SCALE]);
   const u = faceTransform(TILES.inner);
-  near(u.kx, FACE_SCALE, 1e-9); near(u.cx, 96, 1e-12);
+  near(u.kx, NAMES_FACE_SCALE, 1e-9); near(u.cx, 96, 1e-12);
 });
 
 test("the weekday line spans the full width of every tile, 1.5 times as thick, at the bottom edge of the flat part of the tile", () => {
@@ -193,7 +196,7 @@ test("names letters keep the uniform 1/3-unit pitch over a word whose first tile
   }
   // The same on the unit pitch: the corner tile "MA" of MARCH ends 1/6 before the shared edge, "RCH" starts 1/6 after it.
   const [ma, rch] = [nameLetterX("MA", 1, true), nameLetterX("RCH", 0, true)];
-  near((ma - 96) / (NAMES_FACE_PX_PER_UNIT / FACE_SCALE), nameSlotOffset("MA", 1), 1e-9); // in the frame of the unit cell: no shift for the thick tile (the band is beside the cell)
+  near((ma - 96) / (NAMES_FACE_PX_PER_UNIT / NAMES_FACE_SCALE), nameSlotOffset("MA", 1), 1e-9); // in the frame of the unit cell: no shift for the thick tile (the band is beside the cell)
   assert.ok(rch < 96);
 });
 
@@ -202,11 +205,30 @@ test("letter and digit size in px per unit are the same in every tile (within 1.
   const [innerX, innerY] = size(TILES.inner);
   for (const tile of [TILES.corner, TILES.ring, TILES.side]) {
     const [kx, ky] = size(tile), [W, H] = tileCanvasSize(tile);
-    // final pixels per unit of the drawing are k * px/unit(1 x 1) / FACE_SCALE; that is the pixels per unit of the real face
-    near(kx / FACE_SCALE * NAMES_FACE_PX_PER_UNIT, facePixelsPerUnit(tile.w, W), 1e-9);
-    near(ky / FACE_SCALE * NAMES_FACE_PX_PER_UNIT, facePixelsPerUnit(tile.h, H), 1e-9);
+    // final pixels per unit of the drawing are k * px/unit(1 x 1) / NAMES_FACE_SCALE; that is the pixels per unit of the real face
+    near(kx / NAMES_FACE_SCALE * NAMES_FACE_PX_PER_UNIT, facePixelsPerUnit(tile.w, W), 1e-9);
+    near(ky / NAMES_FACE_SCALE * NAMES_FACE_PX_PER_UNIT, facePixelsPerUnit(tile.h, H), 1e-9);
     assert.ok(Math.abs(kx / innerX - 1) < 0.012 && Math.abs(ky / innerY - 1) < 0.012);
   }
+});
+
+test("names layout, O2: a unit cell is exactly one unit (planar face UV), the sticker drawing fits the visible part of a face, only the names layout is planar", () => {
+  assert.equal(planarFaceUvFor("names"), true);
+  assert.equal(planarFaceUvFor("standard"), false);
+  for (const [w, h, band] of [[1, 1, { l: 0, r: 0, t: 0, b: 0 }], [1, F, { l: 0, r: 0, t: F - 1, b: 0 }], [F, F, { l: F - 1, r: 0, t: F - 1, b: 0 }]]) {
+    const g = tileGrid({ w, h, band }), c = g.cell;
+    const [W, H] = tileCanvasSize({ w, h });
+    near(g.px, W / (w - NAMES_GAP), 1e-12, "px per unit is the texture over the body width");
+    assert.ok(Math.abs(g.px - TEXTURE) < 0.5, "about 192 px per unit in every tile (rounding of the canvas size only)");
+    near(g.py, H / (h - NAMES_GAP), 1e-12);
+    // the unit cell: one unit from the cell edge to the real edge of the body (the canvas edge), less half the gap (the cell edge is on the pitch line)
+    near((c.y1 - c.y0) / g.py, band.t ? 1 - NAMES_GAP / 2 : h - NAMES_GAP, 1e-9, `cell height of ${w} x ${h}`);
+  }
+  // the sticker drawing (192 px, its text square is 0.86 of it) is fitted to the visible face (up to 45 degrees of the bevel); the bevel under the text square is tilted less than 17 degrees
+  near(NAMES_FACE_SCALE, faceVisibleShare(1), 1e-12);
+  const half = NAMES_FACE_SCALE * 0.86 / 2, flat = faceFlatShare(1) / 2;
+  assert.ok(half < faceVisibleShare(1) / 2 - 0.04, "the text square keeps at least 4 % of the cell inside the visible face");
+  assert.ok(Math.asin(Math.min(1, (half - flat) / NAMES_BODY_RADIUS)) < 17 * Math.PI / 180, "the bevel under the text square is tilted less than 17 degrees");
 });
 
 // ---- layer turns on the real print: pivot rotation = engine pose, with the profile ----
@@ -240,13 +262,18 @@ test("names print on the profile: every layer turn (21 generators x 3 exponents,
   assert.equal(n, 63);
 });
 
-test("viewer profile: the bevel radius is the preset 0.055 on a body of every size (not scaled with the cubie)", () => {
+test("names layout bevel: O2, the millimeter radius of a 3x3 at the cube edge (0.1503 = 0.055 * 8.2 / 3) on a body of every size, as in the shared viewer", () => {
+  near(NAMES_BODY_RADIUS, 0.055 * 8.2 / 3, 1e-12);
+  near(NAMES_BODY_RADIUS, bodyRadiusFor(CALENDAR7_SIZE, NAMES_CUBE_EDGE), 1e-12);
+  near(NAMES_EDGE_INSET, (1 - Math.SQRT1_2) * NAMES_BODY_RADIUS, 1e-12);
+  assert.equal(BODY_RADIUS, PRESENTATION_PRESET.bodyRadius, "the standard layout keeps the preset radius");
   const profile = layerProfileFor("names");
   assert.deepEqual(profile.widths, layerWidthsFor(7));
   assert.equal(layerProfileFor("standard"), undefined);
+  assert.equal(NAMES_BEVEL_SEGMENTS, 2);
   for (const cell of [[1, 1, 1], [1.8, 1, 1], [1, 1.8, 1.8], [1.8, 1.8, 1.8]]) {
     const g = profile.body(cell), p = g.parameters;
-    assert.equal(p.radius, PRESENTATION_PRESET.bodyRadius, `radius of ${cell}`);
+    assert.equal(p.radius, NAMES_BODY_RADIUS, `radius of ${cell}`);
     near(p.width, cell[0] - NAMES_GAP, 1e-12); near(p.height, cell[1] - NAMES_GAP, 1e-12); near(p.depth, cell[2] - NAMES_GAP, 1e-12);
     g.computeBoundingBox();
     const box = g.boundingBox;

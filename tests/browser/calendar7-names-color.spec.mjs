@@ -22,7 +22,7 @@ async function sample(page, scheme, tilted = false, production = false, plastici
     const { parseState } = await import("/src/apps/calendar7/graph.ts");
     const { schemeById, withBannerStyle } = await import("/src/apps/calendar7/schemes.ts");
     const { isBannerClass, tileClass, tileGrid, tileRoles } = await import("/src/apps/calendar7/sticker-art.ts");
-    const { layerWidthsFor, unitGridTileOf } = await import("/src/apps/calendar7/geometry.ts");
+    const { faceFlatShare, layerWidthsFor, unitGridTileOf } = await import("/src/apps/calendar7/geometry.ts");
     const { printing, pose } = parseState(await (await fetch("/calendar7/names/state.v1.json")).json());
     const host = document.createElement("div"), panel = document.createElement("div");
     host.style.cssText = "position:fixed;left:0;top:0;width:800px;height:800px";
@@ -63,7 +63,8 @@ async function sample(page, scheme, tilted = false, production = false, plastici
       const lo = at(fx(rect.x0), fy(rect.y1)), hi = at(fx(rect.x1), fy(rect.y0)), mid = at(fx((rect.x0 + rect.x1) / 2), fy((rect.y0 + rect.y1) / 2));
       const W = Math.abs(hi.x - lo.x) * 0.5 * cv.width, H = Math.abs(hi.y - lo.y) * 0.5 * cv.height;
       const cx = (mid.x * 0.5 + 0.5) * cv.width, cy = (1 - (mid.y * 0.5 + 0.5)) * cv.height;
-      const share = tilted ? 0.3 : 0.8, w = Math.round(W * share), h = Math.round(H * share), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
+      // The probe stays on the flat face as before: the O2 bevel (0.1503) leaves 0.699 of the cell flat (0.9106 at 0.055), so the width share follows the flat share and the height stays above the underline.
+      const share = tilted ? 0.3 : 0.8 * faceFlatShare(1) / 0.9106, shareY = tilted ? 0.3 : 0.7, w = Math.round(W * share), h = Math.round(H * shareY), x0 = Math.round(cx - w / 2), y0 = Math.round(cy - h / 2);
       const d = ctx.getImageData(x0, y0, w, h).data, pix = [];
       for (let k = 0; k < w * h; k++) pix.push([d[4 * k], d[4 * k + 1], d[4 * k + 2]]);
       const cls = tileClass(printing.text[i], printing.ink[i]), roles = tileRoles(withBannerStyle(sch, "theme"), printing.text[i], printing.ink[i], "names");
