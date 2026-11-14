@@ -192,7 +192,7 @@ test("the renderer uses the soft shoulder (Custom) tone mapping at the face-foll
     return out;
   });
   const NEUTRAL = 7, CUSTOM = 5; // THREE.NeutralToneMapping, THREE.CustomToneMapping (the soft shoulder of names-tone.ts)
-  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.03); // 1.264 against 1.217: the names light rig keeps 5% of the directional lights, so the tilt costs the front face less than before (0.1 or more)
+  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.03); // 1.264 against 1.217: the names light rig keeps 8% of the directional lights, so the tilt costs the front face less than before (0.1 or more)
   expect(seen.namesHeadOn).toBeCloseTo(1.217, 2);
   expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: CUSTOM, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
 });
