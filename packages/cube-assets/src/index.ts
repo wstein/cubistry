@@ -358,12 +358,33 @@ async function fetchOnce(
   }
   return bytes;
 }
+/** Bytes of verified assets by path and hash: loads that share one cache fetch each file once. */
+export type AssetBytesCache = Map<string, Promise<Uint8Array>>;
+export function fetchBoundedCached(
+  cache: AssetBytesCache,
+  path: string,
+  expected: string,
+  kind: "svg" | "png" | "webp" | "woff2",
+  budget: { bytes: number },
+  signal?: AbortSignal,
+  basePath = "/",
+): Promise<Uint8Array> {
+  const key = basePath + "|" + path + "#" + expected;
+  let pending = cache.get(key);
+  if (!pending) {
+    pending = fetchBounded(path, expected, kind, budget, signal, basePath);
+    cache.set(key, pending);
+    pending.catch(() => { if (cache.get(key) === pending) cache.delete(key); });
+  }
+  return pending;
+}
 export async function loadAssets(
   raw: unknown,
   prints: readonly PrintDefinition[],
   signal?: AbortSignal,
   basePath = "/",
   local?: LocalSources,
+  bytesCache?: AssetBytesCache,
 ): Promise<LoadedAssets> {
   basePath = deploymentBasePath(basePath);
   signal = signal
@@ -495,14 +516,9 @@ export async function loadAssets(
         let bytes: Uint8Array;
         if (inMemory) bytes = await verifyLocalSource(local, asset, localBudget);
         else {
-          bytes = await fetchBounded(
-            asset.url,
-            asset.sha256,
-            asset.format,
-            budget,
-            signal,
-            basePath,
-          );
+          bytes = await (bytesCache
+            ? fetchBoundedCached(bytesCache, asset.url, asset.sha256, asset.format, budget, signal, basePath)
+            : fetchBounded(asset.url, asset.sha256, asset.format, budget, signal, basePath));
           if (asset.format === "svg")
             validateSvg(new TextDecoder().decode(bytes));
           else {
