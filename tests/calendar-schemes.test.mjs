@@ -261,7 +261,14 @@ test("Classic month chip override is pinned: ground #d9b36a, ink #3d2005", () =>
 test("unprinted (blank) stickers are plain paper in every scheme, whatever their slot (German blank tens digit sits in month-class slot 4)", () => {
   for (const sc of CAL3_SCHEMES)
     for (const [id, d] of Object.entries(designs))
-      for (const s of d.printing.filter((x) => x.image === "")) assert.equal(stickerArt(s, sc).ground, sc.ground, `${sc.id} ${id} sticker ${s.id} slot ${s.slot}`);
+      for (const s of d.printing.filter((x) => x.image === "")) {
+        const art = stickerArt(s, sc), msg = `${sc.id} ${id} sticker ${s.id} slot ${s.slot}`;
+        assert.equal(art.ground, sc.ground, msg);
+        // Only the ground is special-cased: ink, weight and size of a blank sticker stay those of its role (nothing is drawn).
+        assert.equal(art.color, sc.roles[stickerRole(s)].ink, msg);
+        assert.equal(art.weight, 600, msg);
+        assert.equal(art.size, 168, msg);
+      }
   // The case of the owner report: the German blank center stickers (slot 4) exist in the print.
   assert.deepEqual(designs["de-a-unpadded"].printing.filter((s) => s.image === "" && s.slot >= 3).map((s) => s.id), [30, 43]);
 });
