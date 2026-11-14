@@ -44,7 +44,7 @@ export function orientBodyArtwork(base: THREE.BufferGeometry, frames: readonly S
  * Planar UV of the exterior faces for the projected stickerless look: `u = ±position / extent + 0.5` along the face's image
  * right and up, so a linear texture window (`stickerWindow`) lands exactly where the image belongs. Three's arc-length UV is
  * not linear in position, which shifted the image by up to 0.007 pitch against the seam. The bevel arcs project along the
- * face normal (no smear: they end at 0 and 1). `groups` are the face groups to map (the faces that carry the image); the
+ * face normal (no smear: the face group ends at 45 degrees of the bevel, u about 0.99, and the UV stays linear in position up to there). `groups` are the face groups to map (the faces that carry the image); the
  * others and the geometry itself stay as they are. Keeps each face's orientation, read from its existing UV.
  */
 export function planarBodyUv(base: THREE.BufferGeometry, extent: Vec3, groups: ReadonlySet<number>): THREE.BufferGeometry {
