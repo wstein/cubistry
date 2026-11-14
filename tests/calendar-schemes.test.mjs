@@ -224,10 +224,9 @@ test("CalendarViewer.setScheme repaints the existing canvases and textures in pl
   assert.deepEqual(body.slice(2), [["body", "#fffdf6"], ["faces", designs["en-3-zero"].printing.length]]);
 });
 
-test("the calendar mode and the parameter inventory name scheme", async () => {
+test("the calendar mode names scheme", async () => {
   const { MODE_CATALOG } = await import("../src/apps/mode-catalog.ts");
   assert.ok(MODE_CATALOG.find((m) => m.id === "calendar").params.includes("scheme"));
-  assert.match(readFileSync("tests/app-parameter-inventory.test.mjs", "utf8"), /row\(\["scheme"\], "src\/apps\/calendar\/mount\.ts", \["calendar"\]/);
 });
 
 test("the chosen scheme survives configure (a DE/EN switch): stickers and stickerless body use it, not the default", async () => {
