@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # SPDX-License-Identifier: AGPL-3.0-or-later
 # Source mutants of .github/workflows/beam-reroot-measure.yml: tests/beam-reroot-measure-workflow.test.mjs must fail on each mutated copy.
-# Usage: [ONLY=name] MUTANT_TMP=<existing dir, not /tmp> scripts/ci/beam-reroot-measure-mutants.sh [node]    (about 2 s each)
+# Usage: [ONLY=name] MUTANT_TMP=<existing dir, not /tmp> scripts/ci/beam-reroot-measure-mutants.sh [node]    (about 2 s each, 31 mutants)
 set -u
 here=$(cd "$(dirname "$0")/../.." && pwd); node=${1:-node}; bad=0; n=0
 base=${MUTANT_TMP:-${TMPDIR:-}}
@@ -45,5 +45,20 @@ run commit-zero         '^[1-9][0-9]{0,3}(,[1-9][0-9]{0,3}){0,7}$' '^[0-9]{1,4}(
 run pair-grouping       'NR%2==1{p=$0; next}' 'NR%3==1{p=$0; next}'
 run concurrency-cancel  'cancel-in-progress: false' 'cancel-in-progress: true'
 run persist-credentials 'persist-credentials: false # the repository' 'persist-credentials: true # the repository'
+run rc-from-dollar-question 'rc=${PIPESTATUS[0]}' 'rc=$?'
+run rc-gate-removed          '          [ "$rc" = 0 ]
+      - uses: actions/upload-artifact' '          true
+      - uses: actions/upload-artifact'
+run wrong-script-path        'src/research/calendar-7x7/row1-window-chain/run_reroot_measure.sh' 'src/research/calendar-7x7/row1-window-chain/run_reroot.sh'
+run checkout-ref-main        '          ref: ${{ inputs.research_ref }}' '          ref: main'
+run required-check-dropped   '[ "$missing" = 0 ] || fail "research commit lacks required files"' 'true'
+run missing-flag-dropped     'missing=1; }' ':; }'
+run beam2-not-required       'research/calendar-7x7/upright-beam/beam2.jl research/calendar-7x7/global-search/search.jl; do' 'research/calendar-7x7/global-search/search.jl; do'
+run edges-expanded-in-run    'deadline_s=$((DEADLINE_MIN * 60)) 2>&1' 'deadline_s=$((DEADLINE_MIN * 60)) edges=${{ inputs.edges }} 2>&1'
+run ref-width-unvalidated    '[ -z "$IN_REF_WIDTH" ] || { [[ "$IN_REF_WIDTH"' 'true || { [[ "$IN_REF_WIDTH"'
+run ref-width-cap            '-le 400 ]; } || fail "ref_width' '-le 4000 ]; } || fail "ref_width'
+run ref-width-not-passed     '${REF_WIDTH:+ref_width="$REF_WIDTH"} ' ''
+run ref-width-env-dropped    '      REF_WIDTH: ${{ inputs.ref_width }}' '      REF_WIDTH: ""'
+run ref-width-grep-dropped   'git grep -qw ref_width "$SHA" -- "$WC/measure_edges.jl" ||' 'true ||'
 [ $n -ge 1 ] || { echo "no mutant selected (ONLY=${ONLY:-})" >&2; exit 2; }
 exit $bad
