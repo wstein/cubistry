@@ -11,7 +11,6 @@ import * as THREE from "three";
  * `(q - inner) / rho` and `rho` the radii of the three axes. `rho[a]` at a corner is big when the face (a, side) is exterior and
  * one of the two other faces at that corner is exterior, so an exterior face gets the large rounding only along the borders it
  * shares with another exterior face; its other borders (the seams to its neighbors on the same cube face) get the small one.
- * Away from the corners `rho` is interpolated bilinearly along the border.
  *
  * Face groups, vertex order and the UV of the faces follow three's Box/RoundedBox (+X, -X, +Y, -Y, +Z, -Z, the same image
  * orientation per face), but the UV is linear in position (`u = position / extent + 0.5`, see `planarBodyUv`).
@@ -60,17 +59,28 @@ export function createTwoRadiusBody(options: TwoRadiusBodyOptions): THREE.Buffer
   for (let k = 0; k < 8; k++) rho.push(cornerRho(outer, [k & 1, (k >> 1) & 1, (k >> 2) & 1], big, small));
   const rhoAt = (a: number, q: readonly number[]): number => {
     const b = (a + 1) % 3, c = (a + 2) % 3, sa = q[a] >= 0 ? 1 : 0;
-    const tb = Math.min(1, Math.max(0, (q[b] + h[b]) / (2 * h[b]))), tc = Math.min(1, Math.max(0, (q[c] + h[c]) / (2 * h[c])));
     const corner = (sb: number, sc: number): number => { const s = [0, 0, 0]; s[a] = sa; s[b] = sb; s[c] = sc; return rho[s[0] + 2 * s[1] + 4 * s[2]][a]; };
-    const lo = corner(0, 0) * (1 - tb) + corner(1, 0) * tb, hi = corner(0, 1) * (1 - tb) + corner(1, 1) * tb;
-    return lo * (1 - tc) + hi * tc;
+    // The share of a corner end along an axis: 1 up to `big` from the end (the span of its rounding), 0 from 2 `big` on.
+    const ramp = (distance: number): number => Math.min(1, Math.max(0, 2 - distance / big));
+    const rb = [ramp(q[b] + h[b]), ramp(h[b] - q[b])], rc = [ramp(q[c] + h[c]), ramp(h[c] - q[c])];
+    // Along one axis: the smaller end value, and each end opens up to its own value near it.
+    const along = (v0: number, v1: number, r0: number, r1: number): number => { const m = Math.min(v0, v1); return m + (v0 - m) * r0 + (v1 - m) * r1; };
+    return along(along(corner(0, 0), corner(1, 0), rb[0], rb[1]), along(corner(0, 1), corner(1, 1), rb[0], rb[1]), rc[0], rc[1]);
   };
-  /** Grid lines of one axis of a face: the bevel of the low border, the flat part, the bevel of the high border. */
-  const lines = (half: number, lo: number, hi: number): number[] => {
-    const out: number[] = [];
-    for (let j = 0; j <= segments; j++) out.push(-half + (lo * j) / segments);
-    for (let j = segments; j >= 0; j--) out.push(half - (hi * j) / segments);
-    return out;
+  /**
+   * Grid lines of one axis of a face: the bevel of the low border, the flat part, the bevel of the high border. A border whose two
+   * corners have different extents gets the lines of both (the large rounding at one end, the small one along the seam), and a
+   * line at `big` and at 2 `big` from an end where the rounding across opens to the large radius (the ramp of `rhoAt`).
+   */
+  type Ends = { extents: readonly number[]; ramp: boolean };
+  const lines = (half: number, lo: Ends, hi: Ends): number[] => {
+    const set = (end: Ends, sign: number): number[] => {
+      const out: number[] = [];
+      for (const e of new Set(end.extents)) for (let j = 0; j <= segments; j++) out.push(sign * (half - (e * j) / segments));
+      if (end.ramp) out.push(sign * (half - big), sign * (half - 2 * big));
+      return out;
+    };
+    return [...new Set([...set(lo, -1), ...set(hi, 1)])].sort((x, y) => x - y);
   };
   const position: number[] = [], normal: number[] = [], uv: number[] = [], index: number[] = [];
   const groups: { start: number; count: number; materialIndex: number }[] = [];
@@ -89,11 +99,16 @@ export function createTwoRadiusBody(options: TwoRadiusBodyOptions): THREE.Buffer
   for (let face = 0; face < 6; face++) {
     const a = face >> 1, s = face & 1 ? -1 : 1, b = (a + 1) % 3, c = (a + 2) % 3;
     const side = s > 0 ? 1 : 0;
-    // The largest rounding extent of each border along the face (it varies along the border for mixed corners).
-    const extent = (axis: number, other: number, sAxis: number): number => {
-      const values: number[] = [];
-      for (let so = 0; so < 2; so++) { const sg = [0, 0, 0]; sg[a] = side; sg[axis] = sAxis; sg[other] = so; values.push(rho[sg[0] + 2 * sg[1] + 4 * sg[2]][axis]); }
-      return Math.max(...values);
+    // The rounding extents of each border along the face (two values for mixed corners).
+    const extent = (axis: number, other: number, sAxis: number): Ends => {
+      const extents: number[] = [];
+      let ramp = false;
+      for (let so = 0; so < 2; so++) {
+        const sg = [0, 0, 0]; sg[a] = side; sg[axis] = sAxis; sg[other] = so; extents.push(rho[sg[0] + 2 * sg[1] + 4 * sg[2]][axis]);
+        const across = rho[sg[0] + 2 * sg[1] + 4 * sg[2]][other]; sg[axis] = 1 - sAxis;
+        if (across > rho[sg[0] + 2 * sg[1] + 4 * sg[2]][other] + 1e-12) ramp = true; // the rounding across opens up at this end only
+      }
+      return { extents, ramp };
     };
     const ub = lines(h[b], extent(b, c, 0), extent(b, c, 1)), vc = lines(h[c], extent(c, b, 0), extent(c, b, 1));
     const first = vertexCount, startIndex = index.length;
