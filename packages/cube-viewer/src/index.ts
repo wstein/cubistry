@@ -26,7 +26,7 @@ export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
 import { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppearanceControls, type ViewerAppearance } from "./appearance.ts";
 export { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppearanceControls, type ViewerAppearance, type Construction } from "./appearance.ts";
 import { effectivePictureMode, type PictureMode } from "./picture-mode.ts";
-export { DEFAULT_PICTURE_MODE, PICTURE_MODES, PICTURES_PARAM, PICTURE_MODE_HELP, PICTURE_MODE_LABEL, parsePictureMode, effectivePictureMode, type PictureMode } from "./picture-mode.ts";
+export { DEFAULT_PICTURE_MODE, PICTURE_MODES, PICTURES_PARAM, PROJECTED_HELP, parsePictureMode, effectivePictureMode, type PictureMode } from "./picture-mode.ts";
 import { FACE_KEYS, type FaceKey } from "./projected-uv.ts";
 export { FACE_KEYS, PROJECTED_FACES, STICKER_SHARE, faceOfNormal, imageExtent, stickerWindow, windowUv, type FaceKey, type StickerWindow } from "./projected-uv.ts";
 /** Id of the whole-face image of `face` in the viewer's assets; a design that has all six offers the Projected picture mode. */
@@ -202,9 +202,9 @@ export class CubeViewer {
   get picturesAvailable(): boolean {
     return this.pictureFaces !== null;
   }
-  /** The mode in effect: an explicit URL mode, else the explicit stored choice, else Projected. */
+  /** The mode in effect: Projected on a stickerless cube, else an explicit URL mode, else the explicit stored choice, else Projected. */
   get pictureMode(): PictureMode {
-    return effectivePictureMode({ url: this.pictureUrlMode, stored: this.appearance?.pictureMode });
+    return effectivePictureMode({ url: this.pictureUrlMode, stored: this.appearance?.pictureMode, construction: this.appearance?.construction });
   }
   /** The mode that the page address named (`?pictures=`); undefined: the address names none. */
   setPictureModeFromUrl(mode: PictureMode | undefined): void {

@@ -57,26 +57,39 @@ test("URL: an explicit mode is honored before any stored choice; a menu choice a
   v.destroy();
 });
 
-test("a stored Per sticker choice stays after a new design is loaded; the construction change keeps the mode", () => {
+test("a stored Per sticker choice stays after a new design is loaded; stickerless is projected, back to stickered it is per sticker again", () => {
   const d = createDesign("picture"), v = viewer();
   v.setAppearance({ construction: "stickered", frameColor: null, pictureMode: "per-sticker" });
   v.configure(d.print, d.target, assetsOf(d, true));
   assert.equal(v.pictureMode, "per-sticker");
   v.setAppearance({ construction: "stickerless", frameColor: null, pictureMode: "per-sticker" });
-  assert.equal(v.pictureMode, "per-sticker");
+  assert.equal(v.pictureMode, "projected", "a stickerless cube is always projected, even with a stored per-sticker choice");
+  v.setAppearance({ construction: "stickered", frameColor: null, pictureMode: "per-sticker" });
+  assert.equal(v.pictureMode, "per-sticker", "the explicit stored choice was kept");
   const e = createDesign("pastel");
   v.configure(e.print, e.target, assetsOf(e, true));
   assert.equal(v.pictureMode, "per-sticker");
   v.destroy();
 });
 
-test("Projected and the construction: stickerless works with both picture modes", () => {
+test("stickerless always carries the projected image on the body faces (also with a stored per-sticker choice and ?pictures=per-sticker)", () => {
   const d = createDesign("picture"), v = viewer();
-  v.configure(d.print, d.target, assetsOf(d, true));
-  v.setAppearance({ construction: "stickerless", frameColor: null });
-  assert.equal(v.pictureMode, "projected");
   v.setAppearance({ construction: "stickerless", frameColor: null, pictureMode: "per-sticker" });
-  v.setAppearance({ construction: "stickered", frameColor: null });
+  v.configure(d.print, d.target, assetsOf(d, true));
+  v.setPictureModeFromUrl("per-sticker");
   assert.equal(v.pictureMode, "projected");
+  let windows = 0;
+  v.presentation.traverse((o) => { const ids = o.userData.sourceFaceStickerIds; if (ids && Array.isArray(o.material)) ids.forEach((id, i) => { if (id !== null && o.material[i].map && o.material[i].map.repeat.x < 1) windows++; }); });
+  assert.equal(windows, d.print.stickers.length, "every exterior body face has the window of its face image");
+  v.setAppearance({ construction: "stickered", frameColor: null, pictureMode: "per-sticker" });
+  assert.equal(v.pictureMode, "per-sticker");
+  v.destroy();
+});
+
+test("a design without whole faces stays tile-mapped when stickerless (classic)", () => {
+  const d = createDesign("classic"), v = viewer();
+  v.configure(d.print, d.target, assetsOf(d, false));
+  v.setAppearance({ construction: "stickerless", frameColor: null });
+  assert.equal(v.picturesAvailable, false);
   v.destroy();
 });
