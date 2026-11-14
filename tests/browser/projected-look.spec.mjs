@@ -76,3 +76,19 @@ test("the three looks render differently; the classic design offers no Projected
   await expect(projected).toBeHidden();
   await expect(stickerless).toBeVisible();
 });
+
+test("Stickerless never writes the picture mode: from a stored per-sticker record, check and uncheck keep per-sticker", async ({ page }) => {
+  const { stickerless, projected } = await open(page, "?app=playground", { construction: "stickered", pictureMode: "per-sticker" });
+  const stored = async () => JSON.parse(await page.evaluate((k) => localStorage.getItem(k), KEY));
+  await expect(projected).not.toBeChecked();
+  await stickerless.check();
+  await expect(projected).toBeChecked(); // locked on by Stickerless (look C), a display state only
+  await expect(projected).toBeDisabled();
+  expect((await stored()).pictureMode).toBe("per-sticker");
+  await stickerless.uncheck();
+  await expect(projected).toBeEnabled();
+  await expect(projected).not.toBeChecked();
+  const after = await stored();
+  expect(after.construction).toBe("stickered");
+  expect(after.pictureMode).toBe("per-sticker");
+});
