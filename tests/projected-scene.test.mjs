@@ -184,3 +184,16 @@ test("a frame that is not the cube model's face frame is refused; a missing face
   assert.throws(() => odd.setPictureProjection({ faces: faceTextures() }), /face frame/i);
   bad.scene.dispose(); odd.dispose(); scene.dispose();
 });
+
+test("round trip in the stickerless construction: after Per sticker the body faces have their own color and map back, no stale white", () => {
+  const { scene, parent, originals } = build(2, { colors: new Map(frames(2).map((s) => [s.id, "#336699"])) });
+  for (const m of originals.values()) m.map = null; // plain colored stickers: the body color is the face color
+  scene.setConstruction("stickerless");
+  const read = () => { const out = []; parent.traverse((o) => { const ids = o.userData.sourceFaceStickerIds; if (ids) ids.forEach((id, i) => { if (id !== null) out.push([o.material[i].color.getHexString(), o.material[i].map?.source?.uuid ?? null]); }); }); return out; };
+  const before = read();
+  scene.setPictureProjection({ faces: faceTextures() });
+  scene.setPictureProjection(null);
+  assert.equal(before.length, 24); assert.equal(before[0][0], "336699");
+  assert.deepEqual(read(), before);
+  scene.dispose();
+});
