@@ -397,3 +397,60 @@ remain unchanged. No print-sheet generator, app export, workflow dispatch or
 browser test is included. Independent review is still required.
 
 See `experiment.json` for artifact hashes and `NOTICE.txt` for data attribution.
+
+## Re-root measurement (streaming inside an edge)
+
+Question (owner decision 2026-11-14): a player could start playing an edge before the solver has finished it, if the solver commits a
+prefix and never takes it back. How much route length does that cost? Measurement only; the producer (`solve_edge`) is unchanged.
+The one change in `../upright-beam/beam2.jl` is the hook `BEAMLOG` (default `nothing`: no call, no change of any result); it only reads.
+
+Definitions (`reroot_measure_lib.jl`):
+- `A_d` = longest common prefix of the words of all beam nodes after beam iteration `d` (over the move tokens of `n.word`, HTM of the prefix).
+  `A_d` is not a guarantee: the final route can come from a snapshot (`finish<u>`) or from `improve_word`, both can rewrite moves at the seam
+  (first measurement: `A_d` was no prefix of the final route in 1 of 187 iterations).
+- Commit event: an iteration whose `A_d` extends the committed prefix `C` and is longer in HTM; then `C := A_d`. An `A_d` that does not
+  extend `C` is no commit and is counted.
+- Commit points: the first commit event with at least `t` HTM for each threshold `t` (`commits=1,10,30,60`), and the last commit event.
+- Re-root at `P`: the edge is solved again with `solve_edge` (same library, width, lambda, core weight) from the state after `P`. Every
+  candidate of that solve (beam nodes, incumbent, snapshots, finish candidates) starts with `P` by construction; nothing that does not extend
+  `P` exists. The streamed route is `P ++ rest`. No take-backs: the player has played exactly `P` when it is committed, and the route only
+  ever extends it. `P ++ rest` is not simplified across the seam (the player played `P`); `merged_htm` and `seam_cancel` show what
+  normalization would have saved at the junction.
+- Length cost = `streamed_htm - free_htm` (HTM), `free_htm` = the unconstrained solve of the same run. Negative cost means the re-rooted
+  solve found a shorter route. Share streamed = `p_htm / streamed_htm`; `t_s` is when the commit was available in the unconstrained run.
+  The solves of different commit points are independent single re-roots; a sequence of re-roots in one solve (cumulative cost) is not measured.
+- Not measured: player speed, cost of the sequence of commits, widths other than 40, the Rust/3x3 side.
+
+Edges (`evidence/reroot-measure/edges-selected.tsv`, written by `select_edges.jl`; rule: not measured before, no best-effort record,
+sorted by HTM, ten evenly spaced ranks from the shortest to the longest): 87 (2026-03, 14 HTM), 62 (2024-02), 54 (2023-06), 22 (2020-10),
+77 (2025-05), 74 (2025-02), 193 (2035-01), 203 (2035-11), 166 (2032-10, finish1), 159 (2032-03, 169 HTM, finish2). Measured before:
+3, 4, 27, 28, 46, 52, 71, 150, 158. The table column `rotations` is the rotation count of the stored edge record (0 for edge 87, 1 for
+edge 74, 2 for the others); `seam_cancel` in `reroot.tsv` is the number of tokens that cancel at the seam.
+
+Frozen inputs (`evidence/reroot-measure/SHA256SUMS`, checked by `run_reroot_measure.sh`): print C `evidence/print-c/printing.tsv`, layout
+`evidence/print-c/layout.tsv` (e9a409...), `evidence/month-list/months-chain-2019-01-2036-01.tsv`, and the stored chain
+`chain-2019-01-2036-01.moves.tsv` (204 edges, Action run 43307881914, copied unchanged) with its `edges-stage5.tsv`.
+
+Parse error of the first measurement (`... ArgumentError: invalid base 10 digit ',' in "7,1;7,7"`): the stored chain has the best-effort
+edge 2026-02 (id 86) with the records `wrong<TAB>7<TAB>1` and `hall<TAB>7,1;7,7` between the edge line and its first move. The old script took
+every record of an edge as `move g q`: `hall` crashed on the cell list, and `wrong 7 1` would have been read as the move (7,1) without any error.
+`RerootMeasure.read_chain_edges` reads the records apart (`move`, `wrong`, `hall`; an unknown record, a missing `finish` or `end`, or a
+malformed field is an error); `solve_edge` does not produce such an edge, so `measure_edges.jl` refuses its id. Test `chain reader keeps
+move, wrong and hall records apart` and `stored chain evidence parses`.
+
+Tests (short, local): `julia --startup-file=no test_reroot_measure.jl` (about 10 s, pure functions, synthetic prefixes and chain text,
+the stored chain); `MUTANT_TMP=<dir> ./run_reroot_mutants.sh` (14 mutants, each must fail the named test set). The plumbing of
+`measure_edges.jl` was run on edge 4 with `library=L1` (below 3 minutes, not evidence of the L5 numbers): `./run_reroot_measure.sh OUT 4
+commits=1,10 library=L1`. The workflow checks live in `tests/beam-reroot-measure-workflow.test.mjs` and
+`scripts/ci/beam-reroot-measure-mutants.sh` of the default branch.
+
+Dispatch (only after the forward chain run has finished and the owner approved; the workflow file must be on `main`; `research_ref` is a
+commit of this branch that contains these files; the run is refused while a window-chain run is queued or running):
+`gh workflow run beam-reroot-measure.yml --ref main -f research_ref=<40 hex SHA> -f edges=87,62,54,22,77,74,193,203,166,159 -f commits=1,10,30,60`
+(library L5, width 40, lambda 3 and deadline_min 300 are the defaults). Five jobs of two edges, in parallel, 4 threads each.
+What to look at: artifact `reroot-<job>-<run id>`: `reroot.tsv` (per commit point: `p_htm`, `free_htm`, `rest_htm`, `streamed_htm`,
+`cost_htm`, `share`, `t_s`, `status` ok/none/deadline/invalid), `summary.tsv` (`same_moves`/`same_end` must be true for every edge: the
+unconstrained re-solve reproduces the stored edge, otherwise the run differs from the stored chain), `iter-<id>-<month>.tsv`.
+Expected wall time: about 1 to 2 minutes of setup (library build) plus, per edge, one solve of 10 to 70 s and up to five re-root solves of
+10 to 70 s, so about 5 to 8 minutes for a long edge, 12 to 20 minutes per job (estimate from the first measurement, not measured for this
+run). The wall-clock limit is below 345 minutes (job 340 minutes; no re-root solve starts after `deadline_min`).
