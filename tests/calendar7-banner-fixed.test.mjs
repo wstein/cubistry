@@ -37,7 +37,8 @@ const tileDump = () => {
 };
 
 // Digests of the accepted design (banner 1.0 tall at y 2.9 .. 3.9, x -3.8 .. 3.8, radius 0.3) at the shipped f = 1.6 (owner decision 2026-11-11; taken at 72e44d0b with f = 1.8 before: the cube edge, the gap in units and the bands f - 1 follow the table).
-const PINS = { table: "709651d4cdb94e0497cecaa9b3a2c024e6d5feaf951f30258631c480b6f09d8d", tiles: "d6354ffebaf0827b32c8f39c4139eb71bdfbc286ea4abacea3de5bbb016c5e5d" };
+// Re-pinned 2026-11-14 for the two-radius bevel (seam radius 0.6 * 0.1503): the edge inset, the 14-font table and the grid rectangles follow it.
+const PINS = { table: "bd3fef3bd141d8b9aa0731c621e2ea452f22a398250966314a099945c03ee636", tiles: "d13c2ec31737e102418be114b4d1526a62b7824fcd784f5f03ed5f9d4a9ceb87" };
 
 test("at the shipped f = 1.6 the banner defined by its absolute unit-grid constants reproduces the geometry of the accepted design exactly (14-font table, grid rectangles and cut-face edge colors of all 294 tiles in all 10 schemes)", () => {
   assert.equal(outerLayerWidth(CALENDAR7_SIZE), 1.6);
@@ -139,7 +140,7 @@ test("clipping at f = 1.2: the banner extends beyond the outer cubie face (top f
 });
 
 test("font table at f = 1.2 and 1.6: no blocked tile, sizes and tracking range pinned as literals, equal to the table at 1.8 (the first-tile room of the 0.8 unit stays within the texture edge)", () => {
-  const PIN = { noto: [97.75, -14.27, 1.83], nunito: [97.5, -10.53, 0.02], "nunito-sans": [93.75, -5.84, 3.66], quicksand: [102.75, -10.49, -3.01], "nova-oval": [90.75, -10.74, 11.65], "nova-square": [97.5, -11.8, 6.6], "nova-mono": [125.25, -8.89, -1.38], comfortaa: [90.25, -10.56, 4.43], "varela-round": [94.25, -8, 1], "crete-round": [88.75, -1.15, 13.16], "dseg14classic-bold": [87, -3.72, -1.68], "dseg14classic-regular": [87, -3.72, -1.68], "dseg14modern-bold": [86, -2.59, -2.59], "dseg14modern-regular": [86, -2.59, -2.59] };
+  const PIN = { noto: [100.25, -12.03, 3.16], nunito: [99, -6.8, 2.26], "nunito-sans": [97.5, -6.17, 3.72], quicksand: [102.75, -4.61, 0.68], "nova-oval": [94.5, -11.53, 11.92], "nova-square": [99.75, -11.66, 6.94], "nova-mono": [125.25, -3.57, 2.32], comfortaa: [90.25, -4.74, 8.12], "varela-round": [94.25, -4.3, 4.7], "crete-round": [92.25, -1.18, 13.65], "dseg14classic-bold": [87, -1.09, 0.95], "dseg14classic-regular": [87, -1.09, 0.95], "dseg14modern-bold": [86, 0, 0.13], "dseg14modern-regular": [86, 0, 0.13] };
   for (const f of [1.2, 1.6, 1.8]) for (const [id, font] of Object.entries(FONT_METRICS)) {
     const t = nameFaceTable(font, f), tr = [...t.tiles.values()].map((x) => x.tracking), [size, lo, hi] = PIN[id];
     assert.equal(t.blocked.length, 0, `${id} f ${f}: no blocked tile`);

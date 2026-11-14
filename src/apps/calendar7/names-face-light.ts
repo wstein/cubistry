@@ -31,8 +31,10 @@ export const FACE_SHARE_POWER = 4;
  * Reference of the fragment shader (`vC7Obj`, `vC7Axes`): the cosine to the camera of the body face a fragment belongs to. `n` is the
  * interpolated object space normal, `axisCos` the cosine to the camera of the +x, +y and +z body axes. A flat face gives the cosine of
  * its face; a bevel the cosines of its two faces weighted by |n_a|^FACE_SHARE_POWER, so a bevel belongs to the face it is nearer to. The
- * fragment weight uses min(n . c, this cosine): a bevel that turns toward the camera does not take more light than its face (the larger
- * bevel of the O2 radius clipped on the top face), a bevel that turns away keeps its own weight.
+ * fragment weight W uses min(n . c, this cosine) in place of n . c: the weight of a bevel fragment is never larger than that of its
+ * face, and where the fragment turns away from the camera by more than its face does, it keeps the smaller weight of its own normal.
+ * Only the weight changes: the diffuse light of the fragment still follows its normal, so a bevel that faces a light is brighter than
+ * the flat face (the large bevel of the O2 radius had taken the full studio light, W = 1, on the top face and clipped).
  */
 export function faceCosine(n: readonly [number, number, number], axisCos: readonly [number, number, number]): number {
   const a = n.map(x => Math.pow(Math.abs(x), FACE_SHARE_POWER)), sum = a[0] + a[1] + a[2] + 1e-6;
@@ -101,6 +103,8 @@ export function patchFaceLight(material: THREE.Material, uniform: FaceLightUnifo
   material.onBeforeCompile = (shader) => {
     shader.uniforms.c7FaceLight = uniform;
     const chunks = faceLightChunks();
+    // Like the fragment chunks: a three.js that no longer has this include must fail here, not render the old look silently.
+    if (!shader.vertexShader.includes(DEFAULT_NORMAL)) throw new Error(`three.js changed its vertex shader: update names-face-light.ts (${DEFAULT_NORMAL})`);
     shader.vertexShader = VERTEX_DECLARE + shader.vertexShader.replace(DEFAULT_NORMAL, DEFAULT_NORMAL + FACE_VERTEX);
     shader.fragmentShader = DECLARE + shader.fragmentShader.replace("#include <lights_fragment_begin>", chunks.begin).replace("#include <lights_fragment_end>", chunks.end);
   };
