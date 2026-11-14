@@ -110,8 +110,16 @@ visible groove around the planar faces.
 The shared 2×2 viewer uses smaller 0.03-unit body bevels. The narrower bevel
 reduces the apparent groove between adjacent front faces while retaining the
 0.01-unit physical shell clearance. Body width, center pitch, sticker size and
-sticker offset are unchanged. Larger cubes and callers that omit a size retain
-the 0.055-unit bevel. Layer turns preserve the separating axis coordinate, so
+sticker offset are unchanged. The 3x3 and callers that omit a size keep the
+0.055-unit bevel. A cube larger than 3x3 keeps the millimeter bevel radius of the
+3x3 at the same cube edge (owner decision 2026-11-14): `bodyRadiusFor(N, edge)` =
+0.055 * edge / 3, with `edge` = N, or the sum of the layer widths with a profile
+(5x5 0.092 or 0.095 with f 1.1, 7x7 0.128 or 0.150 with f 1.6). The sticker radius
+follows, and a sticker never exceeds the flat part of its body less 0.01
+(`stickerSideFor`: 0.79 on a 5x5, 0.68 on a 7x7; 0.87 up to 3x3).
+`presentationLayerProfile` builds body and sticker per cell. The option
+`planarFaceUv` maps the exterior and the cut faces of a stickerless cube linear in
+position (Three's arc-length UV stays the default). Layer turns preserve the separating axis coordinate, so
 the shell clearance remains positive throughout quarter and half turns.
 
 **Core ball (supersedes per-cubie box cores).** The former per-cubie plastic box
