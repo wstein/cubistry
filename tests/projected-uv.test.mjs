@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // The pure UV rule of the "Projected" picture mode: six beamers, one per face, each projecting its own image face-on onto
-// its own face; only the stickers carry the image. These tests state the rule independently of the implementation (literal
-// face orientations, the prototype formula) and cover every face, every size 2 to 7, corners, the margin of exactly one gap
-// width and the layer-width profile.
+// its own face; the image rectangle is the full face extent. These tests state the rule independently of the implementation (literal
+// face orientations, the prototype formula) and cover every face, every size 2 to 7, corners, the image that reaches the
+// face edge (no margin, g = 0) and the layer-width profile.
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import {
-  PROJECTED_FACES, faceOfNormal, gapWidth, imageExtent, stickerWindow, windowUv, STICKER_SHARE,
+  PROJECTED_FACES, faceOfNormal, imageExtent, stickerWindow, windowUv, STICKER_SHARE,
 } from "../packages/cube-viewer/src/projected-uv.ts";
 import { thickOuterLayerWidths, uniformLayerWidths, layerEdge } from "../packages/cube-viewer/src/layer-widths.ts";
 
@@ -46,17 +46,13 @@ test("the face table: normals, right and up of the six faces; faceOfNormal inver
   assert.throws(() => faceOfNormal([1, 1, 0]));
 });
 
-test("uniform widths: the gap is 0.13 of a pitch (1 - 0.87) and the image side is n - 2 g", () => {
+test("the image is the whole face: its side is the face extent n pitches, no margin (g = 0)", () => {
   assert.equal(STICKER_SHARE, 0.87);
-  for (const n of SIZES) {
-    const w = uniformLayerWidths(n);
-    near(gapWidth(w, STICKER_SHARE), 0.13, 1e-12, `gap n=${n}`);
-    near(imageExtent(w, STICKER_SHARE), n - 0.26, 1e-12, `image n=${n}`);
-  }
+  for (const n of SIZES) near(imageExtent(uniformLayerWidths(n)), n, 1e-12, `image n=${n}`);
 });
 
-for (const face of KEYS) for (const n of SIZES) test(`${face} ${n}x${n}: every sticker window equals the prototype formula (A = c_right + (u - .5) 0.87, s = A / IMG + .5, t = .5 - B / IMG)`, () => {
-  const widths = uniformLayerWidths(n), IMG = n - 2 * 0.13, h = (n - 1) / 2;
+for (const face of KEYS) for (const n of SIZES) test(`${face} ${n}x${n}: every sticker window equals the prototype formula (A = c_right + (u - .5) 0.87, IMG = n, s = A / IMG + .5, t = .5 - B / IMG)`, () => {
+  const widths = uniformLayerWidths(n), IMG = n, h = (n - 1) / 2;
   const { right, up } = ORIENTATION[face];
   const seen = new Set();
   for (const index of faceStickers(face, n)) {
@@ -87,49 +83,42 @@ for (const face of KEYS) test(`${face}: the image's top-left corner lies on the 
     corner[axis] = NORMAL[face][axis] > 0 ? n - 1 : 0;
     const win = stickerWindow(uniformLayerWidths(n), STICKER_SHARE, face, corner);
     assert.deepEqual([win.col, win.row], [0, 0], `${face} ${n}`);
-    // the sticker's upper-left uv corner is the image corner plus the gap and a half margin: outside the image by 0.065 pitch
+    // the sticker's upper-left uv corner is the face corner plus the half gap (0.065 pitch): inside the image, never outside
     const [s, tUp] = windowUv(win, 0, 1);
-    const IMG = n - 0.26;
-    near(s, ((-n / 2 + 0.5) - 0.435) / IMG + 0.5, 1e-9, `${face} ${n} s`);
-    near(1 - tUp, 0.5 - ((n / 2 - 0.5) + 0.435) / IMG, 1e-9, `${face} ${n} t`);
-    assert.ok(s < 0 && 1 - tUp < 0, "the outer rim of a corner sticker lies outside the image (plastic)");
+    near(s, ((-n / 2 + 0.5) - 0.435) / n + 0.5, 1e-9, `${face} ${n} s`);
+    near(1 - tUp, 0.5 - ((n / 2 - 0.5) + 0.435) / n, 1e-9, `${face} ${n} t`);
+    assert.ok(s > 0 && 1 - tUp > 0, "the outer rim of a corner sticker lies inside the image");
   }
 });
 
-test("margin: the image ends exactly one gap width inside the face extent on every side, for every size", () => {
+test("the image reaches the face edge: texture coordinates 0 and 1 sit exactly on the face extent, for every size and face", () => {
   for (const n of SIZES) {
-    const w = uniformLayerWidths(n), g = gapWidth(w, STICKER_SHARE);
+    const w = uniformLayerWidths(n);
     for (const face of KEYS) {
-      // the sticker row/column at the far ends: texture coordinate 0 and 1 are at the image edge
-      const first = faceStickers(face, n).map((i) => stickerWindow(w, STICKER_SHARE, face, i));
-      const left = first.find((x) => x.col === 0 && x.row === 0), right = first.find((x) => x.col === n - 1 && x.row === n - 1);
-      // image coordinate s = 0 sits at A = -IMG/2; the face edge is A = -n/2: distance g
-      const edgeA = (win, edge) => (edge - win.offsetU) / win.scaleU; // sticker-u (in 0..1 units) where s hits `edge`
+      const all = faceStickers(face, n).map((i) => stickerWindow(w, STICKER_SHARE, face, i));
+      const left = all.find((x) => x.col === 0 && x.row === 0), right = all.find((x) => x.col === n - 1 && x.row === n - 1);
+      const edgeA = (win, edge) => (edge - win.offsetU) / win.scaleU; // sticker-u where the texture coordinate hits `edge`
       const aOfU = (win, u, c) => c + (u - 0.5) * 0.87;
-      const cLeft = -(n - 1) / 2, cRight = (n - 1) / 2;
-      near(aOfU(left, edgeA(left, 0), cLeft), -n / 2 + g, 1e-9, `${face} ${n} left margin`);
-      near(aOfU(right, edgeA(right, 1), cRight), n / 2 - g, 1e-9, `${face} ${n} right margin`);
+      near(aOfU(left, edgeA(left, 0), -(n - 1) / 2), -n / 2, 1e-9, `${face} ${n} left edge`);
+      near(aOfU(right, edgeA(right, 1), (n - 1) / 2), n / 2, 1e-9, `${face} ${n} right edge`);
+      for (const win of all) for (const [u, v] of [[0, 0], [1, 1], [0, 1], [1, 0]]) {
+        const [tu, tv] = windowUv(win, u, v);
+        assert.ok(tu >= -1e-12 && tu <= 1 + 1e-12 && tv >= -1e-12 && tv <= 1 + 1e-12, `${face} ${n}: a sticker corner lies inside the image`);
+      }
     }
   }
 });
 
-test("profile [f,1,...,1,f]: the face extent is the summed widths; g is the mean of the real gaps between neighbor stickers", () => {
+test("profile [f,1,...,1,f]: the image is the face extent, the summed widths", () => {
   for (const [n, f] of [[2, 1.2], [3, 1.2], [5, 1.2], [6, 1.5], [7, 1.8]]) {
-    const w = thickOuterLayerWidths(n, f), edge = layerEdge(w);
-    // the gap between stickers of layers i and i + 1 is (1 - 0.87) (w_i + w_i+1) / 2, because a sticker is 0.87 of its cell
-    let sum = 0;
-    for (let i = 0; i + 1 < n; i++) sum += (1 - STICKER_SHARE) * (w[i] + w[i + 1]) / 2;
-    const g = sum / (n - 1);
-    near(gapWidth(w, STICKER_SHARE), g, 1e-12, `gap ${n} f=${f}`);
-    near(imageExtent(w, STICKER_SHARE), edge - 2 * g, 1e-12, `image ${n} f=${f}`);
+    const w = thickOuterLayerWidths(n, f);
+    near(imageExtent(w), layerEdge(w), 1e-12, `image ${n} f=${f}`);
   }
-  // the 7x7 values by hand: gaps 0.065 (1.8 + 1) = 0.182 twice and 0.13 four times; mean 0.156
-  near(gapWidth(thickOuterLayerWidths(7, 1.8), STICKER_SHARE), (2 * 0.065 * 2.8 + 4 * 0.13) / 6, 1e-12);
-  near(imageExtent(thickOuterLayerWidths(7, 1.8), STICKER_SHARE), 8.6 - 2 * ((2 * 0.065 * 2.8 + 4 * 0.13) / 6), 1e-12);
+  near(imageExtent(thickOuterLayerWidths(7, 1.8)), 8.6, 1e-12);
 });
 
 test("profile 7x7 f = 1.8: windows follow the real cell centers and sizes; the sticker of a thick corner covers 0.87 of 1.8", () => {
-  const widths = thickOuterLayerWidths(7, 1.8), IMG = imageExtent(widths, STICKER_SHARE);
+  const widths = thickOuterLayerWidths(7, 1.8), IMG = imageExtent(widths);
   const centers = [-3.4, -2, -1, 0, 1, 2, 3.4];
   for (const face of KEYS) {
     const { right, up } = ORIENTATION[face];
@@ -155,10 +144,10 @@ test("profile 7x7 f = 1.8: windows follow the real cell centers and sizes; the s
   near(corner.scaleU, 0.87 * 1.8 / IMG, 1e-12);
 });
 
-test("the body share (0.99) uses the same gap and image as the sticker share", () => {
+test("the body share (0.99) uses the same image as the sticker share", () => {
   const w = uniformLayerWidths(3);
   const a = stickerWindow(w, 0.87, "F", [1, 1, 2]), b = stickerWindow(w, 0.99, "F", [1, 1, 2]);
-  near(b.scaleU, 0.99 / imageExtent(w, STICKER_SHARE), 1e-12);
+  near(b.scaleU, 0.99 / imageExtent(w), 1e-12);
   near(a.offsetU + a.scaleU / 2, b.offsetU + b.scaleU / 2, 1e-12, "same center");
 });
 
@@ -167,5 +156,4 @@ test("input checks", () => {
   assert.throws(() => stickerWindow(w, STICKER_SHARE, "X", [0, 0, 0]));
   assert.throws(() => stickerWindow(w, STICKER_SHARE, "F", [0, 0, 3]));
   assert.throws(() => stickerWindow(w, 0, "F", [0, 0, 2]));
-  assert.throws(() => gapWidth([1], STICKER_SHARE));
 });

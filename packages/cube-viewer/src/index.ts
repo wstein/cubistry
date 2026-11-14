@@ -28,7 +28,7 @@ export { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppeara
 import { effectivePictureMode, type PictureMode } from "./picture-mode.ts";
 export { DEFAULT_PICTURE_MODE, PICTURE_MODES, PICTURES_PARAM, PICTURE_MODE_HELP, PICTURE_MODE_LABEL, parsePictureMode, effectivePictureMode, type PictureMode } from "./picture-mode.ts";
 import { FACE_KEYS, type FaceKey } from "./projected-uv.ts";
-export { FACE_KEYS, PROJECTED_FACES, STICKER_SHARE, faceOfNormal, gapWidth, imageExtent, stickerWindow, windowUv, type FaceKey, type StickerWindow } from "./projected-uv.ts";
+export { FACE_KEYS, PROJECTED_FACES, STICKER_SHARE, faceOfNormal, imageExtent, stickerWindow, windowUv, type FaceKey, type StickerWindow } from "./projected-uv.ts";
 /** Id of the whole-face image of `face` in the viewer's assets; a design that has all six offers the Projected picture mode. */
 export const faceImageAssetId = (face: FaceKey): string => `face_${face}`;
 import { createPresentationStudio } from "./studio.ts";
