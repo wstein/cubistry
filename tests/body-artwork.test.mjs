@@ -108,7 +108,7 @@ test("rounded surface refresh follows null-to-image shader changes without takin
   art.dispose(); plastic.dispose(); texture.dispose();
 });
 
-test("planarBodyUv: the flat part of every image face of the 2x2 body maps u = x / 0.99 + 0.5 in all orientations; the arcs end at 0 and 1; cut faces and positions stay", () => {
+test("planarBodyUv: the flat part of every image face of the 2x2 body maps u = x / 0.99 + 0.5 in all orientations; the arcs stay planar up to 45 degrees of the bevel; cut faces and positions stay", () => {
   const geometry = createPresentationGeometry(2), base = geometry.body, extent = [0.99, 0.99, 0.99];
   for (const n of axes) for (const up of axes.filter(up => dot(up, n) === 0)) {
     const oriented = orientBodyArtwork(base, [{ n, up }]), index = sourceFaceIndex(n), right = cross(up, n);
