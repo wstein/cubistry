@@ -15,7 +15,7 @@ test('Calendar7 always draws stickerless faces despite legacy hints and stored a
    viewer.presentation.traverse(o=>{if(o.userData.stickerId!==undefined&&o.visible)visible++;if(o.userData.sourceFaceStickerIds&&Array.isArray(o.material))o.material.forEach((m,i)=>{if(o.userData.sourceFaceStickerIds[i]===null)cut.add(m.color.getHexString());else if(m.map)mapped++;});});
    rows.push({hint:hint??'omitted',visible,mapped,surface:viewer.surface,cut:[...cut],core:viewer.cube.coreMaterial.color.getHexString()});
   }
-  const preserved=localStorage.getItem(key)===saved;viewer.destroy();return{rows,preserved,constructionControls:panel.querySelectorAll('[aria-label="Cube construction"]').length};
+  const preserved=localStorage.getItem(key)===saved;viewer.destroy();return{rows,preserved,constructionControls:panel.querySelectorAll('[aria-label="Cube construction"],[aria-label="Stickerless"],[aria-label="Projected"]').length};
  });
  for(const row of result.rows){expect(row.surface,row.hint).toBe('face');expect(row.visible,row.hint).toBe(0);expect(row.mapped,row.hint).toBe(294);expect(row.cut,row.hint).toEqual(['ffffff']);expect(row.core,row.hint).toBe('ffffff');}
  expect(result.preserved).toBe(true);expect(result.constructionControls).toBe(0);
@@ -52,7 +52,7 @@ test('the color picker works by keyboard at 360px, preserves fonts and sheet col
  const bounds=await page.evaluate(()=>({width:innerWidth,scroll:document.documentElement.scrollWidth,controls:[...document.querySelectorAll('.c7-appearance-choices select')].map(el=>{const r=el.getBoundingClientRect();return{left:r.left,right:r.right};})}));expect(bounds.scroll).toBeLessThanOrEqual(bounds.width+1);for(const b of bounds.controls){expect(b.left).toBeGreaterThanOrEqual(0);expect(b.right).toBeLessThanOrEqual(bounds.width);}
  await page.screenshot({path:info.outputPath('calendar7-color-picker-mobile.png')});
  await page.setViewportSize({width:1280,height:1000});await page.screenshot({path:info.outputPath('calendar7-color-picker-desktop.png')});
- await page.reload();await expect(root).toHaveAttribute('data-c7-month','2026-11',{timeout:30000});await expect(select).toHaveValue('paper-blue');await expect(root).toHaveAttribute('data-c7-digest',digest);expect(await page.evaluate(()=>localStorage.getItem('cubistry-viewer-appearance-v1:/index.html'))).toBe(saved);await expect(page.getByRole('combobox',{name:'Cube construction',exact:true})).toHaveCount(0);
+ await page.reload();await expect(root).toHaveAttribute('data-c7-month','2026-11',{timeout:30000});await expect(select).toHaveValue('paper-blue');await expect(root).toHaveAttribute('data-c7-digest',digest);expect(await page.evaluate(()=>localStorage.getItem('cubistry-viewer-appearance-v1:/index.html'))).toBe(saved);await expect(page.getByRole('checkbox',{name:'Stickerless',exact:true})).toHaveCount(0);
 });
 
 test('a color selected while the viewer loads reaches the first cube',async({page})=>{

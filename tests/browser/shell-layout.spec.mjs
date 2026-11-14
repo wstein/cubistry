@@ -215,7 +215,7 @@ for (const frame of frames) {
     await expect(toggle).toBeFocused();
     const look = await page.locator(".cube-appearance").evaluate(e => { const c = getComputedStyle(e); return [c.opacity, c.backdropFilter]; });
     expect(look, "solid panel: no ambient opacity, no blur").toEqual(["1", "none"]);
-    await expect(page.getByLabel("Cube construction")).toBeVisible();
+    await expect(page.getByRole("checkbox", { name: "Stickerless" })).toBeVisible();
     await expect(page.getByLabel("View rotation mode")).toBeVisible();
     await expect(page.getByLabel("Plastic frame color")).toBeHidden(); // under "More"
     const [stage, panel] = await Promise.all([boxOf(page, "stage"), page.locator(".cube-appearance").boundingBox()]);
