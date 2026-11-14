@@ -1,0 +1,101 @@
+print	variant	step	date	app_htm	app_rot	status	front_htm	front_rot	nodes	solve_ms	pdb_ms	root_h	route
+en-3-zero	own	1	2027-01-02	17	0	solved	6	0	2146	16.0	1089.0	5	U B2 R' B R U'
+en-3-zero	own	2	2027-01-03	18	0	solved	6	0	1759	0.3	1011.5	5	D B2 L' B L D'
+en-3-zero	own	3	2027-01-04	17	0	solved	6	0	3385	0.5	1062.2	5	D B' L2 D L2 D2
+en-3-zero	own	4	2027-01-05	16	0	solved	7	0	22486	3.0	1190.2	4	R' B2 L' B' R B2 L
+en-3-zero	own	5	2027-01-06	14	0	solved	8	0	144185	15.9	905.4	5	R2 B L' B' R B2 R L
+en-3-zero	own	6	2027-01-07	14	0	solved	6	0	1305	0.3	1070.1	5	R' B U2 R' U2 R2
+en-3-zero	own	7	2027-01-08	17	0	solved	6	0	5029	0.8	751.4	5	L' B2 R' B R L
+en-3-zero	own	8	2027-01-09	14	0	solved	8	0	153694	11.9	810.4	6	R' L' B2 L U B2 U' R
+en-3-zero	own	9	2027-01-10	18	0	solved	9	1	344399	20.2	810.1	5	z R L' F' U' D2 L' B2 L D2
+en-3-zero	own	10	2027-01-11	17	0	solved	7	0	24307	2.0	919.3	4	R' B2 L' B R B2 L
+en-3-zero	own	11	2027-01-12	14	0	solved	7	0	30638	2.1	1003.3	5	B' L' B2 D B' D' L
+en-3-zero	own	12	2027-01-13	13	0	solved	8	0	138382	7.7	970.6	6	R2 U2 R2 D R' U2 R D'
+en-3-zero	own	13	2027-01-14	18	0	solved	6	0	2746	0.4	841.2	5	D B2 L' B L D'
+en-3-zero	own	14	2027-01-15	17	0	solved	7	0	26754	2.1	918.6	4	L' B2 R' B L B R
+en-3-zero	own	15	2027-01-16	14	0	solved	8	0	153694	7.7	663.3	6	R' L' B2 L U B2 U' R
+en-3-zero	own	16	2027-01-17	17	0	solved	6	0	1581	0.3	737.6	5	R' B U2 R' U2 R2
+en-3-zero	own	17	2027-01-18	16	0	solved	7	0	31193	2.4	829.1	4	R2 B L' B' R2 B2 L
+en-3-zero	own	18	2027-01-19	14	0	solved	8	0	144185	10.6	820.1	5	R2 B L' B' R B2 R L
+en-3-zero	own	19	2027-01-20	18	0	solved	7	0	9065	0.9	1127.2	6	B L' D B2 D B' L
+en-3-zero	own	20	2027-01-21	17	0	solved	6	0	1518	0.3	816.4	5	R' B2 L' B R L
+en-3-zero	own	21	2027-01-22	17	0	solved	7	0	8943	1.2	938.3	5	R' L' B' L B U' R
+en-3-zero	own	22	2027-01-23	14	0	solved	8	0	74885	6.8	998.3	5	R2 L' U R U' B2 R L
+en-3-zero	own	23	2027-01-24	18	0	solved	7	0	14015	1.5	772.7	5	R U' R U' B2 U2 R'
+en-3-zero	own	24	2027-01-25	15	0	solved	7	0	26246	2.0	858.7	5	R' U2 B2 U' R' U R2
+en-3-zero	own	25	2027-01-26	14	0	solved	8	0	60899	4.5	938.5	5	R F2 B2 L D F2 R' U2
+en-3-zero	own	26	2027-01-27	14	0	solved	7	0	11098	1.9	1093.2	5	R' B2 U2 B U' B' R
+en-3-zero	own	27	2027-01-28	18	0	solved	6	0	2987	0.7	1019.3	4	R' B2 U2 R' U2 R2
+en-3-zero	own	28	2027-01-29	14	0	solved	8	0	72978	5.7	930.6	6	R' L' B2 L U B2 U' R
+en-3-zero	own	29	2027-01-30	16	0	solved	8	0	31854	3.0	933.5	5	L F L F2 D' F D2 L2
+en-3-zero	own	30	2027-01-31	16	0	solved	7	0	9716	1.3	579.7	5	R' B2 L' B R B2 L
+en-3-zero	own	31	2027-02-01	20	2	solved	7	2	11616	1.1	569.9	5	x2 y' F2 U B2 D F2 R2 D'
+en-3-zero	own	32	2027-02-02	18	0	solved	7	0	30638	2.3	586.1	5	B' L' B2 D B' D' L
+en-3-zero	own	33	2027-02-03	13	0	solved	8	0	138382	9.3	620.1	6	R2 U2 R2 D R' U2 R D'
+en-3-zero	own	34	2027-02-04	16	0	solved	7	0	31845	5.6	786.1	5	U B D B U' B2 D'
+en-3-zero	own	35	2027-02-05	18	0	solved	7	0	51237	4.3	892.3	4	B2 L2 D2 L D2 B' L
+en-3-zero	own	36	2027-02-06	14	0	solved	8	0	153694	22.3	808.4	6	R' L' B2 L U B2 U' R
+en-3-zero	own	37	2027-02-07	18	0	solved	7	0	16936	1.6	853.4	5	R2 U2 R U B2 U R
+en-3-zero	own	38	2027-02-08	16	0	solved	7	0	37249	3.6	767.4	5	R U2 R' U2 R2 B R
+en-3-zero	own	39	2027-02-09	14	0	solved	8	0	144185	7.8	724.3	5	R2 B L' B' R B2 R L
+en-3-zero	own	40	2027-02-10	17	0	solved	10	0	393247	29.0	754.2	6	R' U' F' D' R' D F B2 R U2
+en-3-zero	own	41	2027-02-11	18	0	solved	6	0	2104	0.4	829.5	5	R2 U2 R U2 B' R
+en-3-zero	own	42	2027-02-12	16	0	solved	6	0	2146	0.5	867.5	5	U B2 R' B R U'
+en-3-zero	own	43	2027-02-13	14	0	solved	8	0	144009	8.7	811.1	5	R2 L' U R U' B2 R L
+en-3-zero	own	44	2027-02-14	16	0	solved	6	0	1897	0.5	903.3	5	D B' L2 D L2 D2
+en-3-zero	own	45	2027-02-15	16	0	solved	6	0	3564	0.5	735.2	5	B2 D L' B L D'
+en-3-zero	own	46	2027-02-16	14	0	solved	8	0	144185	8.1	622.4	5	R2 B L' B' R B2 R L
+en-3-zero	own	47	2027-02-17	14	0	solved	8	0	144185	7.1	689.9	5	R2 B L' B' R B2 R L
+en-3-zero	own	48	2027-02-18	16	0	solved	7	0	44033	3.0	646.9	5	U F D' B2 D F' U'
+en-3-zero	own	49	2027-02-19	14	0	solved	8	0	153694	9.8	674.2	6	R' L' B2 L U B2 U' R
+en-3-zero	own	50	2027-02-20	18	0	solved	8	1	110481	6.7	681.3	5	z F' B' L' B D' B2 D' L
+en-3-zero	own	51	2027-02-21	17	0	solved	7	0	9731	1.1	583.6	5	R' B2 L' B R B2 L
+en-3-zero	own	52	2027-02-22	16	0	solved	5	0	288	0.1	690.7	4	R' U B' U' R
+en-3-zero	own	53	2027-02-23	13	0	solved	6	0	238	0.1	670.9	6	R' U2 B U' B2 R
+en-3-zero	own	54	2027-02-24	13	0	solved	8	0	59437	3.7	489.5	6	R2 U2 R2 D R' U2 R D'
+en-3-zero	own	55	2027-02-25	16	0	solved	7	0	34445	2.3	396.5	4	R U2 R' U2 D' R' D
+en-3-zero	own	56	2027-02-26	14	0	solved	8	0	51374	3.4	402.0	6	R U2 B' R B2 R2 U2 R'
+en-3-zero	own	57	2027-02-27	14	0	solved	7	1	8509	0.8	415.9	6	z2 F2 R' B2 U B' U2 R
+en-3-zero	own	58	2027-02-28	17	0	solved	7	0	24429	2.0	403.0	5	R U2 R' U2 R2 B R
+en-3-zero	own	59	2027-03-01	24	2	solved	9	1	60528	4.1	541.7	7	x F L U' L F D L2 B' D2
+en-3-zero	own	60	2027-03-02	14	0	solved	7	0	39549	3.5	629.6	4	B U B2 D B' U' D'
+en-3-zero	own	61	2027-03-03	13	0	solved	8	0	138382	7.4	641.0	6	R2 U2 R2 D R' U2 R D'
+en-3-zero	own	62	2027-03-04	18	0	solved	7	0	29805	2.2	685.1	5	B D B2 L' B L D'
+en-3-zero	own	63	2027-03-05	17	0	solved	7	0	26754	2.1	721.4	4	L' B2 R' B L B R
+en-3-zero	own	64	2027-03-06	14	0	solved	8	0	153694	8.6	617.3	6	R' L' B2 L U B2 U' R
+en-3-zero	own	65	2027-03-07	17	0	solved	7	0	18765	1.7	629.6	5	R2 U2 R U B2 U R
+en-3-zero	own	66	2027-03-08	16	0	solved	6	0	4299	0.5	632.9	5	R' U B U' B R
+en-3-zero	own	67	2027-03-09	14	0	solved	8	0	144185	8.2	669.3	5	R2 B L' B' R B2 R L
+en-3-zero	own	68	2027-03-10	18	0	solved	9	0	112730	7.9	707.4	6	F' R2 B2 L F B D B' U'
+en-3-zero	own	69	2027-03-11	17	0	solved	7	0	40728	3.4	651.7	4	U R' B2 R' U R2 U2
+en-3-zero	own	70	2027-03-12	17	0	solved	7	0	28501	2.0	558.9	5	B' U B2 R' B R U'
+en-3-zero	own	71	2027-03-13	14	0	solved	8	0	144009	8.3	696.9	5	R2 L' U R U' B2 R L
+en-3-zero	own	72	2027-03-14	18	0	solved	6	0	955	0.2	668.8	5	R2 U2 R U2 B' R
+en-3-zero	own	73	2027-03-15	15	0	solved	7	0	73593	4.6	523.8	3	R U2 R' U2 D' R' D
+en-3-zero	own	74	2027-03-16	14	0	solved	8	0	144185	7.3	694.3	5	R2 B L' B' R B2 R L
+en-3-zero	own	75	2027-03-17	14	0	solved	8	0	144185	6.6	663.2	5	R2 B L' B' R B2 R L
+en-3-zero	own	76	2027-03-18	18	0	solved	6	0	7416	0.7	694.9	4	L' B2 D2 L' D2 L2
+en-3-zero	own	77	2027-03-19	14	0	solved	8	0	153694	8.1	697.4	6	R' L' B2 L U B2 U' R
+en-3-zero	own	78	2027-03-20	19	0	solved	7	1	11702	1.1	608.6	5	z U2 B L' F2 R' F L'
+en-3-zero	own	79	2027-03-21	16	0	solved	7	0	10620	1.2	725.2	5	U B D B U' B2 D'
+en-3-zero	own	80	2027-03-22	15	0	solved	5	0	3332	0.5	688.2	3	R' L' B' R L
+en-3-zero	own	81	2027-03-23	13	0	solved	8	0	69759	4.5	542.0	6	R2 U2 R2 D R' U2 R D'
+en-3-zero	own	82	2027-03-24	13	0	solved	7	0	5411	0.7	612.1	6	R2 U' R U B' U R
+en-3-zero	own	83	2027-03-25	14	0	solved	6	0	3976	0.6	661.5	4	L2 D B' D' B L2
+en-3-zero	own	84	2027-03-26	14	0	solved	8	0	74762	5.0	677.4	6	R' L' B2 L U B2 U' R
+en-3-zero	own	85	2027-03-27	14	0	solved	8	0	74603	4.7	714.3	6	R' L' B2 L U B2 U' R
+en-3-zero	own	86	2027-03-28	17	0	solved	7	0	13132	1.5	612.0	5	R' B' L' B R B2 L
+en-3-zero	own	87	2027-03-29	17	0	solved	6	0	2839	0.4	585.9	5	B2 R2 U' R B2 R
+en-3-zero	own	88	2027-03-30	18	0	solved	8	0	38944	2.8	727.1	5	R L F L F' R' D L2
+en-3-zero	own	89	2027-03-31	13	0	solved	8	0	59788	3.9	678.3	6	R2 U2 R2 D R' U2 R D'
+en-3-zero	own	90	2027-04-01	24	1	solved	8	2	5595	0.8	569.1	7	x z L2 U2 D B L U R2 D'
+en-3-zero	own	91	2027-04-02	17	0	solved	7	0	20708	2.5	855.9	5	U2 R2 U' R' B2 R' U'
+en-3-zero	own	92	2027-04-03	14	0	solved	8	0	144009	7.6	716.6	5	R2 L' U R U' B2 R L
+en-3-zero	own	93	2027-04-04	15	0	solved	6	0	1489	0.3	894.0	5	R' B2 L' B R L
+en-3-zero	own	94	2027-04-05	12	0	solved	6	0	5628	0.6	782.4	4	L2 D B' D' B L2
+en-3-zero	own	95	2027-04-06	14	0	solved	8	0	144185	11.3	713.7	5	R2 B L' B' R B2 R L
+en-3-zero	own	96	2027-04-07	14	0	solved	8	0	144185	10.9	905.4	5	R2 B L' B' R B2 R L
+en-3-zero	own	97	2027-04-08	18	0	solved	7	0	12076	1.1	574.7	5	R' B' L' B R B2 L
+en-3-zero	own	98	2027-04-09	14	0	solved	8	0	153694	7.6	568.2	6	R' L' B2 L U B2 U' R
+en-3-zero	own	99	2027-04-10	17	0	solved	9	0	162338	17.3	646.6	6	D2 R' F R2 D' R F' D' R2
+en-3-zero	own	100	2027-04-11	17	0	solved	6	0	910	0.4	943.4	5	D B2 L' B L D'

@@ -1,0 +1,151 @@
+print	subset	databases	step	status	htm	nodes	solve_ms	bytes
+en-3-zero	all9	9	1	solved	6	2146	9.3	11943936
+en-3-zero	cc+ee+mix(5)	5	1	solved	6	2758	0.4	6635520
+en-3-zero	corner only(1)	1	1	solved	6	20683	5.7	1327104
+en-3-zero	corners+edges(4)	4	1	solved	6	2758	0.2	5308416
+en-3-zero	one corner+one edge(2)	2	1	solved	6	8911	0.2	2654208
+en-3-zero	all9	9	2	solved	7	22533	2.8	11943936
+en-3-zero	cc+ee+mix(5)	5	2	solved	7	176792	4.2	6635520
+en-3-zero	corner only(1)	1	2	solved	7	4087476	1472.2	1327104
+en-3-zero	corners+edges(4)	4	2	solved	7	249606	7.3	5308416
+en-3-zero	one corner+one edge(2)	2	2	solved	7	571170	16.7	2654208
+en-3-zero	all9	9	3	solved	7	29805	2.5	11943936
+en-3-zero	cc+ee+mix(5)	5	3	solved	7	38199	2.9	6635520
+en-3-zero	corner only(1)	1	3	solved	7	497054	124.5	1327104
+en-3-zero	corners+edges(4)	4	3	solved	7	38199	3.0	5308416
+en-3-zero	one corner+one edge(2)	2	3	solved	7	134696	5.8	2654208
+en-3-zero	all9	9	4	solved	7	39549	5.3	11943936
+en-3-zero	cc+ee+mix(5)	5	4	solved	7	50895	1.6	6635520
+en-3-zero	corner only(1)	1	4	solved	7	699216	161.0	1327104
+en-3-zero	corners+edges(4)	4	4	solved	7	50895	1.6	5308416
+en-3-zero	one corner+one edge(2)	2	4	solved	7	179484	2.7	2654208
+en-3-zero	all9	9	5	solved	8	144185	14.4	11943936
+en-3-zero	cc+ee+mix(5)	5	5	solved	8	214037	24.8	6635520
+en-3-zero	corner only(1)	1	5	solved	8	4974294	1307.7	1327104
+en-3-zero	corners+edges(4)	4	5	solved	8	214037	14.1	5308416
+en-3-zero	one corner+one edge(2)	2	5	solved	8	889791	18.8	2654208
+en-3-zero	all9	9	6	solved	7	19963	2.5	11943936
+en-3-zero	cc+ee+mix(5)	5	6	solved	7	26101	2.4	6635520
+en-3-zero	corner only(1)	1	6	solved	7	292144	57.3	1327104
+en-3-zero	corners+edges(4)	4	6	solved	7	26101	0.9	5308416
+en-3-zero	one corner+one edge(2)	2	6	solved	7	81619	1.3	2654208
+en-3-zero	all9	9	7	solved	6	1477	0.3	11943936
+en-3-zero	cc+ee+mix(5)	5	7	solved	6	1765	0.1	6635520
+en-3-zero	corner only(1)	1	7	solved	6	21613	5.5	1327104
+en-3-zero	corners+edges(4)	4	7	solved	6	1765	0.2	5308416
+en-3-zero	one corner+one edge(2)	2	7	solved	6	8299	0.2	2654208
+en-3-zero	all9	9	8	solved	8	153694	11.7	11943936
+en-3-zero	cc+ee+mix(5)	5	8	solved	8	200734	4.9	6635520
+en-3-zero	corner only(1)	1	8	solved	8	3810484	1027.4	1327104
+en-3-zero	corners+edges(4)	4	8	solved	8	200734	4.6	5308416
+en-3-zero	one corner+one edge(2)	2	8	solved	8	769522	14.4	2654208
+en-3-zero	all9	9	9	solved	9	161595	18.4	11943936
+en-3-zero	cc+ee+mix(5)	5	9	solved	9	231438	7.0	6635520
+en-3-zero	corner only(1)	1	9	solved	9	44097956	12949.6	1327104
+en-3-zero	corners+edges(4)	4	9	solved	9	462141	19.1	5308416
+en-3-zero	one corner+one edge(2)	2	9	solved	9	716038	9.5	2654208
+en-3-zero	all9	9	10	solved	7	31845	4.7	11943936
+en-3-zero	cc+ee+mix(5)	5	10	solved	7	39672	2.6	6635520
+en-3-zero	corner only(1)	1	10	solved	7	334170	85.7	1327104
+en-3-zero	corners+edges(4)	4	10	solved	7	39672	2.8	5308416
+en-3-zero	one corner+one edge(2)	2	10	solved	7	95517	3.9	2654208
+en-3-zero	all9	9	11	solved	7	22486	1.8	11943936
+en-3-zero	cc+ee+mix(5)	5	11	solved	7	31249	0.8	6635520
+en-3-zero	corner only(1)	1	11	solved	7	257782	88.5	1327104
+en-3-zero	corners+edges(4)	4	11	solved	7	31249	1.0	5308416
+en-3-zero	one corner+one edge(2)	2	11	solved	7	70594	1.2	2654208
+en-3-zero	all9	9	12	solved	8	138382	13.7	11943936
+en-3-zero	cc+ee+mix(5)	5	12	solved	8	189904	4.3	6635520
+en-3-zero	corner only(1)	1	12	solved	8	3762445	1146.6	1327104
+en-3-zero	corners+edges(4)	4	12	solved	8	189904	4.5	5308416
+en-3-zero	one corner+one edge(2)	2	12	solved	8	757051	18.9	2654208
+en-3-zero	all9	9	13	solved	7	21802	2.2	11943936
+en-3-zero	cc+ee+mix(5)	5	13	solved	7	32581	2.7	6635520
+en-3-zero	corner only(1)	1	13	solved	7	345631	73.1	1327104
+en-3-zero	corners+edges(4)	4	13	solved	7	32581	1.2	5308416
+en-3-zero	one corner+one edge(2)	2	13	solved	7	88897	1.5	2654208
+en-3-zero	all9	9	14	solved	7	27308	2.2	11943936
+en-3-zero	cc+ee+mix(5)	5	14	solved	7	42731	1.1	6635520
+en-3-zero	corner only(1)	1	14	solved	7	494084	139.4	1327104
+en-3-zero	corners+edges(4)	4	14	solved	7	42731	1.2	5308416
+en-3-zero	one corner+one edge(2)	2	14	solved	7	133745	2.4	2654208
+en-3-zero	all9	9	15	solved	8	153694	10.2	11943936
+en-3-zero	cc+ee+mix(5)	5	15	solved	8	200734	8.7	6635520
+en-3-zero	corner only(1)	1	15	solved	8	3810484	971.7	1327104
+en-3-zero	corners+edges(4)	4	15	solved	8	200734	10.8	5308416
+en-3-zero	one corner+one edge(2)	2	15	solved	8	769522	14.8	2654208
+en-3-zero	all9	9	16	solved	6	1650	1.5	11943936
+en-3-zero	cc+ee+mix(5)	5	16	solved	6	20147	5.8	6635520
+en-3-zero	corner only(1)	1	16	solved	6	249711	77.5	1327104
+en-3-zero	corners+edges(4)	4	16	solved	6	28230	7.7	5308416
+en-3-zero	one corner+one edge(2)	2	16	solved	6	58899	1.0	2654208
+en-3-zero	all9	9	17	solved	6	5106	0.9	11943936
+en-3-zero	cc+ee+mix(5)	5	17	solved	6	5853	0.5	6635520
+en-3-zero	corner only(1)	1	17	solved	6	32448	9.8	1327104
+en-3-zero	corners+edges(4)	4	17	solved	6	5853	0.3	5308416
+en-3-zero	one corner+one edge(2)	2	17	solved	6	11940	0.2	2654208
+en-3-zero	all9	9	18	solved	8	144185	14.5	11943936
+en-3-zero	cc+ee+mix(5)	5	18	solved	8	214037	5.0	6635520
+en-3-zero	corner only(1)	1	18	solved	8	4974294	1628.7	1327104
+en-3-zero	corners+edges(4)	4	18	solved	8	214037	9.4	5308416
+en-3-zero	one corner+one edge(2)	2	18	solved	8	889791	32.2	2654208
+en-3-zero	all9	9	19	solved	6	881	0.2	11943936
+en-3-zero	cc+ee+mix(5)	5	19	solved	6	3181	0.2	6635520
+en-3-zero	corner only(1)	1	19	solved	6	29267	9.6	1327104
+en-3-zero	corners+edges(4)	4	19	solved	6	3169	0.4	5308416
+en-3-zero	one corner+one edge(2)	2	19	solved	6	10928	0.6	2654208
+en-3-zero	all9	9	20	solved	7	10353	1.9	11943936
+en-3-zero	cc+ee+mix(5)	5	20	solved	7	13824	2.4	6635520
+en-3-zero	corner only(1)	1	20	solved	7	345631	76.1	1327104
+en-3-zero	corners+edges(4)	4	20	solved	7	13455	0.6	5308416
+en-3-zero	one corner+one edge(2)	2	20	solved	7	119047	3.3	2654208
+en-3-zero	all9	9	21	solved	5	146	0.1	11943936
+en-3-zero	cc+ee+mix(5)	5	21	solved	5	146	1.1	6635520
+en-3-zero	corner only(1)	1	21	solved	5	1034	10.0	1327104
+en-3-zero	corners+edges(4)	4	21	solved	5	146	0.1	5308416
+en-3-zero	one corner+one edge(2)	2	21	solved	5	641	0.1	2654208
+en-3-zero	all9	9	22	solved	7	8578	0.8	11943936
+en-3-zero	cc+ee+mix(5)	5	22	solved	7	11284	0.7	6635520
+en-3-zero	corner only(1)	1	22	solved	7	371233	89.8	1327104
+en-3-zero	corners+edges(4)	4	22	solved	7	11146	0.7	5308416
+en-3-zero	one corner+one edge(2)	2	22	solved	7	120688	2.1	2654208
+en-3-zero	all9	9	23	solved	6	1999	0.3	11943936
+en-3-zero	cc+ee+mix(5)	5	23	solved	6	15511	1.6	6635520
+en-3-zero	corner only(1)	1	23	solved	6	308632	145.1	1327104
+en-3-zero	corners+edges(4)	4	23	solved	6	25795	1.0	5308416
+en-3-zero	one corner+one edge(2)	2	23	solved	6	95953	2.0	2654208
+en-3-zero	all9	9	24	solved	7	34900	2.5	11943936
+en-3-zero	cc+ee+mix(5)	5	24	solved	7	43387	1.5	6635520
+en-3-zero	corner only(1)	1	24	solved	7	632768	148.5	1327104
+en-3-zero	corners+edges(4)	4	24	solved	7	43336	3.9	5308416
+en-3-zero	one corner+one edge(2)	2	24	solved	7	202814	5.4	2654208
+en-3-zero	all9	9	25	solved	8	73618	5.0	11943936
+en-3-zero	cc+ee+mix(5)	5	25	solved	8	109477	6.1	6635520
+en-3-zero	corner only(1)	1	25	solved	8	4257019	1213.3	1327104
+en-3-zero	corners+edges(4)	4	25	solved	8	108637	13.6	5308416
+en-3-zero	one corner+one edge(2)	2	25	solved	8	1226866	31.4	2654208
+en-3-zero	all9	9	26	solved	8	73618	14.3	11943936
+en-3-zero	cc+ee+mix(5)	5	26	solved	8	109477	16.5	6635520
+en-3-zero	corner only(1)	1	26	solved	8	4257019	1138.4	1327104
+en-3-zero	corners+edges(4)	4	26	solved	8	108637	4.0	5308416
+en-3-zero	one corner+one edge(2)	2	26	solved	8	1226866	35.7	2654208
+en-3-zero	all9	9	27	solved	7	7091	1.0	11943936
+en-3-zero	cc+ee+mix(5)	5	27	solved	7	8936	0.3	6635520
+en-3-zero	corner only(1)	1	27	solved	7	145544	41.6	1327104
+en-3-zero	corners+edges(4)	4	27	solved	7	8909	0.5	5308416
+en-3-zero	one corner+one edge(2)	2	27	solved	7	50942	1.3	2654208
+en-3-zero	all9	9	28	solved	8	58572	4.1	11943936
+en-3-zero	cc+ee+mix(5)	5	28	solved	8	83301	2.9	6635520
+en-3-zero	corner only(1)	1	28	solved	8	2756109	778.8	1327104
+en-3-zero	corners+edges(4)	4	28	solved	8	82953	6.6	5308416
+en-3-zero	one corner+one edge(2)	2	28	solved	8	829995	29.9	2654208
+en-3-zero	all9	9	29	solved	8	56451	5.2	11943936
+en-3-zero	cc+ee+mix(5)	5	29	solved	8	242183	16.8	6635520
+en-3-zero	corner only(1)	1	29	solved	8	5907029	1853.7	1327104
+en-3-zero	corners+edges(4)	4	29	solved	8	241802	10.8	5308416
+en-3-zero	one corner+one edge(2)	2	29	solved	8	653618	20.0	2654208
+en-3-zero	all9	9	30	solved	7	10122	1.0	11943936
+en-3-zero	cc+ee+mix(5)	5	30	solved	7	43092	3.2	6635520
+en-3-zero	corner only(1)	1	30	solved	7	334170	79.8	1327104
+en-3-zero	corners+edges(4)	4	30	solved	7	50580	2.0	5308416
+en-3-zero	one corner+one edge(2)	2	30	solved	7	130035	2.1	2654208
