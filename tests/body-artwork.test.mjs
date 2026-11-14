@@ -2,7 +2,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
 import { cross, dot } from "@cubistry/cube-core";
-import { orientBodyArtwork, sourceFaceIndex } from "../packages/cube-viewer/src/body-artwork.ts";
+import { orientBodyArtwork, planarBodyUv, sourceFaceIndex } from "../packages/cube-viewer/src/body-artwork.ts";
 import { createPresentationGeometry, PRESENTATION_PRESET as preset } from "../packages/cube-viewer/src/presentation-preset.ts";
 import { PhysicalCubeScene } from "../packages/cube-viewer/src/physical-scene.ts";
 import { createDesign } from "../src/apps/playground/model.ts";
@@ -106,4 +106,31 @@ test("rounded surface refresh follows null-to-image shader changes without takin
   let disposed = 0; texture.addEventListener("dispose", () => disposed++);
   scene.dispose(); assert.equal(disposed, 0);
   art.dispose(); plastic.dispose(); texture.dispose();
+});
+
+test("planarBodyUv: the flat part of every image face of the 2x2 body maps u = x / 0.99 + 0.5 in all orientations; the arcs end at 0 and 1; cut faces and positions stay", () => {
+  const geometry = createPresentationGeometry(2), base = geometry.body, extent = [0.99, 0.99, 0.99];
+  for (const n of axes) for (const up of axes.filter(up => dot(up, n) === 0)) {
+    const oriented = orientBodyArtwork(base, [{ n, up }]), index = sourceFaceIndex(n), right = cross(up, n);
+    const planar = planarBodyUv(oriented, extent, new Set([index]));
+    assert.deepEqual(planar.getAttribute("position").array, base.getAttribute("position").array);
+    const group = planar.groups.find(g => g.materialIndex === index), uv = planar.getAttribute("uv"), pos = planar.getAttribute("position");
+    const us = [], vs = []; let flat = 0, worst = 0;
+    for (let i = group.start; i < group.start + group.count; i++) {
+      const v = (planar.index?.getX(i) ?? i), p = [pos.getX(v), pos.getY(v), pos.getZ(v)];
+      const x = dot(right, p), y = dot(up, p);
+      us.push(uv.getX(v)); vs.push(uv.getY(v));
+      if (Math.abs(x) <= 0.4651 && Math.abs(y) <= 0.4651) { flat++; worst = Math.max(worst, Math.abs(uv.getX(v) - (x / 0.99 + 0.5)), Math.abs(uv.getY(v) - (y / 0.99 + 0.5))); }
+    }
+    assert(flat > 0 && worst < 1e-3, `${n} ${up}: deviation ${worst}`);
+    // The face group ends halfway round each bevel (45 degrees); the arc continues the plane with no smear: its UV is planar too.
+    const end = (0.99 / 2 - preset.size2BodyRadius * (1 - Math.SQRT1_2)) / 0.99 + 0.5;
+    for (const values of [us, vs]) { near(Math.min(...values), 1 - end); near(Math.max(...values), end); }
+    const other = (index + 2) % 6, g2 = planar.groups.find(g => g.materialIndex === other), o2 = oriented.groups.find(g => g.materialIndex === other);
+    for (let i = g2.start; i < g2.start + g2.count; i++) {
+      const v = (planar.index?.getX(i) ?? i);
+      assert.equal(planar.getAttribute("uv").getX(v), oriented.getAttribute("uv").getX(v), "a face outside the set keeps its UV");
+    }
+    assert.equal(g2.start, o2.start);
+  }
 });

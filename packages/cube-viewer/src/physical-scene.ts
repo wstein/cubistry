@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import * as THREE from "three";
-import { bodyArtworkKey, orientBodyArtwork, sourceFaceIndex } from "./body-artwork.ts";
+import { bodyArtworkKey, orientBodyArtwork, planarBodyUv, sourceFaceIndex } from "./body-artwork.ts";
 import type { Construction } from "./appearance.ts";
 import { cross, demand, dot, type Vec3 } from "@cubistry/cube-core";
 import { layerCenters, layerEdge, layerIndexOf, type LayerWidths, validateLayerWidths } from "./layer-widths.ts";
@@ -76,7 +76,11 @@ export interface PhysicalSceneOptions extends StickerlessBodyOptions {
 export class PhysicalCubeScene {
   private readonly bodies = new Map<number, THREE.Group>();
   private readonly references = new Map<number, { id: number; inverse: THREE.Matrix4 }>();
-  private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[] }>();
+  private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[]; base: THREE.BufferGeometry; key: string; extent: Vec3; image: ReadonlySet<number> }>();
+  /** Projected stickerless look: body geometries with planar UV on the image faces, by body variant key (see body-artwork.ts). */
+  private readonly planarBodies = new Map<string, THREE.BufferGeometry>();
+  private construction: Construction = "stickered";
+  private projecting = false;
   private readonly artwork: { id: number; surface: THREE.MeshStandardMaterial; source: THREE.MeshStandardMaterial; fallback: string; projected?: boolean }[] = [];
   private readonly stickers: THREE.Mesh[] = [];
   /** Projected picture mode: every sticker with its tile material, normal and cubie position; the clones this scene made. */
@@ -198,7 +202,9 @@ export class PhysicalCubeScene {
           faceMaterials[index] = this.miterMaterial(index, sourceIds, edges, dirs, exterior);
         }
         shell.userData.sourceFaceStickerIds = sourceIds;
-        this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials });
+        this.shells.set(s.cubie, { mesh: shell, stickerless: faceMaterials, base: bodyGeometry, key,
+          extent: (cell ?? [1, 1, 1]).map(c => BODY_SHARE * c) as unknown as Vec3,
+          image: new Set(sourceFaces.map(face => sourceFaceIndex(face.n))) });
         this.bodies.set(s.cubie, body);
         this.references.set(s.cubie, {
           id: s.id,
@@ -271,7 +277,8 @@ export class PhysicalCubeScene {
    */
   setPictureProjection(projection: PictureProjection | null): void {
     this.clearProjection();
-    if (!projection) { this.refreshArtwork(); return; }
+    this.projecting = projection !== null;
+    if (!projection) { this.updateBodyUv(); this.refreshArtwork(); return; }
     const n = this.axisCoordinates[0].length;
     demand(this.axisCoordinates.every((c) => c.length === n), "Picture projection needs a cube");
     const widths = this.layers?.widths ?? Array<number>(n).fill(1);
@@ -299,6 +306,21 @@ export class PhysicalCubeScene {
       entry.surface.color.set("#ffffff");
       entry.surface.needsUpdate = true;
       entry.projected = true;
+    }
+    this.updateBodyUv();
+  }
+  /**
+   * Stickerless and projected: the image faces of the bodies take planar UV (the linear window of the projection is exact);
+   * every other look keeps Three's arc-length UV of the body.
+   */
+  private updateBodyUv(): void {
+    const planar = this.projecting && this.construction === "stickerless";
+    for (const shell of this.shells.values()) {
+      if (!planar) { shell.mesh.geometry = shell.base; continue; }
+      const key = `${shell.key}|${shell.extent.join(",")}|${[...shell.image].sort().join("")}`; // the image faces differ between cubies of one orientation key
+      let geometry = this.planarBodies.get(key);
+      if (!geometry) { geometry = planarBodyUv(shell.base, shell.extent, shell.image); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
+      shell.mesh.geometry = geometry;
     }
   }
   /** A clone of a face texture with the window as texture transform; the clone shares the face's image (one GPU upload). */
@@ -391,6 +413,8 @@ export class PhysicalCubeScene {
   /** Materials change in place, including during a turn; source frames stay fixed. */
   setConstruction(construction: Construction): void {
     demand(["stickered", "stickerless"].includes(construction), "Invalid cube construction");
+    this.construction = construction;
+    this.updateBodyUv();
     for (const { mesh, stickerless } of this.shells.values())
       mesh.material = construction === "stickerless" ? stickerless : this.plastic;
     for (const core of this.cores)
