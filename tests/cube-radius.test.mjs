@@ -132,6 +132,30 @@ test("planarFaceUv: a cut face is planar too, so its edge stops sit where the ex
   }
 });
 
+test("planarFaceUv: every one of the six face groups of a cut-face body is planar (UV linear in position along both tangent axes)", () => {
+  const widths = thickOuterLayerWidths(7, 1.6), profile = presentationLayerProfile(widths), edge = layerEdge(widths);
+  const fr = [{ id: 1, cubie: 1, p: [-3, 3, 3], n: [0, 0, 1], up: [0, 1, 0] }, { id: 2, cubie: 2, p: [0, 0, 3], n: [0, 0, 1], up: [0, 1, 0] }];
+  const root = new THREE.Group(), mat = createStickerMaterial(new THREE.Texture());
+  const scene = new PhysicalCubeScene(root, fr, new Map(fr.map((s) => [s.id, mat])), createPlasticMaterial(), 1, createPresentationGeometry(7, edge), new Map(), { layers: profile, planarFaceUv: true, miterCutFaces: true, bodyColor: "#202329" });
+  scene.setConstruction("stickerless");
+  let bodies = 0;
+  root.traverse((o) => {
+    if (!o.isMesh || !o.userData.sourceFaceStickerIds) return;
+    const g = o.geometry; g.computeBoundingBox(); const size = g.boundingBox.getSize(new THREE.Vector3()), pos = g.getAttribute("position"), uv = g.getAttribute("uv"), axes = faceUvAxes(g);
+    for (let face = 0; face < 6; face++) {
+      const a = axes[face];
+      for (const group of g.groups.filter((x) => x.materialIndex === face)) for (let i = group.start; i < group.start + group.count; i++) {
+        const v = g.index?.getX(i) ?? i;
+        near(uv.getX(v), a.uSign * (pos.getComponent(v, a.uAxis) / size.getComponent(a.uAxis)) + 0.5, 1e-5, `face group ${face}: u linear in position`);
+        near(uv.getY(v), a.vSign * (pos.getComponent(v, a.vAxis) / size.getComponent(a.vAxis)) + 0.5, 1e-5, `face group ${face}: v linear in position`);
+      }
+    }
+    bodies++;
+  });
+  assert.ok(bodies >= 2, "bodies checked");
+  scene.dispose();
+});
+
 test("stickerSideFor keeps 0.01 between the sticker and the start of the bevel, and the sticker radius equals the body radius from 3x3 on", () => {
   for (const [n, edge] of [[5, 5], [5, 5.2], [7, 7], [7, 8.2]]) {
     const r = bodyRadiusFor(n, edge), flat = P.bodyWidth - 2 * r;
