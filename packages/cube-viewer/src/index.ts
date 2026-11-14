@@ -39,8 +39,8 @@ import {
   configurePresentationRenderer,
 } from "./presentation-preset.ts";
 export {
-  PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial,
-  createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
+  PRESENTATION_PRESET, createPresentationGeometry, createPlasticMaterial, bodyRadiusFor, stickerRadiusFor, stickerSideFor,
+  createStickerGeometry, presentationLayerProfile, createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
 export { CUT_TEXTURE_SIZE, cutColorAt, cutFaceEdges, cutPatternKey, faceUvAxes, flatCutColor, paintCutPattern, type CutEdge, type CutEdgeColor, type EdgeProfile, type EdgeStop, type FaceUvAxes } from "./cut-faces.ts";
 export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type PictureProjection, type FaceEdgeColors, type FaceEdgeName, type LayerProfile, type PhysicalSceneOptions, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";

@@ -45,6 +45,16 @@ export const CALENDAR7_SIZE = 7;
 /** Total edge of the 7x7 in units of an inner layer: (N - 2) + 2 f = 5 + 2 * 1.6 = 8.2. */
 export const NAMES_CUBE_EDGE = layerWidthsFor(CALENDAR7_SIZE).reduce((sum, w) => sum + w, 0);
 /**
+ * Bevel radius of every body of the names layout (owner decision 2026-11-14, option O2): the millimeter radius of a 3x3 at the
+ * same cube edge, BODY_RADIUS * edge / 3 = 0.055 * 8.2 / 3 = 0.1503 inner layers (the shared viewer's `bodyRadiusFor`, which
+ * tests/calendar7-layer-widths.test.mjs compares). The standard layout keeps BODY_RADIUS.
+ */
+export const NAMES_BODY_RADIUS = BODY_RADIUS * NAMES_CUBE_EDGE / 3;
+/** Distance (inner layers) from the texture edge of a face to the end of its visible part: where the bevel is 45 degrees steep, r (1 - cos 45). */
+export const NAMES_EDGE_INSET = (1 - Math.SQRT1_2) * NAMES_BODY_RADIUS;
+/** Bevel segments of a body of the names layout: the radius is 2.7 times larger, one segment would be a visible chamfer. */
+export const NAMES_BEVEL_SEGMENTS = 2;
+/**
  * Physical edge of the 7x7 in mm: the middle of the 61.5 to 70 mm range of common 7x7 cubes (an assumption, not measured on
  * the owner's cube). The names layout states its gap in mm with it.
  */
@@ -59,24 +69,26 @@ export const NAMES_GAP = NAMES_GAP_MM / INNER_CUBIE_EDGE_MM;
 export const NAMES_BODY_WIDTH = 1 - NAMES_GAP;
 /** Body size of a names-layout cubie with the layer widths `cell`: every width minus the gap. */
 export const namesBodySize = (cell: readonly number[]): [number, number, number] => cell.map(w => w - NAMES_GAP) as [number, number, number];
-/** Bevel radius of a body (the preset's, but never more than half of the thinnest side, as RoundedBoxGeometry clamps it). */
-export const bevelRadius = (width: number): number => Math.min(BODY_RADIUS, width / 2);
+/** Bevel radius of a body of the names layout (`NAMES_BODY_RADIUS`, but never more than half of the thinnest side, as RoundedBoxGeometry clamps it). */
+export const bevelRadius = (width: number): number => Math.min(NAMES_BODY_RADIUS, width / 2);
 /**
- * Texture pixels per scene unit across the flat part of a body face of an extent `w` (in inner layers) whose texture is
- * `pixels` wide. RoundedBoxGeometry (one bevel segment) maps the texture along the arc length: the face is `L - (2 - pi/2) r`
- * long in uv space, so px per unit = pixels / (L - (2 - pi/2) r) with L = w - gap. tests/calendar7-layer-widths.test.mjs
- * measures it on the real geometry.
+ * Texture pixels per scene unit of a body face of an extent `w` (in inner layers) whose texture is `pixels` wide. The names layout
+ * maps its face textures planar (PhysicalSceneOptions.planarFaceUv: u = position / body width + 0.5), so the scale is the same on the
+ * flat part and on the bevel: pixels / L with L = w - gap, and a cell edge lies where the cell edge is.
+ * tests/calendar7-layer-widths.test.mjs measures it on the real geometry.
  */
-export const facePixelsPerUnit = (w: number, pixels: number): number => {
-  const length = w - NAMES_GAP;
-  return pixels / (length - (2 - Math.PI / 2) * bevelRadius(length));
-};
-/** Share of the texture (along one axis) that is the flat part of the face: (L - 2 r) / (L - (2 - pi/2) r). */
+export const facePixelsPerUnit = (w: number, pixels: number): number => pixels / (w - NAMES_GAP);
+/** Share of the texture (along one axis) that is the flat part of the face: (L - 2 r) / L. */
 export const faceFlatShare = (w: number): number => {
-  const length = w - NAMES_GAP, r = bevelRadius(length);
-  return (length - 2 * r) / (length - (2 - Math.PI / 2) * r);
+  const length = w - NAMES_GAP;
+  return (length - 2 * bevelRadius(length)) / length;
 };
-/** Texture pixels of a 1 x 1 face of the names layout: 192 / (L - (2 - pi/2) r) = 196.9. */
+/** Share of the texture (along one axis) that is visible: up to where the bevel is 45 degrees steep, (L - 2 inset) / L. */
+export const faceVisibleShare = (w: number): number => {
+  const length = w - NAMES_GAP;
+  return (length - 2 * Math.min(NAMES_EDGE_INSET, length / 2)) / length;
+};
+/** Texture pixels of a 1 x 1 face of the names layout: 192 / L = 192.2. */
 export const NAMES_FACE_PX_PER_UNIT = facePixelsPerUnit(1, 192);
 
 /**

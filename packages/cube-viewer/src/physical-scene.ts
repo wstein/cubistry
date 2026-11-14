@@ -58,6 +58,11 @@ export interface StickerlessBodyOptions {
 export interface LayerProfile {
   readonly widths: LayerWidths;
   readonly body: (cell: readonly [number, number, number]) => THREE.BufferGeometry;
+  /**
+   * Optional sticker geometry for a face of the cell extents `width` (right) x `height` (up), in scene units. Absent: the unit
+   * sticker scaled by the cell (a corner radius that stretches with the cell). The scene owns and disposes what it returns.
+   */
+  readonly sticker?: (width: number, height: number) => THREE.BufferGeometry;
 }
 /**
  * Projected picture mode: the whole image of every face. One texture per face (caller-owned, origin bottom-left as the asset
@@ -68,8 +73,20 @@ export interface PictureProjection {
 }
 /** Share of a cell that the UV range of a body face covers (the rounded box is `bodyWidth` of the pitch wide). */
 const BODY_SHARE = 0.99;
+/** Size of the box of a body geometry. */
+const bodyExtent = (geometry: THREE.BufferGeometry): Vec3 => {
+  geometry.computeBoundingBox();
+  const size = geometry.boundingBox!.getSize(new THREE.Vector3());
+  return [size.x, size.y, size.z];
+};
 export interface PhysicalSceneOptions extends StickerlessBodyOptions {
   readonly layers?: LayerProfile;
+  /**
+   * Stickerless construction only: the exterior faces of the bodies take planar UV (`u = position / body extent + 0.5`) instead of
+   * Three's arc-length UV, always and not only in the projected look. A face texture is then linear in space: its pixels per
+   * unit are the same everywhere (the texture width over the body width) and a cell edge lies where the cell edge is.
+   */
+  readonly planarFaceUv?: boolean;
 }
 /** Size-neutral scene adapter. Callers validate prints, state and legal moves.
  * Textures/materials and animation deadlines stay caller-owned. */
@@ -79,18 +96,20 @@ export class PhysicalCubeScene {
   private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[]; base: THREE.BufferGeometry; key: string; extent: Vec3; image: ReadonlySet<number> }>();
   /** Projected stickerless look: body geometries with planar UV on the image faces, by body variant key (see body-artwork.ts). */
   private readonly planarBodies = new Map<string, THREE.BufferGeometry>();
+  private planarFaceUv = false;
   private construction: Construction = "stickered";
   private projecting = false;
   private readonly artwork: { id: number; surface: THREE.MeshStandardMaterial; source: THREE.MeshStandardMaterial; fallback: string; projected?: boolean }[] = [];
   private readonly stickers: THREE.Mesh[] = [];
   /** Projected picture mode: every sticker with its tile material, normal and cubie position; the clones this scene made. */
-  private readonly stickerInfo = new Map<number, { mesh: THREE.Mesh; base: THREE.Material; n: Vec3; up: Vec3; p: Vec3 }>();
+  private readonly stickerInfo = new Map<number, { mesh: THREE.Mesh; base: THREE.Material; n: Vec3; up: Vec3; p: Vec3; size: readonly [number, number] }>();
   private projectionTextures: THREE.Texture[] = [];
   private projectionMaterials: THREE.Material[] = [];
   private axisCoordinates: number[][] = [[], [], []];
   private readonly bodyVariants = new Map<string, THREE.BufferGeometry>();
   /** Layer profile: one body geometry per cell size. */
   private readonly cellBodies = new Map<string, THREE.BufferGeometry>();
+  private readonly cellStickers = new Map<string, THREE.BufferGeometry>();
   private readonly cores: THREE.Mesh[] = [];
   /** Stickerless core: visible only in seams; never follows a frame color. */
   private readonly coreMaterial: THREE.MeshStandardMaterial;
@@ -109,7 +128,7 @@ export class PhysicalCubeScene {
   private readonly parent: THREE.Scene | THREE.Group;
   private readonly spacing: number;
   /** Layer profile: the center of every layer along an axis (scene units, before spacing); null: unit pitch. */
-  private readonly layers: { widths: LayerWidths; centers: number[]; body: LayerProfile["body"] } | null;
+  private readonly layers: { widths: LayerWidths; centers: number[]; body: LayerProfile["body"]; sticker?: LayerProfile["sticker"] } | null;
   private readonly plastic: THREE.Material;
   constructor(
     parent: THREE.Scene | THREE.Group,
@@ -129,6 +148,7 @@ export class PhysicalCubeScene {
     demand(options.bodyColor == null || HEX_COLOR.test(options.bodyColor), "Invalid body color");
     this.bodyColor = options.bodyColor ?? null;
     this.miter = options.miterCutFaces === true;
+    this.planarFaceUv = options.planarFaceUv === true;
     if (this.miter) this.uvAxes = faceUvAxes(geometry.body);
     for (const [id, color] of faceColors) this.faceColorOf.set(id, color);
     for (const [id, edges] of options.faceEdgeColors ?? []) this.edgeColorOf.set(id, edges);
@@ -136,7 +156,7 @@ export class PhysicalCubeScene {
     this.coreMaterial = this.neutralPlastic(coreColor) as THREE.MeshStandardMaterial;
     this.spacing = spacing;
     if (options.layers) validateLayerWidths(options.layers.widths);
-    this.layers = options.layers ? { widths: options.layers.widths, centers: layerCenters(options.layers.widths), body: options.layers.body } : null;
+    this.layers = options.layers ? { widths: options.layers.widths, centers: layerCenters(options.layers.widths), body: options.layers.body, sticker: options.layers.sticker } : null;
     this.axisCoordinates = [0, 1, 2].map((axis) => [...new Set(printed.map((s) => s.p[axis]))].sort((a, b) => a - b));
     this.geometries = [geometry.body, geometry.sticker, ...(geometry.core ? [geometry.core] : [])];
     for (const s of printed) {
@@ -221,10 +241,19 @@ export class PhysicalCubeScene {
         const axisOf = (v: Vec3) => v.findIndex(c => c !== 0);
         const normalAxis = axisOf(s.n);
         sticker.position.set(...s.n).multiplyScalar(geometry.stickerOffset - 0.5 + cell[normalAxis] / 2);
-        sticker.scale.set(cell[axisOf(cross(s.up, s.n))], cell[axisOf(s.up)], 1);
+        const right = cell[axisOf(cross(s.up, s.n))], up = cell[axisOf(s.up)];
+        if (this.layers!.sticker) {
+          const key = right + "," + up;
+          let sized = this.cellStickers.get(key);
+          if (!sized) { sized = this.layers!.sticker(right, up); this.cellStickers.set(key, sized); this.geometries.push(sized); }
+          sticker.geometry = sized;
+        } else sticker.scale.set(right, up, 1);
       }
       sticker.userData.stickerId = s.id;
-      this.stickerInfo.set(s.id, { mesh: sticker, base: materials.get(s.id)!, n: s.n, up: s.up, p: s.p });
+      const own = sticker.geometry.userData.size as readonly [number, number] | undefined;
+      sticker.geometry.computeBoundingBox();
+      const box = sticker.geometry.boundingBox!;
+      this.stickerInfo.set(s.id, { mesh: sticker, base: materials.get(s.id)!, n: s.n, up: s.up, p: s.p, size: [(own?.[0] ?? box.max.x - box.min.x) * sticker.scale.x, (own?.[1] ?? box.max.y - box.min.y) * sticker.scale.y] });
       sticker.castShadow = sticker.receiveShadow = true;
       body.add(sticker);
       this.stickers.push(sticker);
@@ -284,16 +313,16 @@ export class PhysicalCubeScene {
     demand(this.axisCoordinates.every((c) => c.length === n), "Picture projection needs a cube");
     const widths = this.layers?.widths ?? Array<number>(n).fill(1);
     demand(widths.length === n, "Layer widths do not fit the cube");
-    const windowOf = (info: { n: Vec3; up: Vec3; p: Vec3 }, share: number): { face: FaceKey; win: StickerWindow } => {
+    const windowOf = (info: { n: Vec3; up: Vec3; p: Vec3; size: readonly [number, number] }, share: number, own = false): { face: FaceKey; win: StickerWindow } => {
       const face = faceOfNormal(info.n);
       demand(PROJECTED_FACES[face].up.every((c, i) => c === info.up[i]), "Picture projection needs the cube model's face frame");
       const texture = projection.faces.get(face);
       demand(texture !== undefined, `Picture projection needs the face image of ${face}`);
       const index = info.p.map((c, axis) => this.axisCoordinates[axis].indexOf(c)) as unknown as Vec3;
-      return { face, win: stickerWindow(widths, share, face, index) };
+      return { face, win: stickerWindow(widths, share, face, index, own ? info.size : undefined) };
     };
     for (const info of this.stickerInfo.values()) {
-      const { face, win } = windowOf(info, STICKER_SHARE);
+      const { face, win } = windowOf(info, STICKER_SHARE, true);
       const material = info.base.clone() as THREE.MeshStandardMaterial;
       material.map = this.windowedTexture(projection.faces.get(face)!, win);
       material.color.set("#ffffff");
@@ -316,12 +345,14 @@ export class PhysicalCubeScene {
    * every other look keeps Three's arc-length UV of the body.
    */
   private updateBodyUv(): void {
-    const planar = this.projecting && this.construction === "stickerless";
+    const planar = (this.projecting || this.planarFaceUv) && this.construction === "stickerless";
     for (const shell of this.shells.values()) {
       if (!planar) { shell.mesh.geometry = shell.base; continue; }
-      const key = `${shell.key}|${shell.extent.join(",")}|${[...shell.image].sort().join("")}`; // the image faces differ between cubies of one orientation key
+      // The projected look maps the face image over the preset share of the cell; the planar face UV over the body itself.
+      const extent = this.projecting ? shell.extent : bodyExtent(shell.base);
+      const key = `${shell.key}|${extent.join(",")}|${[...shell.image].sort().join("")}`; // the image faces differ between cubies of one orientation key
       let geometry = this.planarBodies.get(key);
-      if (!geometry) { geometry = planarBodyUv(shell.base, shell.extent, shell.image); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
+      if (!geometry) { geometry = planarBodyUv(shell.base, extent, shell.image); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
       shell.mesh.geometry = geometry;
     }
   }
@@ -467,6 +498,7 @@ export class PhysicalCubeScene {
     this.artwork.length = 0;
     this.bodyVariants.clear();
     this.cellBodies.clear();
+    this.cellStickers.clear();
     this.miterSlots.length = 0;
     this.miterMaterials.clear();
     for (const texture of this.miterTextures) texture.dispose();
