@@ -90,7 +90,8 @@ export function stickerArt(
   return {
     weight: r.weight,
     color: r.ink,
-    ground: r.ground,
+    // An unprinted sticker is paper whatever its slot: the German blank tens digit sits in the month-class slot 4.
+    ground: s.image === "" ? scheme.ground : r.ground,
     size: s.image.length === 3 ? 82 : s.image.length === 2 ? 112 : 168,
   };
 }
