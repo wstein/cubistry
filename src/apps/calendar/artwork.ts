@@ -1,8 +1,11 @@
 import type { Sticker } from "./model.ts";
 import { SCHEMES, type ColorScheme } from "../calendar7/schemes.ts";
 
-/** Label classes of a 3x3 calendar sticker. German has no weekend class: its weekday stickers are plain in every scheme. */
-export type StickerRole = "day" | "weekday" | "month" | "weekend";
+/**
+ * Label classes of a 3x3 calendar sticker. `weekdayDe` is the German weekday: the chip of the month in a theme, plain in the
+ * default scheme. German has no weekend class. `stickerRole` itself never returns `weekdayDe`; `stickerArt` maps German weekdays to it.
+ */
+export type StickerRole = "day" | "weekday" | "weekdayDe" | "month" | "weekend";
 export interface RoleInk {
   readonly ink: string;
   readonly ground: string;
@@ -29,6 +32,7 @@ export const DEFAULT_CAL3_SCHEME: Cal3Scheme = Object.freeze({
     day: plain("#315d4e"),
     weekday: plain("#25343e"),
     month: plain("#925a32"),
+    weekdayDe: plain("#25343e"),
     weekend: plain("#ba302c", 800),
   }),
 });
@@ -56,7 +60,7 @@ function fromCalendar7(s: ColorScheme): Cal3Scheme {
     id: s.id,
     name: s.name,
     ground: s.dayFill,
-    roles: Object.freeze({ day: on(s.dayInk), weekday: on(s.weekdayInk), month: chip, weekend }),
+    roles: Object.freeze({ day: on(s.dayInk), weekday: on(s.weekdayInk), weekdayDe: chip, month: chip, weekend }),
   });
 }
 
@@ -80,13 +84,16 @@ export function stickerRole(s: Pick<Sticker, "image" | "slot">): StickerRole {
 export function stickerArt(
   s: Pick<Sticker, "image" | "slot">,
   scheme: Cal3Scheme = DEFAULT_CAL3_SCHEME,
+  /** True for the German print: its weekday stickers use the `weekdayDe` role (the shared chip in a theme). */
+  german = false,
 ): {
   color: string;
   ground: string;
   size: number;
   weight: 600 | 800;
 } {
-  const r = scheme.roles[stickerRole(s)];
+  const role = stickerRole(s);
+  const r = scheme.roles[german && role === "weekday" ? "weekdayDe" : role];
   return {
     weight: r.weight,
     color: r.ink,
@@ -107,8 +114,8 @@ export interface StickerContext {
 }
 
 /** Paints one 256 px sticker texture: ground, then the glyph. Used again on the same canvas when the scheme changes. */
-export function paintSticker(ctx: StickerContext, s: Pick<Sticker, "image" | "slot">, scheme: Cal3Scheme): void {
-  const art = stickerArt(s, scheme);
+export function paintSticker(ctx: StickerContext, s: Pick<Sticker, "image" | "slot">, scheme: Cal3Scheme, german = false): void {
+  const art = stickerArt(s, scheme, german);
   ctx.fillStyle = art.ground;
   ctx.fillRect(0, 0, 256, 256);
   ctx.fillStyle = art.color;
