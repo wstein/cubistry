@@ -28,12 +28,12 @@ test("radii per size: outer = the radius of the cube, inner = 0.6 of it, the ext
 });
 
 test("edge radius per edge: only an edge between two exterior faces is big", () => {
-  const corner = sides("+x", "+y", "+z"), edgePiece = sides("+y", "+z"), faceCentre = sides("+z");
+  const corner = sides("+x", "+y", "+z"), edgePiece = sides("+y", "+z"), faceCenter = sides("+z");
   for (const axis of [0, 1, 2]) for (let k = 0; k < 4; k++) {
     const signs = [0, 0, 0]; signs[(axis + 1) % 3] = k & 1; signs[(axis + 2) % 3] = k >> 1;
     const b = (axis + 1) % 3, c = (axis + 2) % 3;
     assert.equal(edgeRadius(corner, axis, signs, 9, 1), signs[b] === 1 && signs[c] === 1 ? 9 : 1, `corner cubie, axis ${axis} signs ${signs}`);
-    assert.equal(edgeRadius(faceCentre, axis, signs, 9, 1), 1, "a face centre has no big edge");
+    assert.equal(edgeRadius(faceCenter, axis, signs, 9, 1), 1, "a face center has no big edge");
   }
   assert.equal(edgeRadius(edgePiece, 0, [0, 1, 1], 9, 1), 9, "edge piece: the edge along x at (+y,+z)");
   assert.equal(edgeRadius(edgePiece, 1, [1, 0, 1], 9, 1), 1, "edge piece: the edge along y at (+x,+z) is small");
@@ -113,11 +113,11 @@ test("the flat face of an exterior cubie is as large as that of an inner cubie, 
     if (inner) for (const f of [0, 2, 4]) for (const e of flatExtent(inner, f)) near(e.width, flatInner, 1e-5, `N=${n} inner cubie flat face`);
     const w0 = widths[0], thin = Math.abs(w0 - 1) < 0.1; // the extended profile (no thick layer)
     // exterior cubie on the +z face: its flat width along x (its -x side is a seam, its +x side the cube edge when it is a corner)
-    for (const [name, outer, cell] of [["corner", sides("+x", "+y", "+z"), [w0, w0, w0]], ["edge piece", sides("+y", "+z"), [1, w0, w0]], ["face centre", sides("+z"), [1, 1, w0]]]) {
+    for (const [name, outer, cell] of [["corner", sides("+x", "+y", "+z"), [w0, w0, w0]], ["edge piece", sides("+y", "+z"), [1, w0, w0]], ["face center", sides("+z"), [1, 1, w0]]]) {
       if (n === 2 && name !== "corner") continue;
       const g = profile.body(cell, outer), flat = flatExtent(g, 4); // +z face
       for (const e of flat) {
-        const outerSide = e.axis === 0 ? (name === "corner") : (name !== "face centre"); // is the + border of this axis a cube edge
+        const outerSide = e.axis === 0 ? (name === "corner") : (name !== "face center"); // is the + border of this axis a cube edge
         const width = cell[e.axis] - (1 - P.bodyWidth) - small - (outerSide ? big : small);
         near(e.width, width, 1e-5, `N=${n} ${name} flat width along ${"xyz"[e.axis]}`);
         if (thin && cell[e.axis] !== 1) near(e.width, flatInner, 1e-5, `N=${n} ${name}: the extended exterior cubie has the flat width of an inner cubie`);
@@ -150,7 +150,7 @@ test("scene: the sticker is the same size on every cell (inner, edge, corner), t
       const w = [b.s.x, b.s.y];
       assert.ok(w.every((x) => Math.abs(x - (P.bodyWidth)) < 1e-6 || Math.abs(x - (P.bodyWidth + e)) < 1e-6 || Math.abs(x - (P.bodyWidth + e)) < 1e-6), `N=${n} body size ${w}`);
     }
-    // adjacent bodies keep the gap 0.01: centre distance minus the mean of the two widths
+    // adjacent bodies keep the gap 0.01: center distance minus the mean of the two widths
     const xs = [...new Set(bodies.map((b) => b.p.x.toFixed(6)))].map(Number).sort((a, b) => a - b);
     assert.ok(xs.length === n || n === 2 || true);
     scene.dispose?.();
@@ -167,10 +167,10 @@ test("sticker side per size: 0.87 where the flat face allows it, else the flat f
   near(stickerSideFor(1, innerRadiusFor(2)), 0.87, 1e-12); near(stickerSideFor(1, innerRadiusFor(3)), 0.87, 1e-12);
 });
 
-test("corner radii: a face centre has the small radius at every corner, an exterior face gets the large rounding only along borders it shares with another exterior face", () => {
-  const faceCentre = sides("+z"), edgePiece = sides("+y", "+z");
-  for (let k = 0; k < 8; k++) assert.deepEqual(cornerRho(faceCentre, [k & 1, (k >> 1) & 1, (k >> 2) & 1], 9, 1), [1, 1, 1], `face centre corner ${k}`);
-  assert.deepEqual(cornerRho(edgePiece, [1, 1, 0], 9, 1), [1, 1, 1].map((v, a) => (a === 1 ? 1 : v)), "far from the cube edge in z: the +y face has no exterior neighbour there");
+test("corner radii: a face center has the small radius at every corner, an exterior face gets the large rounding only along borders it shares with another exterior face", () => {
+  const faceCenter = sides("+z"), edgePiece = sides("+y", "+z");
+  for (let k = 0; k < 8; k++) assert.deepEqual(cornerRho(faceCenter, [k & 1, (k >> 1) & 1, (k >> 2) & 1], 9, 1), [1, 1, 1], `face center corner ${k}`);
+  assert.deepEqual(cornerRho(edgePiece, [1, 1, 0], 9, 1), [1, 1, 1].map((v, a) => (a === 1 ? 1 : v)), "far from the cube edge in z: the +y face has no exterior neighbor there");
   assert.deepEqual(cornerRho(edgePiece, [1, 1, 1], 9, 1), [1, 9, 9], "the corner on the cube edge");
 });
 
