@@ -37,7 +37,7 @@ export function readAppearance(storage: Pick<Storage, "getItem">, key: string): 
 }
 
 /** One small presentation control per viewport; no application-state settings. */
-export function installAppearanceControls(host: HTMLElement, change: (value: ViewerAppearance) => void) {
+export function installAppearanceControls(host: HTMLElement, change: (value: ViewerAppearance, info?: { readonly pictureChosen: boolean }) => void) {
   const key = appearanceStorageKey(location.pathname);
   let value = DEFAULT_APPEARANCE;
   try { value = readAppearance(localStorage, key); } catch { /* Storage may be unavailable. */ }
@@ -182,13 +182,13 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
     mode.value = value.construction; color.value = value.frameColor ?? defaultColor;
     color.disabled = reset.disabled = value.construction === "stickerless";
   };
-  const update = (next: ViewerAppearance) => {
-    value = validateAppearance(next); refresh(); change(value);
+  const update = (next: ViewerAppearance, pictureChosen = false) => {
+    value = validateAppearance(next); refresh(); change(value, pictureChosen ? { pictureChosen } : undefined);
     try { localStorage.setItem(key, JSON.stringify({ version: 1, ...value })); } catch { /* Presentation remains usable. */ }
   };
   const showPictureMode = (id: PictureMode) => { pictures.value = id; picturesHelp.textContent = PICTURE_MODE_HELP[id]; };
   showPictureMode(DEFAULT_PICTURE_MODE);
-  pictures.addEventListener("change", () => { const id = parsePictureMode(pictures.value); if (id) update({ ...value, pictureMode: id }); });
+  pictures.addEventListener("change", () => { const id = parsePictureMode(pictures.value); if (id) update({ ...value, pictureMode: id }, true); });
   mode.addEventListener("change", () => update({ ...value, construction: mode.value as Construction }));
   color.addEventListener("input", () => update({ ...value, frameColor: color.value }));
   reset.addEventListener("click", () => update({ ...value, frameColor: null }));

@@ -25,6 +25,12 @@ export { clampPitch, pitchLimit } from "./orbit-input.ts";
 export type { MotionTiming, MotionTimingSource } from "./motion-timing.ts";
 import { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppearanceControls, type ViewerAppearance } from "./appearance.ts";
 export { DEFAULT_APPEARANCE, validateAppearance, sourceFaceColor, installAppearanceControls, type ViewerAppearance, type Construction } from "./appearance.ts";
+import { effectivePictureMode, type PictureMode } from "./picture-mode.ts";
+export { DEFAULT_PICTURE_MODE, PICTURE_MODES, PICTURES_PARAM, PICTURE_MODE_HELP, PICTURE_MODE_LABEL, parsePictureMode, effectivePictureMode, type PictureMode } from "./picture-mode.ts";
+import { FACE_KEYS, type FaceKey } from "./projected-uv.ts";
+export { FACE_KEYS, PROJECTED_FACES, STICKER_SHARE, faceOfNormal, gapWidth, imageExtent, stickerWindow, windowUv, type FaceKey, type StickerWindow } from "./projected-uv.ts";
+/** Id of the whole-face image of `face` in the viewer's assets; a design that has all six offers the Projected picture mode. */
+export const faceImageAssetId = (face: FaceKey): string => `face_${face}`;
 import { createPresentationStudio } from "./studio.ts";
 export { createPresentationStudio, STUDIO_BACKGROUND } from "./studio.ts";
 import { PhysicalCubeScene } from "./physical-scene.ts";
@@ -37,7 +43,7 @@ export {
   createStickerMaterial, configurePresentationRenderer, addPresentationLighting,
 } from "./presentation-preset.ts";
 export { CUT_TEXTURE_SIZE, cutColorAt, cutFaceEdges, cutPatternKey, faceUvAxes, flatCutColor, paintCutPattern, type CutEdge, type CutEdgeColor, type EdgeProfile, type EdgeStop, type FaceUvAxes } from "./cut-faces.ts";
-export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type FaceEdgeColors, type FaceEdgeName, type LayerProfile, type PhysicalSceneOptions, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";
+export { PhysicalCubeScene, stickerFrame, DEFAULT_CORE_COLOR, type PictureProjection, type FaceEdgeColors, type FaceEdgeName, type LayerProfile, type PhysicalSceneOptions, type PhysicalStickerFrame, type StickerlessBodyOptions } from "./physical-scene.ts";
 export { layerCenters, layerEdge, layerIndexOf, layerPlanes, thickOuterLayerWidths, uniformLayerWidths, validateLayerWidths, type LayerWidths } from "./layer-widths.ts";
 import { bindSmartRotation, type SmartRotationBinding } from "./rotation-binding.ts";
 import { bindLightingSwitches, type LightingSwitches } from "./lighting-switches.ts";
@@ -100,6 +106,10 @@ export class CubeViewer {
   private imageMaps = new Map<string, THREE.Texture>();
   private stickerMaterials = new Map<number, THREE.MeshStandardMaterial>();
   private faceletImageOverride: FaceletImageOverride | null = null;
+  /** The six whole-face textures of the loaded design; null: the design has none (tile mapping only). */
+  private pictureFaces: Map<FaceKey, THREE.Texture> | null = null;
+  private pictureUrlMode: PictureMode | undefined;
+  private projectionOn = false;
   private presented: CubeState | null = null;
   private radius = 10.5;
   private busy = false;
@@ -136,7 +146,7 @@ export class CubeViewer {
     configurePresentationRenderer(this.renderer);
     host.append(this.renderer.domElement);
     this.studio = createPresentationStudio(this.scene, 1, 1, host, cubePresentationRadius(1));
-    this.appearanceControls = installAppearanceControls(host, (value) => this.setAppearance(value));
+    this.appearanceControls = installAppearanceControls(host, (value, info) => this.setAppearance(value, info?.pictureChosen));
     this.lightingSwitches = bindLightingSwitches(this.appearanceControls.panel, this.studio);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth,
@@ -179,10 +189,36 @@ export class CubeViewer {
       this.renderer.render(this.scene, this.camera);
     });
   }
-  setAppearance(value: ViewerAppearance): void {
-    this.appearance = validateAppearance(value);
+  /** `pictureChosen`: the value comes from the Pictures menu, a newer choice than the mode that the URL named. */
+  setAppearance(value: ViewerAppearance, pictureChosen = false): void {
+    const next = validateAppearance(value);
+    if (pictureChosen || next.pictureMode !== this.appearance.pictureMode) this.pictureUrlMode = undefined;
+    this.appearance = next;
     this.plastic?.color.set(this.appearance.frameColor ?? this.defaultPlasticColor);
     this.cube?.setConstruction(this.appearance.construction);
+    this.applyPictureMode();
+  }
+  /** True when the loaded design has the whole image of every face (the Pictures choice is meaningful). */
+  get picturesAvailable(): boolean {
+    return this.pictureFaces !== null;
+  }
+  /** The mode in effect: an explicit URL mode, else the explicit stored choice, else Projected. */
+  get pictureMode(): PictureMode {
+    return effectivePictureMode({ url: this.pictureUrlMode, stored: this.appearance.pictureMode });
+  }
+  /** The mode that the page address named (`?pictures=`); undefined: the address names none. */
+  setPictureModeFromUrl(mode: PictureMode | undefined): void {
+    this.pictureUrlMode = mode;
+    this.applyPictureMode();
+  }
+  private applyPictureMode(): void {
+    const mode = this.pictureMode, faces = this.pictureFaces;
+    const wanted = mode === "projected" && faces !== null;
+    if (this.cube && wanted !== this.projectionOn) {
+      this.cube.setPictureProjection(wanted ? { faces: faces! } : null);
+      this.projectionOn = wanted;
+    }
+    this.appearanceControls?.setPictureChoice({ available: faces !== null, mode });
   }
   resetCamera(): void {
     if (this.shared) {
@@ -260,6 +296,7 @@ export class CubeViewer {
     for (const t of this.textures) t.dispose();
     this.materials = [];
     this.textures = [];
+    this.projectionOn = false;
     this.faceletImageOverride = null;
     this.print = validatePrint(print);
     this.presented = validateState(state, this.print);
@@ -274,6 +311,10 @@ export class CubeViewer {
         return [id, t];
       }),
     ));
+    // Whole-face images (Projected mode): all six or none; they are textures of the same asset set.
+    const faceMaps = FACE_KEYS.map((face) => [face, maps.get(faceImageAssetId(face))] as const);
+    this.pictureFaces = faceMaps.every(([, t]) => t) ? new Map(faceMaps as [FaceKey, THREE.Texture][]) : null;
+    for (const t of this.pictureFaces?.values() ?? []) t.anisotropy = 8;
     const plasticDef = assets.materials.get("plastic");
     const plastic = createPlasticMaterial(plasticDef?.color, plasticDef?.roughness);
     this.plastic = plastic;
@@ -297,6 +338,7 @@ export class CubeViewer {
       { bodyColor: assets.materials.get("body")?.color, coreColor: assets.materials.get("core")?.color });
     this.setAppearance(this.appearance ?? DEFAULT_APPEARANCE);
     this.sync(state);
+    this.applyPictureMode();
     this.updateFaceletImage();
   }
   private sync(state: CubeState): void {

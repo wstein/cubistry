@@ -97,8 +97,8 @@ test("the menu: Pictures is a separate control with Projected and Per sticker; C
 test("choosing a picture mode is an explicit choice: reported and stored; the other settings are kept; nothing is stored before", () => {
   const storage = memory();
   withGlobals(storage, () => {
-    const host = new Element("div"), seen = [];
-    const controls = installAppearanceControls(host, value => seen.push(value));
+    const host = new Element("div"), seen = [], seenInfo = [];
+    const controls = installAppearanceControls(host, (value, info) => { seen.push(value); seenInfo.push(info); });
     assert.equal(storage.box.writes.length, 0, "installing never stores a picture mode");
     assert.equal("pictureMode" in seen.at(-1), false);
     controls.setPictureChoice({ available: true, mode: "projected" });
@@ -106,6 +106,7 @@ test("choosing a picture mode is an explicit choice: reported and stored; the ot
     const pictures = walk(host).find(node => node.tagName === "select" && node.attributes["aria-label"] === "Picture mapping");
     pictures.value = "per-sticker"; pictures.listeners.change();
     assert.equal(seen.at(-1).pictureMode, "per-sticker");
+    assert.deepEqual(seenInfo.at(-1), { pictureChosen: true }, "reported as a menu choice");
     assert.equal(JSON.parse(storage.box.value).pictureMode, "per-sticker");
     assert.equal(JSON.parse(storage.box.value).construction, "stickered");
   });
