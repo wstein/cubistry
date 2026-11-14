@@ -10,7 +10,7 @@ import * as THREE from "three";
  * moves to `inner + rho * m`, where `inner` is q clamped to the box shrunk by `rho` per axis, `m` the unit vector of
  * `(q - inner) / rho` and `rho` the radii of the three axes. `rho[a]` at a corner is big when the face (a, side) is exterior and
  * one of the two other faces at that corner is exterior, so an exterior face gets the large rounding only along the borders it
- * shares with another exterior face; its other borders (the seams to its neighbours on the same cube face) get the small one.
+ * shares with another exterior face; its other borders (the seams to its neighbors on the same cube face) get the small one.
  * Away from the corners `rho` is interpolated bilinearly along the border.
  *
  * Face groups, vertex order and the UV of the faces follow three's Box/RoundedBox (+X, -X, +Y, -Y, +Z, -Z, the same image
