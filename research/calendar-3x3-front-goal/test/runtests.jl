@@ -266,4 +266,71 @@ end
     @test mixed >= 1
 end
 
+
+# ---- free rotations against an independent Node brute force (fixtures/bf-rot-cases.tsv, export-bf-rot-cases.mjs)
+# Every case needs the required center brought to the front by a rotation of two tokens; no word of at most one token
+# reaches a goal within the optimum.
+function bf_rot_cases()
+    out = NamedTuple[]
+    for l in eachline(joinpath(FIX, "bf-rot-cases.tsv"))
+        startswith(l, "#") && continue
+        f = split(l, '\t'; keepempty = true)
+        push!(out, (id = String(f[1]), cells = parse_cells(f[2]), word = String(f[3]), opt = parse(Int, f[5]),
+            bfword = String(f[6]), rot = parse(Int, f[7])))
+    end
+    return out
+end
+BFROT = bf_rot_cases()
+
+@testset "free rotations: optimum equals independent brute force, center off the front, two-token rotation" begin
+    for c in BFROT
+        pose = apply_word(prints[c.id].solved, c.word)
+        r = solve_front(heur(c.id, c.cells), pose; maxdepth = 6)
+        @test r.status == :solved && r.htm == c.opt && r.rotations == c.rot == 2
+        @test FG.matches_pose(prints[c.id], c.cells, apply_word(pose, r.word))
+        # the brute-force word reaches a goal as well (rotation tokens of this word, then outer turns)
+        @test FG.matches_pose(prints[c.id], c.cells, apply_word(pose, c.bfword))
+    end
+    @test length(BFROT) >= 24 && count(c -> c.opt >= 3, BFROT) >= 8
+end
+
+@testset "equal length and equal rotation tokens: first rotation word in table order is kept" begin
+    ties = 0
+    for c in vcat(BF[1:2:end], BFROT)
+        c.opt == 0 && continue
+        pose = apply_word(prints[c.id].solved, c.word)
+        h = heur(c.id, c.cells)
+        r = solve_front(h, pose; maxdepth = 9)
+        r.status == :solved || continue
+        # independent: rotation words in table order whose rotation-free optimum equals the route length
+        same = String[]
+        for w in FG.ROTWORDS
+            q = solve_front(h, apply_word(pose, w); rotations = :none, maxdepth = r.htm)
+            q.status == :solved && q.htm == r.htm && (isempty(w) ? 0 : length(split(w))) == r.rotations && push!(same, w)
+        end
+        @test !isempty(same)
+        if length(same) >= 2
+            ties += 1
+            @test startswith(r.word, same[1] * " ")
+        end
+    end
+    @test ties >= 1
+end
+
+@testset "final acceptance check does not rely on the tables" begin
+    # a heuristic without tables is 0 everywhere: only the final matches_pose test separates goals from other states
+    n = 0
+    for c in BF
+        1 <= c.opt <= 3 || continue
+        pose = apply_word(prints[c.id].solved, c.word)
+        h = heur(c.id, c.cells)
+        blank = FG.Heuristic(h.print, h.cells, h.cubies, h.acc, h.pdbs[1:0], 0.0, 0)
+        r = solve_front(blank, pose; rotations = :none, maxdepth = 3)
+        @test r.status == :solved && r.htm == c.opt
+        @test FG.matches_pose(prints[c.id], c.cells, apply_word(pose, r.word))
+        n += 1
+    end
+    @test n >= 3
+end
+
 end
