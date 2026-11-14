@@ -191,7 +191,7 @@ test("scene: the exterior sides of a cubie come from its layer, not mirrored (a 
   scene.dispose?.();
 });
 
-test("the rounding extent changes linearly along a border where the corners differ (no step in the middle of the edge)", () => {
+test("a seam edge has the small radius along its length: the large rounding opens only within two large radii of the cube edge (owner: every edge that is not on a cube edge has 0.6 R)", () => {
   const size = [1.0, 1.6, 1.6], h = [0.5, 0.8, 0.8], R = 0.15, r = 0.09;
   const g = createTwoRadiusBody({ size, outer: sides("+y", "+z"), big: R, small: r, segments: 3 }), p = g.getAttribute("position"), nor = g.getAttribute("normal");
   const group = g.groups.find((x) => x.materialIndex === 0); // the +x end face: its +z border rounds by rho_z, R next to the cube edge (+y), r at the other end
@@ -202,8 +202,12 @@ test("the rounding extent changes linearly along a border where the corners diff
     rows.set(p.getY(v).toFixed(6), p.getZ(v));
   }
   assert.ok(rows.size >= 2, "rows of the z border");
+  const dists = [];
   for (const [y, z] of rows) {
-    const rhoZ = (h[2] - z) / (1 - Math.SQRT1_2), expect = r + (R - r) * (Number(y) + h[1]) / (2 * h[1]);
-    near(rhoZ, expect, 1e-6, `rho_z at y ${y}`);
+    const rhoZ = (h[2] - z) / (1 - Math.SQRT1_2), d = h[1] - Number(y), expect = r + (R - r) * Math.min(1, Math.max(0, 2 - d / R));
+    near(rhoZ, expect, 1e-6, `rho_z at y ${y} (${d.toFixed(3)} from the cube edge)`); dists.push(d);
   }
+  assert.ok(dists.some((d) => Math.abs(d - R) < 1e-6) && dists.some((d) => Math.abs(d - 2 * R) < 1e-6), "rows where the ramp starts and ends");
+  const middle = [...rows].filter(([y]) => h[1] - Number(y) >= 2 * R - 1e-9);
+  assert.ok(middle.length >= 2 && middle.every(([, z]) => Math.abs((h[2] - z) / (1 - Math.SQRT1_2) - r) < 1e-6), "the seam edge is a circle of the small radius from 2 R on");
 });
