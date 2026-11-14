@@ -361,4 +361,3 @@ test("plasticity: the exposure gain gives back what shadows, specular and clearc
   }
   assert.ok(plasticityGain(1) > plasticityGain(0.25));
 });
-

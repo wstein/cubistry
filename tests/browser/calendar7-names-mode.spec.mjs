@@ -192,7 +192,7 @@ test("the renderer uses the soft shoulder (Custom) tone mapping at the face-foll
     return out;
   });
   const NEUTRAL = 7, CUSTOM = 5; // THREE.NeutralToneMapping, THREE.CustomToneMapping (the soft shoulder of names-tone.ts)
-  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.03); // 1.264 against 1.217: the names light rig keeps 8% of the directional lights, so the tilt costs the front face less than before (0.1 or more)
+  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.1);
   expect(seen.namesHeadOn).toBeCloseTo(1.217, 2);
   expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: CUSTOM, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
 });
@@ -350,7 +350,7 @@ test("turning the cube changes the names exposure through the render loop (no ma
     return out;
   });
   expect(seen.headOn).toBeCloseTo(1.217, 2);
-  expect(seen.start).toBeGreaterThan(seen.headOn + 0.03); // see the tone mapping test: the rig makes the tilt effect small
+  expect(seen.start).toBeGreaterThan(seen.headOn + 0.1);
   expect(Math.abs(seen.steep - seen.headOn)).toBeGreaterThan(0.05);
   expect(seen.standard).toBe(1);
 });
@@ -383,4 +383,35 @@ test("the studio lights keep the intensities of a fresh viewer in the names layo
   expect(seen.names).toEqual(seen.fresh);
   expect(seen.standard).toEqual(seen.fresh);
   expect(seen.again).toEqual(seen.fresh);
+});
+
+test("only the names layout carries the face light: its materials are patched and the uniform is on; the standard layout has neither", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const count = () => { let patched = 0, total = 0; viewer.presentation.traverse((o) => { if (!o.isMesh) return; for (const m of [].concat(o.material)) { total++; if (m.userData.c7FaceLight) patched++; } }); return { patched, total }; };
+    const out = {};
+    viewer.configure(names.printing, names.pose, "face", "names");
+    viewer.syncExposure();
+    out.names = { ...count(), uniform: viewer.faceLight.value.toArray().slice(0, 2) };
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    viewer.syncExposure();
+    out.standard = { ...count(), uniform: viewer.faceLight.value.toArray().slice(0, 2) };
+    viewer.destroy();
+    return out;
+  });
+  expect(seen.names.total).toBeGreaterThan(100);
+  expect(seen.names.patched).toBe(seen.names.total); // every material of the cube
+  expect(seen.names.uniform[0]).toBeCloseTo(0.08, 6); // the share, and the target irradiance (the second value) is set
+  expect(seen.names.uniform[1]).toBeGreaterThan(0.5);
+  expect(seen.standard.patched).toBe(0);
+  expect(seen.standard.uniform).toEqual([1, 0]); // the studio's light on every face
 });
