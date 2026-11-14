@@ -217,3 +217,54 @@ test("round trip in the stickerless construction: after Per sticker the body fac
   assert.deepEqual(read(), before);
   scene.dispose();
 });
+
+/** The image coordinate that each flat-part vertex of an image face of every body samples, against its ideal place on the cube. */
+function imageErrors(scene, parent, fr, n) {
+  let worst = 0, count = 0;
+  parent.children.filter((b) => b.isGroup).forEach((body) => {
+    const shell = body.children[0], ids = shell.userData.sourceFaceStickerIds, uv = shell.geometry.getAttribute("uv"), pos = shell.geometry.getAttribute("position");
+    ids.forEach((id, index) => {
+      if (id === null) return;
+      const s = fr.find((x) => x.id === id), { up } = PROJECTED_FACES[faceOf(s.n)], map = shell.material[index].map;
+      const right = [up[1] * s.n[2] - up[2] * s.n[1], up[2] * s.n[0] - up[0] * s.n[2], up[0] * s.n[1] - up[1] * s.n[0]];
+      const along = (v, d) => v[0] * d[0] + v[1] * d[1] + v[2] * d[2];
+      const group = shell.geometry.groups.find((g) => g.materialIndex === index), seen = new Set();
+      for (let i = group.start; i < group.start + group.count; i++) {
+        const v = (shell.geometry.index?.getX(i) ?? i); if (seen.has(v)) continue; seen.add(v);
+        const p = [pos.getX(v), pos.getY(v), pos.getZ(v)], u = along(p, right), w = along(p, up);
+        if (Math.abs(u) > 0.4401 || Math.abs(w) > 0.4401) continue; // the flat part, up to where the bevel starts: 0.495 - 0.055 = 0.44
+        const tu = map.offset.x + map.repeat.x * uv.getX(v), tv = map.offset.y + map.repeat.y * uv.getY(v);
+        worst = Math.max(worst, Math.abs(tu - ((along(body.position.toArray(), right) + u) / n + 0.5)), Math.abs(tv - ((along(body.position.toArray(), up) + w) / n + 0.5)));
+        count++;
+      }
+    });
+  });
+  return { worst, count };
+}
+
+test("stickerless projected: the image faces of the bodies have planar UV, so every flat-part vertex samples its ideal image point", () => {
+  for (const [n, widths] of [[2], [3], [7], [5, thickOuterLayerWidths(5, 1.2)], [7, thickOuterLayerWidths(7, 1.8)]]) {
+    const { scene, parent, fr } = build(n, { widths });
+    scene.setConstruction("stickerless"); scene.setPictureProjection({ faces: faceTextures() });
+    const { worst, count } = imageErrors(scene, parent, fr, widths ? widths.reduce((a, b) => a + b, 0) : n);
+    assert.ok(count > 20, `${n}: vertices checked`);
+    assert.ok(worst < 1e-6, `${n}: image coordinate error ${worst} (arc-length UV gives about ${0.0063 / n})`);
+    scene.dispose();
+  }
+});
+
+test("body UV stays Three's arc length in look A, in look B (stickered projected) and after Projected is switched off; switching construction follows", () => {
+  const { scene, parent, fr } = build(2), uvOf = () => parent.children.filter((b) => b.isGroup).map((b) => Array.from(b.children[0].geometry.getAttribute("uv").array));
+  const initial = uvOf(), faces = faceTextures();
+  scene.setPictureProjection({ faces }); // look B: stickered
+  assert.deepEqual(uvOf(), initial, "look B keeps the body UV");
+  scene.setConstruction("stickerless");
+  assert.notDeepEqual(uvOf(), initial, "look C has planar UV");
+  scene.setConstruction("stickered");
+  assert.deepEqual(uvOf(), initial, "stickered again");
+  scene.setConstruction("stickerless");
+  scene.setPictureProjection(null); // stickerless without projection (not reachable in the app, kept exact)
+  assert.deepEqual(uvOf(), initial);
+  assert.ok(imageErrors(scene, parent, fr, 2).worst > 1e-3, "the arc-length UV is off the ideal point (this is what planar UV fixes)");
+  scene.dispose();
+});
