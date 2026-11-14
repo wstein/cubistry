@@ -15,7 +15,8 @@ for (const scheme of ["rubik-tint", "solarized-light"]) test(`${scheme} (Feb 202
   test.setTimeout(150000);
   await openApp(page, { scheme, year: 2027, month: 2 });
   for (const [pitch, rotY] of VIEWS) {
-    const { faces } = await measureFaces(page, { pitch, rotY });
+    const { faces, toneMapping } = await measureFaces(page, { pitch, rotY });
+    expect(toneMapping, `${scheme}: the names layout renders with the soft shoulder (THREE.CustomToneMapping, names-tone.ts)`).toBe(5);
     const id = `${scheme} pitch ${pitch}`, { up, front } = faces;
     expect(up, `${id}: the top face is visible`).toBeTruthy();
     expect(up.coloredTiles, `${id}: colored top tiles`).toBeGreaterThanOrEqual(30);

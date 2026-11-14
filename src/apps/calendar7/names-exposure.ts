@@ -2,7 +2,7 @@
 import * as THREE from "three";
 
 /**
- * Exposure of the names layout (renderer.toneMappingExposure at Linear tone mapping): the inverse of the radiance a white
+ * Exposure of the names layout (renderer.toneMappingExposure at the soft shoulder tone mapping of names-tone.ts, a plain exposure scale up to 0.95): the inverse of the radiance a white
  * diffuse surface gets from the scene lights on the face that looks at the camera, so that face shows its albedo and a color
  * token renders as itself, with the paper white as the reference. three.js lights give an albedo times irradiance / pi.
  *
