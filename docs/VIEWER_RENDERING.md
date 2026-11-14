@@ -279,7 +279,7 @@ Under Section 8, Stickerless maps original glyph/photo artwork directly onto
 the rounded body's face groups and hides only the redundant inset planes.
 [`body-artwork.ts`](../packages/cube-viewer/src/body-artwork.ts) retains Three's
 complete 0..1 arc-length bevel UVs and rotates their intrinsic right/up basis
-into each immutable source frame. Naive planar projection would trim tile edges.
+into each immutable source frame. Naive planar projection would trim tile edges for the per-sticker tiles; the projected stickerless look instead switches the image faces to planar UV (`planarBodyUv`, see PICTURE_PLAYGROUND.md, "Picture looks"), which a linear texture window needs.
 Tests cover all six normals/four up rotations, asymmetric raycast landmarks and
 adjacent Landscape tile endpoints. No pixels are erased, recolored or cropped;
 source assets and print exports are unchanged. Stickered restores its original
