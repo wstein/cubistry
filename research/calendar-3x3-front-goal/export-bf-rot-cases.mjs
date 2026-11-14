@@ -77,7 +77,7 @@ const pick = (a) => a[Math.floor(rnd() * a.length)];
 const rows = ["# print\tcells\tscramble_word\tscramble_length\tbf_opt\tbf_word\tmin_rotation_tokens"];
 for (const pid of PRINTS) {
   const design = loadDesign(model, pid);
-  const ts = design.targets.filter((_, i) => i % 97 === 0 && design.targets.length);
+  const ts = design.targets.filter((_, i) => i % 97 === 0);
   let kept = 0;
   while (kept < Number(perPrint)) {
     const t = pick(ts);
