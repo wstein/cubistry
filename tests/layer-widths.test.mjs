@@ -14,7 +14,7 @@ import {
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what} ${a} != ${b}`);
 const GAP = 0.01;
 const R = PRESENTATION_PRESET.bodyRadius;
-const CASES = [[3, 1], [5, 1.2], [6, 1.5], [7, 1.8]]; // N and the outer width f (owner values; N = 6 is a proposal)
+const CASES = [[3, 1], [5, 1.2], [6, 1.5], [7, 1.8]]; // N and the outer width f (test cases of the profile helpers, not the shipped table OUTER_LAYER_WIDTH of calendar7/geometry.ts)
 
 // ---- the pure profile ----
 test("profile helpers: widths [f,1,...,1,f], edge (N-2)+2f, cut planes and centers, layer index of the mechanics coordinate", () => {
