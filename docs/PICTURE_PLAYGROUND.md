@@ -62,7 +62,7 @@ themes and your own pictures have them, Classic colors and the 3x3 picture page 
 | --- | --- | --- | --- |
 | A. Stickered, not projected | off | off | Every sticker shows its own tile of the face image (the tile assets of the print), unchanged. |
 | B. Stickered, projected (default) | off | on | Same rounded stickers as A, white, the face image projected from six sides; the gaps and bevels cut it away. |
-| C. Stickerless | on | on (locked) | Always projected: the body faces carry the image to the face edge; only seams and bevels stay plastic. |
+| C. Stickerless | on | on (locked) | Always projected: the body faces carry the image to the face edge; the body is white, so the seams and bevels between the cubies show white, not plastic. |
 
 While Stickerless is checked, Projected is checked and disabled. Helper line under Projected: "Image projected across each face;
 only stickers carry it."
@@ -70,7 +70,7 @@ only stickers carry it."
 The cube is lit by six beamers, one per face (U R F D L B). Each projects its face's own image face-on (orthographic) onto that
 face only. The image rectangle is the full face extent (the sum of the layer widths, so the thick-outer-layer profile works
 unchanged): no margin, the image reaches the sticker edge on the outer border (g = 0). A sticker covers 0.87 of its cell
-and a body face 0.99, so both lie inside the image; only the gaps, bevels and seams cut it away. The outline of a sticker is the
+and a body face 0.99, so both lie inside the image; only the gaps, bevels and seams cut it away (stickered: plastic; stickerless: white body). The outline of a sticker is the
 sticker geometry (rounded as in A): the image window uses the sticker's own UV and there is no mask, no square outline and no
 plastic-colored margin inside the sticker. The rule is the pure module
 [`projected-uv.ts`](../packages/cube-viewer/src/projected-uv.ts) (tests: `tests/projected-uv.test.mjs`).
