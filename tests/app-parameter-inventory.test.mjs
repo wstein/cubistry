@@ -63,6 +63,7 @@ const INVENTORY = [
   ),
   // The Calendar mode of the host (src/apps/calendar/mount.ts) reads the names the former page calendar.html read.
   row(["date", "lang", "language", "design", "pad", "padding"], "src/apps/calendar/mount.ts", ["calendar"]),
+  row(["scheme"], "src/apps/calendar/mount.ts", ["calendar"], /SCHEME_PARAM = "scheme"/),
   row(["design"], "src/print.mjs", ["print.html"]),
   row(["year", "month"], "src/apps/calendar7/month-view.ts", ["calendar7"]),
   row(["outer"], "src/apps/calendar7/geometry.ts", ["calendar7"]),

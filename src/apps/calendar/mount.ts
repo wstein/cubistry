@@ -56,6 +56,8 @@ export interface CalendarEnv {
   later(fn: () => void, ms: number): void;
   /** Points the print link of the host at the physical print (`de-a` or `en-3`). */
   setPrintDesign(design: string): void;
+  /** The current query string of the page; optional, the mount parameters are the fallback. */
+  search?(): string;
   /** Replaces the query string of the page (`?scheme=...`); optional so a fake stage may omit it. */
   replaceQuery?(search: string): void;
   /** Test and spec hooks (`__calendarController`, `__calendarViewer`); `undefined` removes the hook. */
@@ -384,10 +386,12 @@ export async function mountCalendar(
     schemeId = cal3SchemeById(schemeSelect.value).id;
     schemeSelect.value = schemeId;
     viewer?.setScheme?.(schemeId);
-    if (schemeId === "default") params.delete(SCHEME_PARAM);
-    else params.set(SCHEME_PARAM, schemeId);
     // The page may have switched DE/EN since the URL was read: write the print that is shown.
-    const query = new URLSearchParams(params);
+    // The router removes `app` from the mount params, so it is set again: a reload or shared link must reopen this mode.
+    const query = new URLSearchParams(env.search?.() ?? params);
+    query.set("app", "calendar");
+    if (schemeId === "default") query.delete(SCHEME_PARAM);
+    else query.set(SCHEME_PARAM, schemeId);
     query.delete("language");
     query.delete("design");
     query.set("lang", currentPrint() === "de-a" ? "de" : "en");
