@@ -1,0 +1,5 @@
+print	targets	assignments(min/median/p95/max)	centers(min/max)	full_states_median	share_of_cube_median
+de-a	27	2/2/4/4	1/1	3344302080	7.732132217728926e-11
+de-a-unpadded	27	2/2/4/4	1/2	3344302080	7.732132217728926e-11
+en-3-zero	27	18/18/36/72	1/1	30098718720	6.958918995956033e-10
+en-3-unpadded	27	18/36/36/72	1/1	60197437440	1.3917837991912067e-9

@@ -1,0 +1,101 @@
+print	variant	step	date	app_htm	app_rot	status	front_htm	front_rot	nodes	solve_ms	pdb_ms	root_h	route
+de-a-unpadded	own	1	2027-01-02	18	0	solved	8	1	41202	12.0	888.4	6	x' B' R2 F2 U F' U' L' D
+de-a-unpadded	own	2	2027-01-03	15	0	solved	8	2	132697	18.7	1652.7	5	x z F B2 U2 F R B' L D
+de-a-unpadded	own	3	2027-01-04	13	0	solved	7	0	14990	3.2	1132.6	5	F2 R F2 D2 R2 D2 L'
+de-a-unpadded	own	4	2027-01-05	17	0	solved	9	0	197833	27.2	967.5	6	L B2 D F D R D2 B2 U
+de-a-unpadded	own	5	2027-01-06	17	0	solved	7	0	5820	0.8	1038.5	6	U B2 D' R2 D B U'
+de-a-unpadded	own	6	2027-01-07	17	0	solved	9	0	197833	18.2	1026.8	6	L B2 D F D R D2 B2 U
+de-a-unpadded	own	7	2027-01-08	16	0	solved	8	1	70364	12.1	1186.2	5	z2 R2 F2 L B2 D F2 D' L2
+de-a-unpadded	own	8	2027-01-09	17	0	solved	9	0	258988	38.4	1182.2	6	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	9	2027-01-10	24	2	solved	9	1	42029	3.7	845.0	6	y R B2 R2 F' U2 F U' D L
+de-a-unpadded	own	10	2027-01-11	18	0	solved	8	1	18977	1.6	814.4	6	z R2 D' B2 D2 F' B' R U2
+de-a-unpadded	own	11	2027-01-12	16	0	solved	9	0	73643	12.4	1179.7	6	F R F U' D' L2 U F2 U
+de-a-unpadded	own	12	2027-01-13	18	0	solved	8	0	16057	3.2	1300.1	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	13	2027-01-14	23	0	solved	9	1	51960	10.9	1296.4	6	z R' B' R2 B2 D F2 U' F U2
+de-a-unpadded	own	14	2027-01-15	18	0	solved	8	1	12882	2.2	1232.2	6	z D F' R' D' R2 D B2 U'
+de-a-unpadded	own	15	2027-01-16	14	0	solved	9	0	39021	4.1	1152.0	6	R2 F R D B' D' F' U R2
+de-a-unpadded	own	16	2027-01-17	17	0	solved	9	1	86658	15.8	1276.2	6	z R2 L' F2 R' U2 R' F U R'
+de-a-unpadded	own	17	2027-01-18	20	0	solved	7	0	3792	0.5	1301.9	5	R U' R2 B2 R2 U R'
+de-a-unpadded	own	18	2027-01-19	17	0	solved	9	0	26581	6.9	1138.2	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	19	2027-01-20	23	2	solved	8	1	2728	0.7	996.3	7	x' U2 F2 U L D' R F L2
+de-a-unpadded	own	20	2027-01-21	17	0	solved	9	0	26581	3.4	1024.0	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	21	2027-01-22	18	0	solved	8	0	11011	2.1	1117.8	6	D' F D2 B2 D2 R' F' D
+de-a-unpadded	own	22	2027-01-23	17	0	solved	9	0	25361	2.5	1110.2	7	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	23	2027-01-24	14	0	solved	7	1	5176	0.8	1062.6	5	z' L F B' D' R' U' D
+de-a-unpadded	own	24	2027-01-25	19	0	solved	8	1	18977	4.4	1102.8	6	z R2 D' B2 D2 F' B' R U2
+de-a-unpadded	own	25	2027-01-26	17	0	solved	9	0	73643	7.4	1268.8	6	F R F U' D' L2 U F2 U
+de-a-unpadded	own	26	2027-01-27	18	0	solved	8	0	16057	1.7	1106.2	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	27	2027-01-28	17	0	solved	9	1	47499	8.7	991.6	6	z R D' B2 D F2 U2 F R' U'
+de-a-unpadded	own	28	2027-01-29	18	0	solved	9	0	60702	17.7	2444.9	7	R2 U2 D B U D' R U R2
+de-a-unpadded	own	29	2027-01-30	24	1	solved	9	1	53562	36.2	1167.9	7	x2 L' F U2 R F2 L2 B' L U'
+de-a-unpadded	own	30	2027-01-31	16	0	solved	9	0	62205	9.8	1809.6	6	R2 U B2 U2 B' U R' B' U'
+de-a-unpadded	own	31	2027-02-01	20	1	solved	10	1	3877110	413.8	1458.2	6	y F L2 F2 D L' U F2 B R D2
+de-a-unpadded	own	32	2027-02-02	17	0	solved	9	0	258560	26.3	1118.3	6	F R F U2 F2 U R2 U2 D'
+de-a-unpadded	own	33	2027-02-03	18	0	solved	8	0	36411	9.7	1659.8	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	34	2027-02-04	16	0	solved	9	1	235594	31.6	1238.7	6	x R' U' R2 F2 U R U F U
+de-a-unpadded	own	35	2027-02-05	15	0	solved	8	0	30823	3.3	1478.4	6	R' D B D2 R2 D B2 U'
+de-a-unpadded	own	36	2027-02-06	17	0	solved	9	0	251937	36.7	977.5	6	R2 U2 R U2 F R F' U R
+de-a-unpadded	own	37	2027-02-07	14	0	solved	9	0	393238	42.4	909.3	6	L2 U L2 D2 R' F D' F' D'
+de-a-unpadded	own	38	2027-02-08	19	0	solved	8	0	69939	12.1	1014.1	6	F' U' F U2 R2 U2 B' R
+de-a-unpadded	own	39	2027-02-09	17	0	solved	9	0	197873	17.1	1165.3	6	L B2 D F D R D2 B2 U
+de-a-unpadded	own	40	2027-02-10	24	2	solved	9	2	34413	2.9	1151.7	7	x z R' F D2 F' D L' U' R U2
+de-a-unpadded	own	41	2027-02-11	17	0	solved	9	0	26581	3.0	951.2	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	42	2027-02-12	20	0	solved	6	1	529	0.2	903.8	5	z F' R2 U' R2 U R2
+de-a-unpadded	own	43	2027-02-13	17	0	solved	9	0	25361	4.6	967.8	7	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	44	2027-02-14	18	0	solved	9	0	71621	14.3	1249.2	6	R2 F2 B' D F2 B2 U' B' R2
+de-a-unpadded	own	45	2027-02-15	18	0	solved	8	1	18977	1.7	1009.9	6	z R2 D' B2 D2 F' B' R U2
+de-a-unpadded	own	46	2027-02-16	15	0	solved	9	1	63670	5.0	863.1	6	z R' F' R F2 L' B D2 F2 U'
+de-a-unpadded	own	47	2027-02-17	18	0	solved	8	0	16057	1.3	853.5	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	48	2027-02-18	17	0	solved	9	0	68961	5.2	876.6	6	F R F U2 F2 U R2 U2 D'
+de-a-unpadded	own	49	2027-02-19	18	0	solved	9	0	32219	2.4	886.1	6	R F D2 B2 R2 B D' F' U
+de-a-unpadded	own	50	2027-02-20	24	2	solved	10	1	311334	15.8	576.8	6	y L F2 U' F' L' B' R2 D B' L
+de-a-unpadded	own	51	2027-02-21	17	0	solved	9	0	62205	5.5	652.1	6	R2 U B2 U2 B' U R' B' U'
+de-a-unpadded	own	52	2027-02-22	18	0	solved	7	0	9533	1.3	684.6	5	F2 R U2 L2 U2 F2 L'
+de-a-unpadded	own	53	2027-02-23	17	0	solved	9	0	26581	2.3	902.5	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	54	2027-02-24	16	0	solved	7	0	2821	0.6	995.8	6	U B2 D B' D' R U'
+de-a-unpadded	own	55	2027-02-25	17	0	solved	9	0	26581	4.2	982.2	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	56	2027-02-26	16	0	solved	9	0	56542	4.4	1001.5	6	R2 F2 U B L2 F' R' F' D
+de-a-unpadded	own	57	2027-02-27	17	0	solved	9	0	25361	2.5	1057.4	7	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	58	2027-02-28	15	0	solved	7	1	6670	1.0	949.3	4	z D R2 D' R2 F' R' U
+de-a-unpadded	own	59	2027-03-01	20	1	solved	9	2	315716	29.4	902.9	6	x z U' R' D2 F' L' B2 U D L'
+de-a-unpadded	own	60	2027-03-02	15	0	solved	9	0	338445	32.3	874.8	6	F D' B2 R2 D2 R' D F' U
+de-a-unpadded	own	61	2027-03-03	18	0	solved	8	0	36411	2.9	1098.5	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	62	2027-03-04	17	0	solved	8	2	30131	3.0	820.7	6	x z B R U2 R2 U' D2 F2 U
+de-a-unpadded	own	63	2027-03-05	18	0	solved	8	2	62709	5.0	758.7	6	x y L' B2 R B R D' F U'
+de-a-unpadded	own	64	2027-03-06	18	0	solved	9	2	399248	49.9	1066.1	6	x' z' R2 U R2 F' L2 D2 R D' L2
+de-a-unpadded	own	65	2027-03-07	16	0	solved	8	1	159024	13.8	1051.5	5	y L2 U D2 B2 U' D R2 D
+de-a-unpadded	own	66	2027-03-08	13	0	solved	7	0	10243	1.2	852.3	5	L F L2 D2 L2 F' L'
+de-a-unpadded	own	67	2027-03-09	17	0	solved	9	0	205092	18.9	666.3	6	L B2 D F D R D2 B2 U
+de-a-unpadded	own	68	2027-03-10	24	2	solved	8	1	1948	0.4	569.2	7	x2 D F U' R L2 D B U'
+de-a-unpadded	own	69	2027-03-11	17	0	solved	9	0	26581	2.9	675.2	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	70	2027-03-12	30	0	solved	8	1	29792	2.8	823.7	6	z D' B' R2 F L F2 B U
+de-a-unpadded	own	71	2027-03-13	17	0	solved	9	0	25361	4.8	972.5	7	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	72	2027-03-14	24	0	solved	8	0	27956	2.2	941.0	5	U2 F2 U' L2 U F2 B2 U
+de-a-unpadded	own	73	2027-03-15	18	0	solved	8	1	18977	4.6	934.9	6	z R2 D' B2 D2 F' B' R U2
+de-a-unpadded	own	74	2027-03-16	24	0	solved	9	0	91808	6.8	972.3	6	L F' U' L F R' L2 U' R2
+de-a-unpadded	own	75	2027-03-17	18	0	solved	8	0	16057	1.3	876.0	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	76	2027-03-18	17	0	solved	9	0	73643	6.0	853.3	6	F R F U' D' L2 U F2 U
+de-a-unpadded	own	77	2027-03-19	16	0	solved	9	0	22610	2.8	919.2	7	R U' R2 U2 R F R' F' R
+de-a-unpadded	own	78	2027-03-20	20	2	solved	9	1	46775	5.7	1235.4	6	x L' D2 F R' D R2 D2 L2 U2
+de-a-unpadded	own	79	2027-03-21	17	0	solved	9	0	94566	8.5	884.8	6	L2 U L2 D2 R' F D' F' D'
+de-a-unpadded	own	80	2027-03-22	18	0	solved	7	1	5341	0.6	967.7	5	z F R F2 D2 R2 D2 L'
+de-a-unpadded	own	81	2027-03-23	17	0	solved	9	0	26581	2.5	1124.7	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	82	2027-03-24	18	0	solved	7	0	2821	1.5	853.9	6	U B2 D B' D' R U'
+de-a-unpadded	own	83	2027-03-25	17	0	solved	9	0	26581	2.4	917.3	7	U2 R2 B' R U2 B2 R2 U R'
+de-a-unpadded	own	84	2027-03-26	19	0	solved	8	1	23605	2.2	1067.0	5	z D F2 U' L' F R' U2 R
+de-a-unpadded	own	85	2027-03-27	17	0	solved	9	0	25361	2.3	1064.4	7	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	86	2027-03-28	14	0	solved	8	1	48300	7.0	1031.2	5	z' U2 L' F B U2 R2 U' R2
+de-a-unpadded	own	87	2027-03-29	18	0	solved	8	1	18977	6.8	1097.7	6	z R2 D' B2 D2 F' B' R U2
+de-a-unpadded	own	88	2027-03-30	24	1	solved	9	1	30308	2.9	1102.1	7	y2 F U F2 R D2 L2 B L U2
+de-a-unpadded	own	89	2027-03-31	18	0	solved	8	0	16057	2.3	996.4	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	90	2027-04-01	20	1	solved	9	1	316821	28.1	937.4	6	x' R' F2 R' D2 F' D2 F R' L'
+de-a-unpadded	own	91	2027-04-02	17	0	solved	7	1	7352	1.3	734.2	5	z' L' U F R2 U2 R U
+de-a-unpadded	own	92	2027-04-03	17	0	solved	9	0	255818	15.5	789.1	6	R U' R2 B2 U2 R' B R2 U2
+de-a-unpadded	own	93	2027-04-04	18	0	solved	7	0	8086	1.9	940.5	5	L U' L' B2 D' R2 D
+de-a-unpadded	own	94	2027-04-05	19	0	solved	8	1	35521	3.6	1039.6	6	x' L D R L D2 L2 F' L'
+de-a-unpadded	own	95	2027-04-06	18	0	solved	8	2	30131	5.4	1103.8	6	x z B R U2 R2 U' D2 F2 U
+de-a-unpadded	own	96	2027-04-07	17	0	solved	8	0	42468	3.5	1338.7	6	U R' B2 U2 F D' F' U
+de-a-unpadded	own	97	2027-04-08	17	0	solved	9	1	268636	30.7	1026.4	6	y F2 B D F U' F' L' U' R2
+de-a-unpadded	own	98	2027-04-09	15	0	solved	9	0	216721	16.1	973.8	6	R' U' D B' U' B2 U2 D' R2
+de-a-unpadded	own	99	2027-04-10	20	2	solved	10	1	425066	51.7	997.9	7	y U' F D2 L2 B U' B' D' R U
+de-a-unpadded	own	100	2027-04-11	14	0	solved	9	0	123202	8.3	1064.2	6	R' D B R2 U' F2 U2 F2 U

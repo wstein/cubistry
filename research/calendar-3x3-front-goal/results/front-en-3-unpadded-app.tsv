@@ -1,0 +1,101 @@
+print	variant	step	date	app_htm	app_rot	status	front_htm	front_rot	nodes	solve_ms	pdb_ms	root_h	route
+en-3-unpadded	app	1	2027-01-02	17	0	solved	6	0	1837	6.6	562.3	5	U B2 R' B R U'
+en-3-unpadded	app	2	2027-01-03	18	0	solved	7	0	130521	7.9	527.9	4	U B D B U' B2 D'
+en-3-unpadded	app	3	2027-01-04	17	0	solved	7	0	19152	1.7	547.6	5	B D B2 L' B L D'
+en-3-unpadded	app	4	2027-01-05	16	0	solved	7	0	28648	2.2	521.7	5	B U B2 D B' U' D'
+en-3-unpadded	app	5	2027-01-06	14	0	solved	8	0	30988	2.6	691.0	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	6	2027-01-07	14	0	solved	7	0	12692	1.1	776.7	5	L' B2 R' B' L B2 R
+en-3-unpadded	app	7	2027-01-08	17	0	solved	6	0	1351	0.2	739.6	5	U B' R2 U R2 U2
+en-3-unpadded	app	8	2027-01-09	14	0	solved	8	0	66305	5.5	895.5	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	9	2027-01-10	19	0	solved	8	0	27480	2.7	701.7	6	L F' B2 R' F L' B D'
+en-3-unpadded	app	10	2027-01-11	17	0	solved	7	0	31845	2.7	569.2	5	U B D B U' B2 D'
+en-3-unpadded	app	11	2027-01-12	14	0	solved	7	0	22486	1.8	621.3	4	R' B2 L' B' R B2 L
+en-3-unpadded	app	12	2027-01-13	13	0	solved	8	0	138382	7.7	653.9	6	R2 U2 R2 D R' U2 R D'
+en-3-unpadded	app	13	2027-01-14	18	0	solved	7	0	21802	3.7	686.7	4	R' B2 L' B R B L
+en-3-unpadded	app	14	2027-01-15	17	0	solved	7	0	27308	2.1	707.8	4	B U B2 R' B R U'
+en-3-unpadded	app	15	2027-01-16	14	0	solved	8	0	153694	7.9	643.3	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	16	2027-01-17	17	0	solved	6	0	1650	0.3	661.6	5	R' B2 U B' U' R
+en-3-unpadded	app	17	2027-01-18	16	0	solved	6	0	5106	0.6	678.4	5	U B R' B R U'
+en-3-unpadded	app	18	2027-01-19	14	0	solved	8	0	144185	8.6	571.0	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	19	2027-01-20	18	0	solved	6	0	881	0.2	615.8	5	L2 D' R D2 R' L2
+en-3-unpadded	app	20	2027-01-21	17	0	solved	7	0	10353	1.1	643.2	5	R' B2 L' B R B L
+en-3-unpadded	app	21	2027-01-22	17	0	solved	5	0	146	0.1	686.3	5	R' U B' U2 R
+en-3-unpadded	app	22	2027-01-23	14	0	solved	7	0	8578	0.9	700.4	5	R2 U2 R' F R F' R2
+en-3-unpadded	app	23	2027-01-24	18	0	solved	6	0	1999	0.4	648.0	5	D B2 L' B L D'
+en-3-unpadded	app	24	2027-01-25	15	0	solved	7	0	34900	2.9	543.1	3	L B' L2 B D2 L D2
+en-3-unpadded	app	25	2027-01-26	14	0	solved	8	0	73618	4.7	491.7	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	26	2027-01-27	14	0	solved	8	0	73618	5.0	461.2	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	27	2027-01-28	18	0	solved	7	0	7091	0.8	615.6	5	R U B2 U' R2 B2 R
+en-3-unpadded	app	28	2027-01-29	14	0	solved	8	0	58572	4.1	798.0	6	R2 F' L' U2 L F U2 R2
+en-3-unpadded	app	29	2027-01-30	16	0	solved	8	0	56451	3.9	675.5	5	L2 D' R F L' F' R' L'
+en-3-unpadded	app	30	2027-01-31	16	0	solved	7	0	10122	1.0	571.2	5	U B D B U' B2 D'
+en-3-unpadded	app	31	2027-02-01	24	2	solved	8	2	18944	1.7	583.6	6	x z2 D' L2 F2 D2 L' F' B2 U
+en-3-unpadded	app	32	2027-02-02	18	0	solved	7	0	17412	1.5	653.2	5	U B2 D B' U' B2 D'
+en-3-unpadded	app	33	2027-02-03	13	0	solved	8	0	65405	5.3	661.3	6	R2 U2 R2 D R' U2 R D'
+en-3-unpadded	app	34	2027-02-04	16	0	solved	7	0	19152	4.9	695.8	5	B D B2 L' B L D'
+en-3-unpadded	app	35	2027-02-05	18	0	solved	6	0	1837	0.3	706.4	5	U B2 R' B R U'
+en-3-unpadded	app	36	2027-02-06	14	0	solved	8	0	66305	3.9	572.0	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	37	2027-02-07	18	0	solved	6	0	19338	1.4	683.3	4	D B2 U B' U' D'
+en-3-unpadded	app	38	2027-02-08	16	0	solved	6	0	2096	0.3	680.2	5	U R' B2 R B2 U'
+en-3-unpadded	app	39	2027-02-09	14	0	solved	8	0	30988	2.4	736.7	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	40	2027-02-10	17	0	solved	7	0	1048	0.3	718.1	6	L F2 U F' L F' L2
+en-3-unpadded	app	41	2027-02-11	18	0	solved	7	0	40728	3.0	709.3	4	U R' B2 R' U R2 U2
+en-3-unpadded	app	42	2027-02-12	16	0	solved	7	0	20708	3.4	720.7	5	U2 R2 U' R' B2 R' U'
+en-3-unpadded	app	43	2027-02-13	14	0	solved	8	0	144009	7.7	645.1	5	R2 L' U R U' B2 R L
+en-3-unpadded	app	44	2027-02-14	16	0	solved	6	0	1486	0.3	723.1	5	R' B2 L' B R L
+en-3-unpadded	app	45	2027-02-15	16	0	solved	6	0	4511	0.6	750.0	5	R' B' U2 R' U2 R2
+en-3-unpadded	app	46	2027-02-16	14	0	solved	8	0	144185	8.7	679.6	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	47	2027-02-17	14	0	solved	8	0	144185	8.2	699.3	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	48	2027-02-18	16	0	solved	6	0	12194	1.2	681.8	4	D2 L2 D' L2 B2 D'
+en-3-unpadded	app	49	2027-02-19	14	0	solved	8	0	153694	13.3	546.1	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	50	2027-02-20	18	0	solved	9	0	352598	20.2	651.2	5	L F2 U' R B2 U2 F2 L' D'
+en-3-unpadded	app	51	2027-02-21	17	0	solved	7	0	9713	1.0	635.4	5	R' B2 L' B R B2 L
+en-3-unpadded	app	52	2027-02-22	16	0	solved	6	0	3633	0.4	654.4	5	B2 D L' B L D'
+en-3-unpadded	app	53	2027-02-23	13	0	solved	7	0	8243	1.5	745.3	6	B' R' U2 B U' B2 R
+en-3-unpadded	app	54	2027-02-24	13	0	solved	7	0	8243	0.9	695.2	6	B' R' U2 B U' B2 R
+en-3-unpadded	app	55	2027-02-25	16	0	solved	7	0	26350	2.1	726.1	5	U F D' B2 D F' U'
+en-3-unpadded	app	56	2027-02-26	14	0	solved	8	0	50919	3.7	643.7	6	R2 F' L2 U' L U2 F R2
+en-3-unpadded	app	57	2027-02-27	14	0	solved	8	0	50919	3.5	713.7	6	R2 F' L2 U' L U2 F R2
+en-3-unpadded	app	58	2027-02-28	17	0	solved	6	0	5012	0.5	525.9	4	D B2 D' L' B2 L
+en-3-unpadded	app	59	2027-03-01	20	2	solved	8	1	14806	1.3	538.3	7	y' D2 B' L F' L' U R2 L2
+en-3-unpadded	app	60	2027-03-02	14	0	solved	7	0	10412	1.0	526.4	5	R' B2 L' B' R B2 L
+en-3-unpadded	app	61	2027-03-03	13	0	solved	8	0	65405	4.0	550.8	6	R2 U2 R2 D R' U2 R D'
+en-3-unpadded	app	62	2027-03-04	18	0	solved	7	0	12015	1.2	706.9	5	R' B2 L' B R B L
+en-3-unpadded	app	63	2027-03-05	17	0	solved	7	0	18864	1.6	868.3	5	B U B2 R' B R U'
+en-3-unpadded	app	64	2027-03-06	14	0	solved	8	0	66305	4.1	732.1	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	65	2027-03-07	17	0	solved	6	0	15975	1.2	652.1	4	R' B2 U B' U' R
+en-3-unpadded	app	66	2027-03-08	16	0	solved	6	0	2829	0.4	760.8	5	U B R' B R U'
+en-3-unpadded	app	67	2027-03-09	14	0	solved	8	0	30988	3.9	674.0	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	68	2027-03-10	17	0	solved	8	0	14501	1.4	906.5	7	L F2 U R2 F' L F' L2
+en-3-unpadded	app	69	2027-03-11	17	0	solved	7	0	21802	2.9	568.6	4	R' B2 L' B R B L
+en-3-unpadded	app	70	2027-03-12	17	0	solved	6	0	2146	0.3	627.7	5	U B2 R' B R U'
+en-3-unpadded	app	71	2027-03-13	14	0	solved	8	0	144009	8.1	645.2	5	R2 L' U R U' B2 R L
+en-3-unpadded	app	72	2027-03-14	18	0	solved	6	0	1786	0.3	666.3	5	D B2 L' B L D'
+en-3-unpadded	app	73	2027-03-15	15	0	solved	7	0	41426	2.9	669.8	4	L B' L2 B D2 L D2
+en-3-unpadded	app	74	2027-03-16	14	0	solved	8	0	144185	8.1	572.7	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	75	2027-03-17	14	0	solved	8	0	144185	7.7	1012.3	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	76	2027-03-18	18	0	solved	7	0	8348	0.9	723.2	5	R U B2 U' R2 B2 R
+en-3-unpadded	app	77	2027-03-19	14	0	solved	8	0	153694	9.9	643.4	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	78	2027-03-20	19	0	solved	7	0	13098	1.1	512.2	5	B2 L2 D F' D2 F L2
+en-3-unpadded	app	79	2027-03-21	16	0	solved	7	0	10545	0.9	406.1	5	U B D B U' B2 D'
+en-3-unpadded	app	80	2027-03-22	15	0	solved	5	0	632	0.2	420.7	4	U R' B R U'
+en-3-unpadded	app	81	2027-03-23	13	0	solved	6	0	238	0.1	401.3	6	R' U2 B U' B2 R
+en-3-unpadded	app	82	2027-03-24	13	0	solved	6	0	238	0.2	410.1	6	R' U2 B U' B2 R
+en-3-unpadded	app	83	2027-03-25	14	0	solved	5	0	509	0.2	521.5	4	R2 U R U R
+en-3-unpadded	app	84	2027-03-26	14	0	solved	8	0	71805	3.8	642.0	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	85	2027-03-27	14	0	solved	8	0	71805	10.0	625.5	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	86	2027-03-28	17	0	solved	6	0	3758	0.8	686.7	4	U B2 U' R' B2 R
+en-3-unpadded	app	87	2027-03-29	17	0	solved	6	0	1604	0.4	729.2	5	R' B2 U B' U' R
+en-3-unpadded	app	88	2027-03-30	18	0	solved	8	0	32852	5.5	662.2	5	L' B D2 B' D L' D L2
+en-3-unpadded	app	89	2027-03-31	13	0	solved	8	0	64992	3.6	667.9	6	R2 U2 R2 D R' U2 R D'
+en-3-unpadded	app	90	2027-04-01	20	1	solved	7	2	4289	1.0	647.9	5	x2 y' R' B' U2 B2 U' D R'
+en-3-unpadded	app	91	2027-04-02	17	0	solved	7	0	12756	1.4	797.4	5	L' B2 R' B L B R
+en-3-unpadded	app	92	2027-04-03	14	0	solved	8	0	38555	3.1	726.9	5	R2 L' U R U' B2 R L
+en-3-unpadded	app	93	2027-04-04	15	0	solved	6	0	14155	5.8	924.5	4	D B2 L' B L D'
+en-3-unpadded	app	94	2027-04-05	12	0	solved	7	0	84219	6.6	1194.6	3	R2 F R2 D2 R2 F' R2
+en-3-unpadded	app	95	2027-04-06	14	0	solved	8	0	30988	5.2	883.0	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	96	2027-04-07	14	0	solved	8	0	30988	2.5	933.1	5	R2 B L' B' R B2 R L
+en-3-unpadded	app	97	2027-04-08	18	0	solved	7	0	7826	1.5	888.7	5	R U B2 U' R2 B2 R
+en-3-unpadded	app	98	2027-04-09	14	0	solved	8	0	66305	3.9	681.8	6	R' L' B2 L U B2 U' R
+en-3-unpadded	app	99	2027-04-10	16	0	solved	8	0	14212	1.6	655.7	7	L2 D' R F L' F' R' L'
+en-3-unpadded	app	100	2027-04-11	17	0	solved	7	0	8844	1.0	565.5	5	U B D B U' B2 D'

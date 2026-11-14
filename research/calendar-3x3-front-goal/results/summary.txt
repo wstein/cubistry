@@ -1,0 +1,24 @@
+| print | app HTM min/med/p95/max | front goal, app pose | front goal, own pose | steps saved >= 3 (app pose) | saved min/med/max (app pose) | rotations in front route (max) | unsolved <= 12 |
+|---|---|---|---|---|---|---|---|
+| de-a | 14 / 18 / 24 / 30 | 6 / 9 / 9 / 10 | 6 / 9 / 9 / 11 | 100 of 100 | 5 / 9 / 22 | 2 | 0 app, 0 own |
+| de-a-unpadded | 13 / 17 / 24 / 30 | 6 / 8 / 9 / 10 | 6 / 9 / 9 / 10 | 100 of 100 | 5 / 9 / 22 | 2 | 0 app, 0 own |
+| en-3-zero | 12 / 16 / 18 / 24 | 5 / 7 / 9 / 10 | 5 / 7 / 8 / 10 | 100 of 100 | 5 / 9 / 15 | 1 | 0 app, 0 own |
+| en-3-unpadded | 12 / 16 / 18 / 24 | 5 / 7 / 8 / 9 | 6 / 7 / 8 / 9 | 100 of 100 | 5 / 9 / 16 | 2 | 0 app, 0 own |
+
+| print | variant | nodes median / p95 / max | solve ms median / p95 / max | root heuristic median (route median) | table build ms median |
+|---|---|---|---|---|---|
+| de-a | app | 25361 / 171194 / 705124 | 2.7 / 20.0 / 54.5 | 6 (9) | 854.4 |
+| de-a | own | 26581 / 112423 / 3129634 | 2.5 / 12.0 / 541.6 | 6 (9) | 822.7 |
+| de-a-unpadded | app | 31146 / 422867 / 3625349 | 3.9 / 46.8 / 324.0 | 6 (8) | 1013.2 |
+| de-a-unpadded | own | 35521 / 316821 / 3877110 | 4.6 / 36.7 / 413.8 | 6 (9) | 1009.9 |
+| en-3-zero | app | 27308 / 153694 / 352598 | 3.4 / 15.9 / 55.4 | 5 (7) | 868.5 |
+| en-3-zero | own | 30638 / 153694 / 393247 | 2.5 / 15.9 / 29.0 | 5 (7) | 714.3 |
+| en-3-unpadded | app | 19152 / 144185 / 352598 | 2.1 / 8.6 / 20.2 | 5 (7) | 666.3 |
+| en-3-unpadded | own | 24361 / 144185 / 212314 | 2.3 / 8.9 / 24.1 | 5 (7) | 728.3 |
+
+| print | app HTM + rotation tokens | front goal HTM + rotation tokens (app pose) | front goal HTM + rotation tokens (own pose) | steps with a rotation: app / front (app pose) / front (own pose) |
+|---|---|---|---|---|
+| de-a | 14 / 18 / 25 / 30 | 7 / 9 / 11 / 12 | 6 / 9 / 11 / 12 | 12 / 47 / 39 |
+| de-a-unpadded | 13 / 17 / 25 / 30 | 7 / 9 / 10 / 11 | 7 / 9 / 11 / 11 | 12 / 49 / 41 |
+| en-3-zero | 12 / 16 / 18 / 26 | 5 / 7 / 9 / 11 | 5 / 7 / 9 / 10 | 3 / 5 / 7 |
+| en-3-unpadded | 12 / 16 / 18 / 26 | 5 / 7 / 8 / 10 | 6 / 7 / 8 / 11 | 3 / 3 / 6 |
