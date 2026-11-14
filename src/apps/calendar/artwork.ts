@@ -41,11 +41,16 @@ export const CAL3_EXCLUDED: readonly { readonly id: string; readonly reason: str
   },
 ]);
 
+/** Chip overrides where the scheme's own band color is too close to its paper (Classic: band #efe2c4 on #fffdf6 is 1.26:1). */
+const CHIP_OVERRIDES: Readonly<Record<string, Pick<RoleInk, "ground" | "ink">>> = {
+  classic: { ground: "#d9b36a", ink: "#3d2005" },
+};
+
 function fromCalendar7(s: ColorScheme): Cal3Scheme {
   const weekend: RoleInk = { ink: s.sunSatInk, ground: s.weekendFill ?? s.weekendTint ?? s.dayFill, weight: 800 };
   const on = (ink: string): RoleInk => ({ ink, ground: s.dayFill, weight: 600 });
   // Month stickers are inverse chips: the month color as ground (the band color; line schemes use their accent) with the month ink.
-  const chip: RoleInk = { ground: s.bandFill ?? s.monthInk, ink: s.bandFill ? s.monthInk : s.dayFill, weight: 600 };
+  const chip: RoleInk = { ground: s.bandFill ?? s.monthInk, ink: s.bandFill ? s.monthInk : s.dayFill, weight: 600, ...CHIP_OVERRIDES[s.id] };
   return Object.freeze({
     id: s.id,
     name: s.name,

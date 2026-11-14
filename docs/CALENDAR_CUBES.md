@@ -31,7 +31,7 @@ Rubik-Tint, which needs the home faces of the 7x7 names data. The default theme 
 the print export and the pinned print files use; a theme changes the screen textures only and never the solver goal (which
 compares image and orientation, not color). There is no month band in the 3x3 themes: colors only (band deferred).
 In a theme, month stickers are inverse chips: the scheme's month color (its band color; Paper Blue uses its accent) as ground
-with the scheme's month ink, so months differ from weekdays and digits even where the colors match. The default theme keeps the
+with the scheme's month ink (Classic uses a stronger #d9b36a chip with #3d2005 ink, because its band is too close to its paper), so months differ from weekdays and digits even where the colors match. The default theme keeps the
 plain month artwork. The stickerless body and cut-face rules are unchanged: cut faces follow the sticker grounds.
 
 German has no weekend cue in any theme: its weekday stickers keep the plain weekday ink. In English, SAT and both SUN

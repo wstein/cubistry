@@ -64,8 +64,12 @@ test("every label class of every 3x3 scheme passes the contrast gates", () => {
 test("month stickers are inverse chips: the scheme's month color as ground with its month ink; day and weekday stay on paper; default unchanged", () => {
   for (const sc of CAL3_SCHEMES.slice(1)) {
     const src = SCHEMES.find((s) => s.id === sc.id);
-    assert.equal(sc.roles.month.ground, src.bandFill ?? src.monthInk, sc.id);
-    assert.equal(sc.roles.month.ink, src.bandFill ? src.monthInk : src.dayFill, sc.id);
+    if (sc.id !== "classic") {
+      assert.equal(sc.roles.month.ground, src.bandFill ?? src.monthInk, sc.id);
+      assert.equal(sc.roles.month.ink, src.bandFill ? src.monthInk : src.dayFill, sc.id);
+    }
+    // The month chip must stand out from the paper (owner 2026-11-14): Classic's own band #efe2c4 is only 1.26:1.
+    assert.ok(contrast(sc.roles.month.ground, sc.ground) >= 1.5, `${sc.id} chip vs paper ${contrast(sc.roles.month.ground, sc.ground)}`);
     assert.notEqual(sc.roles.month.ground, sc.roles.weekday.ground, sc.id + " month ground differs from the weekday ground");
     assert.equal(sc.roles.weekday.ground, sc.ground);
     assert.equal(sc.roles.day.ground, sc.ground);
