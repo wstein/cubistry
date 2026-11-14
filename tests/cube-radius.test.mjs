@@ -4,6 +4,7 @@
 import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
+import { faceUvAxes } from "../packages/cube-viewer/src/cut-faces.ts";
 import {
   PRESENTATION_PRESET as P, bodyRadiusFor, stickerRadiusFor, stickerSideFor, createStickerGeometry, createPresentationGeometry,
   presentationLayerProfile, thickOuterLayerWidths, layerEdge, PhysicalCubeScene, createPlasticMaterial, createStickerMaterial,
@@ -35,7 +36,7 @@ test("createPresentationGeometry uses the per-N radius on body and sticker; N <=
     const g = createPresentationGeometry(n);
     near(g.body.parameters.radius, UNIFORM[n], 1e-12, `body radius N=${n}`);
     g.sticker.computeBoundingBox();
-    near(g.sticker.boundingBox.max.x, stickerSideFor(1, stickerRadiusFor(n)) / 2, 1e-6, `sticker half width N=${n}`);
+    near(g.sticker.boundingBox.max.x, stickerSideFor(1, bodyRadiusFor(n)) / 2, 1e-6, `sticker half width N=${n}`);
   }
   for (const n of [2, 3]) { const g = createPresentationGeometry(n); g.sticker.computeBoundingBox(); near(g.sticker.boundingBox.max.x, 0.435, 1e-6); }
   near(createPresentationGeometry().body.parameters.radius, 0.055, 0);
@@ -44,7 +45,7 @@ test("createPresentationGeometry uses the per-N radius on body and sticker; N <=
 test("the sticker stays on the flat part of its body for every N and every layer-profile cell", () => {
   for (const [n, f] of [[2, 1], [3, 1], [4, 1], [5, 1.1], [6, 1.3], [7, 1.6], [7, 1]]) {
     const r = bodyRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)));
-    for (const cell of [1, f]) assert.ok(stickerSideFor(cell, stickerRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)))) <= cell - (1 - P.bodyWidth) - 2 * r + 1e-12, `N=${n} cell ${cell}`);
+    for (const cell of [1, f]) assert.ok(stickerSideFor(cell, bodyRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)))) <= cell - (1 - P.bodyWidth) - 2 * r + 1e-12, `N=${n} cell ${cell}`);
   }
 });
 
@@ -65,8 +66,8 @@ test("scene with presentationLayerProfile: every cell body has the O2 radius, ev
     for (const cell of [[f, f, f], [f, 1, 1], [1, 1, 1], [f, f, 1]]) near(profile.body(cell).parameters.radius, R, 1e-12, `N=${n} cell ${cell}`);
     // outer corner sticker (f x f): square, side stickerSideFor(f)
     const s = profile.sticker(f, 1); s.computeBoundingBox();
-    near(s.boundingBox.max.x * 2, stickerSideFor(f, stickerRadiusFor(Number(n), edge)), 1e-6);
-    near(s.boundingBox.max.y * 2, stickerSideFor(1, stickerRadiusFor(Number(n), edge)), 1e-6);
+    near(s.boundingBox.max.x * 2, stickerSideFor(f, bodyRadiusFor(Number(n), edge)), 1e-6);
+    near(s.boundingBox.max.y * 2, stickerSideFor(1, bodyRadiusFor(Number(n), edge)), 1e-6);
   }
   const widths = thickOuterLayerWidths(5, 1.1), profile = presentationLayerProfile(widths), root = new THREE.Group();
   const tex = new THREE.Texture(), mat = createStickerMaterial(tex), g = createPresentationGeometry(5);
@@ -76,8 +77,8 @@ test("scene with presentationLayerProfile: every cell body has the O2 radius, ev
   assert.equal(stickers.length, 2);
   for (const s of stickers) { assert.deepEqual(s.scale.toArray(), [1, 1, 1]); s.geometry.computeBoundingBox(); }
   const corner = stickers.find((s) => s.userData.stickerId === 1), mid = stickers.find((s) => s.userData.stickerId === 2);
-  near(corner.geometry.boundingBox.max.x * 2, stickerSideFor(1.1, stickerRadiusFor(5, 5.2)), 1e-6);
-  near(mid.geometry.boundingBox.max.x * 2, stickerSideFor(1, stickerRadiusFor(5, 5.2)), 1e-6);
+  near(corner.geometry.boundingBox.max.x * 2, stickerSideFor(1.1, bodyRadiusFor(5, 5.2)), 1e-6);
+  near(mid.geometry.boundingBox.max.x * 2, stickerSideFor(1, bodyRadiusFor(5, 5.2)), 1e-6);
   scene.dispose?.();
 });
 
@@ -105,4 +106,38 @@ test("planarFaceUv (stickerless only): the exterior faces take UV linear in posi
   for (const worst of read(true, true)) assert.ok(worst < 1e-5, `planar: uv error ${worst}`);
   assert.ok(read(true, false).every((w) => w > 1e-3), "stickered keeps the arc-length UV");
   assert.ok(read(false, true).every((w) => w > 1e-3), "without the option the arc-length UV stays");
+});
+
+test("planarFaceUv: a cut face is planar too, so its edge stops sit where the exterior art ends (texture fraction along a shared edge)", () => {
+  for (const [n, f] of [[5, 1.1], [7, 1.6]]) {
+    const widths = thickOuterLayerWidths(n, f), profile = presentationLayerProfile(widths), edge = layerEdge(widths);
+    const fr = [{ id: 1, cubie: 1, p: [0, 0, (n - 1) / 2], n: [0, 0, 1], up: [0, 1, 0] }, { id: 2, cubie: 2, p: [-(n - 1) / 2, (n - 1) / 2, (n - 1) / 2], n: [0, 0, 1], up: [0, 1, 0] }];
+    const root = new THREE.Group(), mat = createStickerMaterial(new THREE.Texture());
+    const scene = new PhysicalCubeScene(root, fr, new Map(fr.map((s) => [s.id, mat])), createPlasticMaterial(), 1, createPresentationGeometry(n, edge), new Map(), { layers: profile, planarFaceUv: true, miterCutFaces: true, bodyColor: "#202329" });
+    scene.setConstruction("stickerless");
+    let checked = 0;
+    root.traverse((o) => {
+      if (!o.isMesh || !o.userData.sourceFaceStickerIds) return;
+      const g = o.geometry; g.computeBoundingBox(); const size = g.boundingBox.getSize(new THREE.Vector3()), pos = g.getAttribute("position"), uv = g.getAttribute("uv");
+      const ax = faceUvAxes(g)[0]; // +X cut face: its u or v runs along y
+      for (const group of g.groups.filter((x) => x.materialIndex === 0)) for (let i = group.start; i < group.start + group.count; i++) {
+        const v = g.index?.getX(i) ?? i;
+        if (pos.getZ(v) < size.z / 2 - 0.2) continue; // the bevel half next to the +Z exterior face
+        const q = ax.uAxis === 1 ? (ax.uSign > 0 ? uv.getX(v) : 1 - uv.getX(v)) : (ax.vSign > 0 ? uv.getY(v) : 1 - uv.getY(v));
+        near(q, pos.getY(v) / size.y + 0.5, 1e-5, `N=${n} cut face texture fraction along the shared edge`); checked++;
+      }
+    });
+    assert.ok(checked > 10, "vertices checked");
+    scene.dispose();
+  }
+});
+
+test("stickerSideFor keeps 0.01 between the sticker and the start of the bevel, and the sticker radius equals the body radius from 3x3 on", () => {
+  for (const [n, edge] of [[5, 5], [5, 5.2], [7, 7], [7, 8.2]]) {
+    const r = bodyRadiusFor(n, edge), flat = P.bodyWidth - 2 * r;
+    near(stickerSideFor(1, r), flat - 0.01, 1e-12, `N=${n} edge ${edge}: flat part of the body less 0.01`);
+    assert.equal(stickerRadiusFor(n, edge), bodyRadiusFor(n, edge), "the corner radius of sticker and body agree (the side rule uses the body radius)");
+  }
+  assert.equal(stickerSideFor(1, 0.055), 0.87);
+  assert.equal(stickerSideFor(1.6, 0.15), Math.min(0.87 * 1.6, 1.6 - 0.01 - 0.3 - 0.01));
 });

@@ -148,6 +148,10 @@ test("a 1 x 1 tile draws what the no-tile drawing draws; the standard layout and
     assert.equal(strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "standard", TILES.corner))), strip(track((c) => drawFace(c, text, ink, "strict", PAPER_RED, "standard"))));
     assert.equal(strip(track((c) => drawFontSticker(c, text, ink, font, PAPER_RED, "sticker", undefined, "names", TILES.corner))), strip(track((c) => drawFontSticker(c, text, ink, font, PAPER_RED, "sticker", undefined, "names"))));
   }
+  // the text is placed with the same transform: a names face without a tile lands where the 1 x 1 tile puts it (NAMES_FACE_SCALE, not FACE_SCALE)
+  const place = (r) => JSON.stringify(r.texts.map((x) => [x.t, Math.round(x.x * 1e4) / 1e4, Math.round(x.y * 1e4) / 1e4]));
+  for (const text of ["28", "MON"]) assert.equal(place(track((c) => drawFace(c, text, "dark", "strict", PAPER_RED, "names"))), place(track((c) => drawFace(c, text, "dark", "strict", PAPER_RED, "names", TILES.inner))), text);
+  assert.deepEqual(Object.values(faceTransform(undefined, "names")).slice(2), [NAMES_FACE_SCALE, NAMES_FACE_SCALE]);
   const t = faceTransform();
   assert.deepEqual([t.cx, t.cy, t.kx, t.ky], [96, 96, FACE_SCALE, FACE_SCALE]);
   const u = faceTransform(TILES.inner);
@@ -274,6 +278,8 @@ test("names layout bevel: O2, the millimeter radius of a 3x3 at the cube edge (0
   for (const cell of [[1, 1, 1], [1.8, 1, 1], [1, 1.8, 1.8], [1.8, 1.8, 1.8]]) {
     const g = profile.body(cell), p = g.parameters;
     assert.equal(p.radius, NAMES_BODY_RADIUS, `radius of ${cell}`);
+    assert.equal(g.getAttribute("position").count, new RoundedBoxGeometry(p.width, p.height, p.depth, NAMES_BEVEL_SEGMENTS, NAMES_BODY_RADIUS).getAttribute("position").count, `bevel segments of ${cell}`);
+    assert.equal(g.getAttribute("position").count, new RoundedBoxGeometry(p.width, p.height, p.depth, 2, NAMES_BODY_RADIUS).getAttribute("position").count, "two bevel segments");
     near(p.width, cell[0] - NAMES_GAP, 1e-12); near(p.height, cell[1] - NAMES_GAP, 1e-12); near(p.depth, cell[2] - NAMES_GAP, 1e-12);
     g.computeBoundingBox();
     const box = g.boundingBox;
