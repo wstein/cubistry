@@ -48,7 +48,7 @@ import { drawFace, drawSticker, drawWrongCell, type FaceTile, isBannerClass, PLA
 import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
-import { namesExposure } from "./names-exposure.ts";
+import { NAMES_DIRECTIONAL_SHARE, applyNamesLightRig, namesExposure } from "./names-exposure.ts";
 import { DEFAULT_PLASTICITY, clampPlasticity, floorOpacityFactor, plasticityGain, plasticityParts } from "./names-plasticity.ts";
 
 /**
@@ -251,7 +251,7 @@ export class Calendar7Viewer implements StageView {
 
   /** The names layout follows the face that looks at the camera (names-exposure.ts); the standard layout keeps the shared value. */
   syncExposure(): void {
-    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled) : STANDARD_EXPOSURE;
+    this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled, NAMES_DIRECTIONAL_SHARE) : STANDARD_EXPOSURE;
   }
 
   /**
@@ -408,7 +408,9 @@ export class Calendar7Viewer implements StageView {
     this.layout = layout;
     this.scheme = layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     this.fitExtent(layout);
-    // The shared tone mapping and exposure 1, except in the names layout: its colors are the scheme tokens (geometry.ts).
+    // The names layout: its colors are the scheme tokens (geometry.ts), so it has its own light rig (the top face is not much brighter
+    // than the front: names-exposure.ts) and Linear tone mapping at its own exposure; otherwise the shared tone mapping and exposure 1.
+    applyNamesLightRig(this.scene, layout === "names" ? NAMES_DIRECTIONAL_SHARE : 1);
     this.renderer.toneMapping = layout === "names" ? THREE.LinearToneMapping : this.standardToneMapping;
     this.syncExposure();
     this.clear();
