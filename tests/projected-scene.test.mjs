@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 // PhysicalCubeScene.setPictureProjection: the Projected picture mode on the physical scene. One texture per face, a UV window
-// per sticker (a texture transform, no prerendered tiles), plastic outside the image, the image stays on its sticker when
+// per sticker (a texture transform, no prerendered tiles), the image reaches the face edge (no margin, no mask), the image stays on its sticker when
 // layers turn, stickered and stickerless constructions, uniform and layer-width profiles. No WebGL is needed.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -57,7 +57,7 @@ test("projected stickers: one clone of the face texture per sticker, sharing the
   for (const [n, double] of [[2, false], [2, true], [3, false], [5, false], [7, false]]) {
     const { scene, fr, stickers, originals } = build(n, { double }), faces = faceTextures(), k = double ? 2 : 1;
     scene.setPictureProjection({ faces });
-    const widths = Array(n).fill(1), IMG = n - 0.26, c = centersOf(n, widths), h = (n - 1) / 2;
+    const widths = Array(n).fill(1), IMG = n, c = centersOf(n, widths), h = (n - 1) / 2;
     for (const s of fr) {
       const mesh = stickers.get(s.id), map = mesh.material.map, face = faceOf(s.n), { up } = PROJECTED_FACES[face];
       assert.notEqual(mesh.material, originals.get(s.id), "a projected material replaces the tile material");
@@ -98,19 +98,39 @@ test("the image stays on the sticker when layers turn: windows and materials do 
   scene.dispose();
 });
 
-test("only stickers carry the image: bodies keep the plastic, the shader shows plastic outside the image, stickers outside 0..1 are masked", () => {
+test("only stickers carry the image: bodies keep the plastic; projected stickers are white and unmasked (the outline is the sticker geometry)", () => {
   const plastic = new THREE.MeshPhysicalMaterial({ color: "#1b2431" });
-  const { scene, parent, stickers } = build(3, { plastic }), faces = faceTextures();
+  const { scene, parent, stickers, originals } = build(3, { plastic }), faces = faceTextures();
+  for (const m of originals.values()) m.color.set("#fffdf6");
   scene.setPictureProjection({ faces });
   parent.traverse((o) => { if (o.userData.sourceFaceStickerIds) assert.equal(o.material, plastic, "stickered: the body is plain plastic"); });
-  const material = [...stickers.values()][0].material, shader = { uniforms: {}, fragmentShader: "void main(){\n#include <map_fragment>\n}" };
-  material.onBeforeCompile(shader, null);
-  assert.match(shader.fragmentShader, /projectedIn/, "mask against the 0..1 image range");
-  assert.ok(shader.fragmentShader.indexOf("#include <map_fragment>") < shader.fragmentShader.indexOf("projectedIn ="), "after the map sample");
-  assert.equal(shader.uniforms.projectedOutside.value, plastic.color, "the live plastic color (follows the frame color)");
-  plastic.color.set("#ff0000");
-  assert.equal(shader.uniforms.projectedOutside.value.getHexString(), "ff0000");
+  for (const mesh of stickers.values()) {
+    const material = mesh.material, shader = { uniforms: {}, fragmentShader: "void main(){\n#include <map_fragment>\n}" };
+    assert.equal(material.color.getHexString(), "ffffff", "a white sticker: the image is not tinted");
+    material.onBeforeCompile(shader, null);
+    assert.equal(shader.fragmentShader, "void main(){\n#include <map_fragment>\n}", "no rectangular mask or plastic mix in the shader");
+    assert.equal(shader.uniforms.projectedOutside, undefined, "no outside color");
+  }
   scene.dispose();
+});
+
+test("no margin: every point of every sticker and body face samples inside the image (texture coordinates within 0..1)", () => {
+  for (const [n, widths] of [[2, undefined], [3, undefined], [7, undefined], [7, thickOuterLayerWidths(7, 1.8)]]) {
+    const { scene, parent, fr, stickers } = build(n, widths ? { widths } : {}), faces = faceTextures();
+    scene.setConstruction("stickerless");
+    scene.setPictureProjection({ faces });
+    const inside = (map, what) => {
+      for (const [u, v] of [[0, 0], [1, 0], [0, 1], [1, 1]]) {
+        const tu = map.offset.x + map.repeat.x * u, tv = map.offset.y + map.repeat.y * v;
+        assert.ok(tu >= -1e-12 && tu <= 1 + 1e-12 && tv >= -1e-12 && tv <= 1 + 1e-12, `${what} corner ${u},${v}: ${tu},${tv}`);
+      }
+    };
+    for (const s of fr) inside(stickers.get(s.id).material.map, `${n} sticker ${s.id}`);
+    let bodies = 0;
+    parent.traverse((o) => { const ids = o.userData.sourceFaceStickerIds; if (ids) ids.forEach((id, i) => { if (id !== null) { bodies++; inside(o.material[i].map, `${n} body ${id}`); } }); });
+    assert.equal(bodies, fr.length);
+    scene.dispose();
+  }
 });
 
 test("switching back to Per sticker restores the tile materials exactly and releases the clones; switching again works", () => {
@@ -127,7 +147,7 @@ test("switching back to Per sticker restores the tile materials exactly and rele
   scene.dispose();
 });
 
-test("stickerless: the exterior body faces carry the same window; the margin outside the image shows the face color", () => {
+test("stickerless: the exterior body faces carry the same window; the body is white with the image (no mask)", () => {
   const colors = new Map(); const { scene, parent, fr } = build(3, { colors });
   scene.setConstruction("stickerless");
   const faces = faceTextures(); scene.setPictureProjection({ faces });
@@ -139,8 +159,9 @@ test("stickerless: the exterior body faces carry the same window; the margin out
       count++;
       const s = fr.find((x) => x.id === id), map = o.material[index].map, face = faceOf(s.n);
       assert.equal(map.source, faces.get(face).source);
-      const IMG = 3 - 0.26;
-      near(map.repeat.x, 0.99 / IMG, 1e-12, "body share 0.99 over the same image");
+      near(map.repeat.x, 0.99 / 3, 1e-12, "body share 0.99 over the same image");
+      assert.equal(o.material[index].color.getHexString(), "ffffff", "the body face is white under the image");
+      assert.equal(o.material[index].onBeforeCompile.toString().includes("projectedIn"), false, "no mask patch");
     });
   });
   assert.equal(count, fr.length);
@@ -154,8 +175,7 @@ test("layer-width profile: windows follow the real cell centers and widths; face
     const widths = thickOuterLayerWidths(n, f), c = layerCenters(widths);
     const { scene, fr, stickers } = build(n, { widths }), faces = faceTextures();
     scene.setPictureProjection({ faces });
-    let gap = 0; for (let i = 0; i + 1 < n; i++) gap += 0.13 * (widths[i] + widths[i + 1]) / 2; gap /= n - 1;
-    const IMG = widths.reduce((a, b) => a + b, 0) - 2 * gap, h = (n - 1) / 2;
+    const IMG = widths.reduce((a, b) => a + b, 0), h = (n - 1) / 2;
     for (const s of fr) {
       const map = stickers.get(s.id).material.map, face = faceOf(s.n), { up } = PROJECTED_FACES[face];
       const right = [up[1] * s.n[2] - up[2] * s.n[1], up[2] * s.n[0] - up[0] * s.n[2], up[0] * s.n[1] - up[1] * s.n[0]];

@@ -265,7 +265,9 @@ export class PhysicalCubeScene {
   /**
    * Projected picture mode on (a projection) or off (null: the caller's per-sticker tile materials are restored exactly).
    * Stickers show their window of their face's image; in the stickerless construction the exterior body faces carry the same
-   * window. Everything outside the image (the margin of one gap width, the gaps, bevels, bodies) stays plastic.
+   * window. The image is the full face extent, so it reaches the sticker edge on the outer border; only the gaps, bevels and
+   * seams cut it away and the sticker outline comes from the sticker geometry (the window is the sticker's own UV, no mask).
+   * Projected stickers and body faces are white so that the image shows undimmed.
    */
   setPictureProjection(projection: PictureProjection | null): void {
     this.clearProjection();
@@ -280,14 +282,13 @@ export class PhysicalCubeScene {
       const texture = projection.faces.get(face);
       demand(texture !== undefined, `Picture projection needs the face image of ${face}`);
       const index = info.p.map((c, axis) => this.axisCoordinates[axis].indexOf(c)) as unknown as Vec3;
-      return { face, win: stickerWindow(widths, share, face, index, STICKER_SHARE) };
+      return { face, win: stickerWindow(widths, share, face, index) };
     };
-    const outside = this.plastic instanceof THREE.MeshStandardMaterial ? this.plastic.color : new THREE.Color(DEFAULT_CORE_COLOR);
     for (const info of this.stickerInfo.values()) {
       const { face, win } = windowOf(info, STICKER_SHARE);
       const material = info.base.clone() as THREE.MeshStandardMaterial;
       material.map = this.windowedTexture(projection.faces.get(face)!, win);
-      maskOutsideImage(material, outside);
+      material.color.set("#ffffff");
       this.projectionMaterials.push(material);
       info.mesh.material = material;
     }
@@ -298,7 +299,6 @@ export class PhysicalCubeScene {
       entry.surface.color.set("#ffffff");
       entry.surface.needsUpdate = true;
       entry.projected = true;
-      maskOutsideImage(entry.surface, new THREE.Color(entry.fallback));
     }
   }
   /** A clone of a face texture with the window as texture transform; the clone shares the face's image (one GPU upload). */
@@ -313,7 +313,7 @@ export class PhysicalCubeScene {
   }
   private clearProjection(): void {
     for (const info of this.stickerInfo.values()) info.mesh.material = info.base;
-    for (const entry of this.artwork) if (entry.projected) { entry.projected = false; entry.surface.map = null; entry.surface.onBeforeCompile = () => {}; entry.surface.customProgramCacheKey = () => ""; entry.surface.needsUpdate = true; }
+    for (const entry of this.artwork) if (entry.projected) { entry.projected = false; entry.surface.map = null; entry.surface.needsUpdate = true; }
     for (const material of this.projectionMaterials) material.dispose();
     for (const texture of this.projectionTextures) texture.dispose();
     this.projectionMaterials = []; this.projectionTextures = [];
@@ -448,18 +448,4 @@ export class PhysicalCubeScene {
     for (const material of this.faceMaterials) material.dispose();
     for (const geometry of this.geometries) geometry.dispose();
   }
-}
-
-/** Shader patch: where the windowed map UV leaves 0..1 (outside the projected image) the surface shows `outside`. */
-function maskOutsideImage(material: THREE.Material, outside: THREE.Color): void {
-  material.onBeforeCompile = (shader) => {
-    shader.uniforms.projectedOutside = { value: outside };
-    shader.fragmentShader = "uniform vec3 projectedOutside;\n" + shader.fragmentShader.replace("#include <map_fragment>",
-      `#include <map_fragment>
-#ifdef USE_MAP
-  float projectedIn = step(0.0, vMapUv.x) * step(vMapUv.x, 1.0) * step(0.0, vMapUv.y) * step(vMapUv.y, 1.0);
-  diffuseColor.rgb = mix(projectedOutside, diffuseColor.rgb, projectedIn);
-#endif`);
-  };
-  material.customProgramCacheKey = () => "picture-projected";
 }

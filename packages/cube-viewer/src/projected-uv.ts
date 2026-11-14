@@ -1,16 +1,13 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 import { demand, type Vec3 } from "@cubistry/cube-core";
-import { layerCenters, layerEdge, validateLayerWidths, type LayerWidths } from "./layer-widths.ts";
+import { layerCenters, layerEdge, type LayerWidths } from "./layer-widths.ts";
 
 /**
  * Pure UV rule of the "Projected" picture mode. Six beamers, one per face, each project that face's own image face-on
- * (orthographic) onto its own face. Only the stickers carry the image; bodies, bevels and the gaps between stickers stay
- * plastic, so the image runs across the sticker area and the gaps cut it away.
- *
- * The image covers the face extent minus one gap width g on every side. g is derived from the real sticker geometry: a
- * sticker is `share` (0.87) of its cell, so two neighbors of the cells i and i + 1 are (1 - share) (w_i + w_i+1) / 2 apart,
- * and g is the mean of these n - 1 gaps (0.13 pitch for uniform widths, where the image side is n - 2 g). A sticker's UV
- * window is a linear map of its own 0..1 sticker UV into the face image; outside 0..1 the surface shows plastic.
+ * (orthographic) onto its own face. The image rectangle is the full face extent (no margin: the image reaches the face
+ * edge, g = 0), so every sticker or body face lies inside the image. Only the gaps, bevels and seams cut it away, and the
+ * outline of a sticker comes from its own geometry. A sticker's UV window is a linear map of its own 0..1 sticker UV into
+ * the face image.
  */
 export type FaceKey = "U" | "R" | "F" | "D" | "L" | "B";
 export const FACE_KEYS: readonly FaceKey[] = ["U", "R", "F", "D", "L", "B"];
@@ -32,17 +29,8 @@ export function faceOfNormal(normal: Vec3): FaceKey {
   return key!;
 }
 
-/** Mean gap between neighboring stickers along an axis; defined for n >= 2 layers. */
-export function gapWidth(widths: LayerWidths, share: number): number {
-  validateLayerWidths(widths);
-  demand(widths.length >= 2 && share > 0 && share < 1, "Invalid projection geometry");
-  let sum = 0;
-  for (let i = 0; i + 1 < widths.length; i++) sum += ((1 - share) * (widths[i] + widths[i + 1])) / 2;
-  return sum / (widths.length - 1);
-}
-
-/** Side of the projected image in scene units: the face extent minus one gap width on each side. */
-export const imageExtent = (widths: LayerWidths, share: number): number => layerEdge(widths) - 2 * gapWidth(widths, share);
+/** Side of the projected image in scene units: the whole face extent. */
+export const imageExtent = (widths: LayerWidths): number => layerEdge(widths);
 
 /**
  * The map of one sticker (or body face) into its face texture, texture origin bottom-left (`v` up) as the shared asset
@@ -60,16 +48,15 @@ export interface StickerWindow {
 
 /**
  * Window of the sticker of `face` on the cubie with the world layer indices `layerIndex` (0..n-1 per axis, increasing with
- * the world coordinate). `share` is the part of the cell the surface covers (the sticker 0.87, a body face 0.99); the gap
- * and the image always come from the sticker share given by `gapShare` (default `share` for the stickers).
+ * the world coordinate). `share` is the part of the cell the surface covers (the sticker 0.87, a body face 0.99).
  */
-export function stickerWindow(widths: LayerWidths, share: number, face: FaceKey, layerIndex: Vec3, gapShare: number = STICKER_SHARE): StickerWindow {
+export function stickerWindow(widths: LayerWidths, share: number, face: FaceKey, layerIndex: Vec3): StickerWindow {
   const frame = PROJECTED_FACES[face];
   demand(frame !== undefined, "Unknown face");
   demand(share > 0, "Invalid projection geometry");
   const n = widths.length;
   demand(layerIndex.length === 3 && layerIndex.every((i) => Number.isInteger(i) && i >= 0 && i < n), "Layer index outside the cube");
-  const centers = layerCenters(widths), img = imageExtent(widths, gapShare);
+  const centers = layerCenters(widths), img = imageExtent(widths);
   const right: Vec3 = [
     frame.up[1] * frame.normal[2] - frame.up[2] * frame.normal[1],
     frame.up[2] * frame.normal[0] - frame.up[0] * frame.normal[2],
