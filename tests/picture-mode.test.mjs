@@ -78,7 +78,7 @@ test("the menu: Pictures is a separate control with Projected and Per sticker; C
   assert.deepEqual(construction.children.map(o => o.value), ["stickered", "stickerless"]);
   assert.deepEqual(pictures.children.map(o => [o.value, o.textContent]), [["projected", "Projected"], ["per-sticker", "Per sticker"]]);
   const group = pictures.parent.parent ?? pictures.parent;
-  assert(walk(group).some(node => node.textContent === "Pictures " || node.textContent === "Pictures"), "labelled Pictures");
+  assert(walk(group).some(node => node.textContent === "Pictures " || node.textContent === "Pictures"), "labeled Pictures");
   // hidden until a picture cube gives the viewer face images
   const wrap = walk(host).find(node => node.className === "cube-appearance-pictures");
   assert.equal(wrap.style.display, "none");
