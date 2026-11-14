@@ -10,10 +10,12 @@ import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.j
 import { PRESENTATION_PRESET, PhysicalCubeScene, createPlasticMaterial } from "@cubistry/cube-viewer";
 import { NAME_WORDS } from "../src/apps/calendar7/layout.ts";
 import { NAMES_WHITE, SCHEMES } from "../src/apps/calendar7/schemes.ts";
-import { FACE_FLAT, FACE_SCALE, LINE_SCALE, TEXTURE, drawFace, drawSticker, nameGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
+import { FACE_FLAT, FACE_SCALE, NAMES_FACE_SCALE, LINE_SCALE, TEXTURE, drawFace, drawSticker, nameGrid, tileRoles } from "../src/apps/calendar7/sticker-art.ts";
 import { drawFontSticker, nameLabelLayout } from "../src/apps/calendar7/font-art.ts";
 import { CUBE_EDGE_MM_7X7, INNER_CUBIE_EDGE_MM, NAMES_BODY_WIDTH, NAMES_FACE_PX_PER_UNIT, NAMES_GAP, NAMES_GAP_MM, STANDARD_BODY_WIDTH, bodyWidthFor } from "../src/apps/calendar7/geometry.ts";
 import { layoutFixture } from "./calendar7-fixture.mjs";
+import { layerProfileFor } from "../src/apps/calendar7/viewer.ts";
+import { planarBodyUv } from "../packages/cube-viewer/src/body-artwork.ts";
 
 const PAPER_RED = SCHEMES.find((s) => s.id === "paper-red");
 
@@ -127,7 +129,7 @@ test("names layout (built-in font grid): letters of a name sit on one uniform ce
     // Row x of a letter in final pixels: tile k spans [k * cubie, (k + 1) * cubie), cubie = NAMES_FACE_PX_PER_UNIT.
     const centers = [];
     words.forEach((tile, k) => {
-      for (const l of nameGrid(tile)) centers.push(k * NAMES_FACE_PX_PER_UNIT + TEXTURE / 2 + (l.x - TEXTURE / 2) * FACE_SCALE);
+      for (const l of nameGrid(tile)) centers.push(k * NAMES_FACE_PX_PER_UNIT + TEXTURE / 2 + (l.x - TEXTURE / 2) * NAMES_FACE_SCALE);
     });
     assert.equal(centers.length, name.length);
     for (let i = 1; i < centers.length; i++) assert.ok(Math.abs(centers[i] - centers[i - 1] - pitch) < 1e-6, `${name} letter ${i}: ${centers[i] - centers[i - 1]} vs ${pitch}`);
@@ -169,8 +171,8 @@ test("names layout: the gap between cubies is 0.01 mm, stated in scene units (in
   g.computeBoundingBox();
   assert.ok(Math.abs(1 - (g.boundingBox.max.x - g.boundingBox.min.x) - NAMES_GAP) < 1e-6);
 });
-test("names layout: the face pixels per unit of the letter grid match the real body geometry", () => {
-  const g = new RoundedBoxGeometry(NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, NAMES_BODY_WIDTH, 1, PRESENTATION_PRESET.bodyRadius);
+test("names layout: the face pixels per unit of the letter grid match the real body geometry (planar face UV)", () => {
+  const w = NAMES_BODY_WIDTH, g = planarBodyUv(layerProfileFor("names").body([1, 1, 1]), [w, w, w], new Set([0, 1, 2, 3, 4, 5]));
   const pos = g.getAttribute("position"), uv = g.getAttribute("uv"), nor = g.getAttribute("normal");
   let u0 = Infinity, u1 = -Infinity, x0 = Infinity, x1 = -Infinity;
   for (let i = 0; i < pos.count; i++) if (Math.abs(nor.getZ(i) - 1) < 1e-6 && Math.abs(pos.getZ(i) - NAMES_BODY_WIDTH / 2) < 1e-6) {

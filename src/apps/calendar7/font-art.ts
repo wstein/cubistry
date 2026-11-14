@@ -2,7 +2,7 @@
 /** Shared 2D/3D artwork: original glyphs, with one source for each 6/9 pair. */
 import { numberLayout, type LoadedFont } from "./fonts.ts";
 import { type Layout, NAME_SLOTS, NAME_WORDS, nameAnchor, type NameWords } from "./layout.ts";
-import { CALENDAR7_SIZE, monthBanner, NAMES_BANNER_OVERHANG, outerLayerWidth } from "./geometry.ts";
+import { CALENDAR7_SIZE, monthBanner, NAMES_BANNER_OVERHANG, NAMES_EDGE_INSET, outerLayerWidth } from "./geometry.ts";
 import { faceTransform, type FaceTile, isBannerClass, lineRect, nameCenterUp, nameLetterX, namePxPerUnit, paintTileGround, TEXT_SQUARE, weekdayShift, TEXTURE, tileCanvasSize, tileGrid, tileRoles, type Surface } from "./sticker-art.ts";
 import type { ColorScheme } from "./schemes.ts";
 
@@ -30,6 +30,12 @@ const NAME_LETTERS = "JANUARYFEBRUCHMPILTSGOVDE";
 export const NAME_MIN_INK_GAP = 2;
 /** Names layout on the cubie faces: ink stays this far (drawing px, a bit more than one canvas px) inside the texture edge, so anti-aliasing never reaches it. */
 export const NAME_EDGE_MARGIN = 1.5;
+/**
+ * Names layout: the visible part of a body face ends where its bevel is 45 degrees steep (the rest of the bevel belongs to the cut
+ * face next to it), `NAMES_EDGE_INSET` units inside the texture edge. Ink that reaches a texture edge (a seam or the cube edge)
+ * keeps this inset plus `NAME_EDGE_MARGIN` from it (drawing px), so no letter is cut off by the cut face.
+ */
+const edgeMargin = (): number => NAME_EDGE_MARGIN + NAMES_EDGE_INSET * namePxPerUnit();
 const WEEKDAY_LABELS = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
 
 /** Per name tile of the 3D face layout: tracking added to the natural gaps and the resulting ink gaps (drawing px). */
@@ -116,7 +122,7 @@ function fitAt(font: LoadedFont, s: number, c: number, outer: number, TILES: rea
   // the seam sits between two texture edges (bevel reach): ink keeps 1.5 px inside the texture on the seam side
   const m = Math.max(c * s / 2, ...TILES.flatMap(t => {
     const room = roomOf(t.anchor, outer);
-    return [...(t.anchor !== -1 ? [ppu / 2 - room.right + NAME_EDGE_MARGIN] : []), ...(t.anchor !== 1 ? [ppu / 2 - room.left + NAME_EDGE_MARGIN] : [])];
+    return [...(t.anchor !== -1 ? [ppu / 2 - room.right + edgeMargin()] : []), ...(t.anchor !== 1 ? [ppu / 2 - room.left + edgeMargin()] : [])];
   }));
   const nat = new Map(TILES.map(t => [t.label, natural(font, t.label)]));
   for (const t of TILES) if (t.anchor === 0) {
@@ -128,7 +134,7 @@ function fitAt(font: LoadedFont, s: number, c: number, outer: number, TILES: rea
     const n = nat.get(t.label)!;
     if (n.height * s + 2 * NAME_EDGE_MARGIN > banner) { fails.push(t.label); continue; }
     if (t.anchor === 0) continue;
-    const room = roomOf(t.anchor, outer), limit = ppu / 2 + (t.anchor === 1 ? room.left - m : room.right - NAME_EDGE_MARGIN) - m, tau = trackingFor(s, n, limit);
+    const room = roomOf(t.anchor, outer), limit = ppu / 2 + (t.anchor === 1 ? room.left - m : room.right - edgeMargin()) - m, tau = trackingFor(s, n, limit);
     if (tau === null) fails.push(t.label);
     else if (t.anchor === 1 && t.label.length >= 3 && NAMES_FIRST_TILE_FILL) taus.set(t.label, tau); // fill the first tile: the ink from half a seam gap inside the banner edge to half a seam gap before the seam
     else taus.set(t.label, Math.min(mean, tau));
@@ -232,7 +238,7 @@ export function drawFontSticker(ctx: CanvasRenderingContext2D, text: string, ink
     ctx.fillRect(0, 0, W, H);
   }
   if (surface === "face") {
-    const { cx, cy, kx, ky } = faceTransform(t);
+    const { cx, cy, kx, ky } = faceTransform(t, layout);
     ctx.save();ctx.translate(cx, cy);ctx.scale(kx, ky);ctx.translate(-96, -96);
   }
   const parts = layout === "names" && printed.cls === "month" ? nameLabelLayout(text, font, surface, words) : labelLayout(text, font);

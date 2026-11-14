@@ -2,7 +2,7 @@
 import { IMAGE_UPS } from "./display.ts";
 import { DEFAULT_RULE_PROFILE, type RuleProfile } from "./profile.ts";
 import { type Layout, NAME_SLOTS, nameSlotOffset, type NameWords, NAME_WORDS, nameSlotStart, nameTileShift } from "./layout.ts";
-import { type FaceBands, faceFlatShare, facePixelsPerUnit, monthBanner, nameAboveShare, NAMES_BANNER_BOTTOM_OFFSET, NAMES_BANNER_HEIGHT, NAMES_BANNER_OVERHANG, NAMES_BANNER_RADIUS, NAMES_BANNER_THIN_TILE_TOP, NAMES_FACE_PX_PER_UNIT, NAMES_WEEKDAY_DOWN, outerLayerWidth, CALENDAR7_SIZE } from "./geometry.ts";
+import { type FaceBands, faceFlatShare, facePixelsPerUnit, faceVisibleShare, monthBanner, nameAboveShare, NAMES_BANNER_BOTTOM_OFFSET, NAMES_BANNER_HEIGHT, NAMES_BANNER_OVERHANG, NAMES_BANNER_RADIUS, NAMES_BANNER_THIN_TILE_TOP, NAMES_FACE_PX_PER_UNIT, NAMES_WEEKDAY_DOWN, outerLayerWidth, CALENDAR7_SIZE } from "./geometry.ts";
 import { type ColorScheme, namesGround, type ResolvedBannerStyle, type SchemeLine, underlineInk } from "./schemes.ts";
 
 /** Sticker artwork of the 7x7 calendar cube: paper, ink colors and the text fitting. DOM-free apart from the 2D context argument. */
@@ -205,14 +205,14 @@ export const nameCenterUp = (capUnits: number, radius: number = NAMES_BANNER_RAD
 export const tileCanvasSize = (tile?: FaceTile): [number, number] => (tile ? [Math.round(TEXTURE * tile.w), Math.round(TEXTURE * tile.h)] : [TEXTURE, TEXTURE]);
 /**
  * Transform of the drawing (192 x 192 sticker coordinates) onto the canvas of a cubie face: the drawing center (96, 96) goes
- * to the center of the unit cell of the tile (the canvas center without bands), the scale is `FACE_SCALE` on a 1 x 1 face and follows the pixels per unit of the face's real geometry
- * (the texture is mapped along the arc length of the bevel, so a larger face has slightly fewer pixels per unit). No tile:
- * exactly the historical centered `FACE_SCALE`.
+ * to the center of the unit cell of the tile (the canvas center without bands), the scale is `NAMES_FACE_SCALE` on a 1 x 1 face and follows the pixels per unit of the face's real geometry
+ * (the texture is mapped planar, so a larger face has the same pixels per unit). No tile: the centered `FACE_SCALE` of the
+ * standard layout, `NAMES_FACE_SCALE` for the names layout.
  */
-export function faceTransform(tile?: FaceTile): { cx: number; cy: number; kx: number; ky: number } {
-  if (!tile) return { cx: TEXTURE / 2, cy: TEXTURE / 2, kx: FACE_SCALE, ky: FACE_SCALE };
+export function faceTransform(tile?: FaceTile, layout: Layout = "standard"): { cx: number; cy: number; kx: number; ky: number } {
+  if (!tile) { const k = layout === "names" ? NAMES_FACE_SCALE : FACE_SCALE; return { cx: TEXTURE / 2, cy: TEXTURE / 2, kx: k, ky: k }; }
   const g = tileGrid(tile);
-  return { cx: g.cx, cy: g.cy, kx: FACE_SCALE * g.px / NAMES_FACE_PX_PER_UNIT, ky: FACE_SCALE * g.py / NAMES_FACE_PX_PER_UNIT };
+  return { cx: g.cx, cy: g.cy, kx: NAMES_FACE_SCALE * g.px / NAMES_FACE_PX_PER_UNIT, ky: NAMES_FACE_SCALE * g.py / NAMES_FACE_PX_PER_UNIT };
 }
 
 /**
@@ -313,7 +313,7 @@ export interface NameLetter {
  * Texture pixels (in drawing coordinates) per scene unit of the cubie pitch on a cubie face the drawing is scaled about the
  * center by `FACE_SCALE`, so the drawing pitch is the on-screen pitch of the flat face divided by it.
  */
-export const namePxPerUnit = (): number => NAMES_FACE_PX_PER_UNIT / FACE_SCALE;
+export const namePxPerUnit = (): number => NAMES_FACE_PX_PER_UNIT / NAMES_FACE_SCALE;
 
 /**
  * Center x (drawing coordinates) of letter `i` of a name tile. On a cubie face (the 3D cube): the slot grid of layout.ts,
@@ -502,6 +502,15 @@ export const FACE_FLAT = 0.9106;
 export const FACE_TEXT_SQUARE = 0.92;
 /** Scale of the sticker label about the texture center: the 86% text square becomes `FACE_TEXT_SQUARE` of the flat face. */
 export const FACE_SCALE = (FACE_FLAT * FACE_TEXT_SQUARE) / 0.86;
+/**
+ * The same for a tile of the names layout (O2 bevel radius, owner decision 2026-11-14): the 192 px sticker drawing is fitted to the
+ * visible face (`faceVisibleShare`: up to where the bevel is 45 degrees steep, 0.912 of the texture), so its 0.86 text square is
+ * 0.784 of the cell. The flat part of a 1 x 1 face is only 0.699 of the texture (FACE_FLAT is 0.9106 at the radius 0.055): the
+ * outer part of the text starts on the first part of the bevel (tilt below 17 degrees); a text square at 0.92 of the flat part
+ * would be 23 % smaller than before and thinner than the 6 / 255 ink limit of tests/browser/calendar7-names-color.spec.mjs can
+ * measure on screen.
+ */
+export const NAMES_FACE_SCALE = faceVisibleShare(1);
 /** How the 3D view draws the labels: on sticker bodies (scheme A, default) or directly on the cubie faces. */
 export type Surface = "sticker" | "face";
 
@@ -526,7 +535,7 @@ export function drawFace(
   const [W, H] = tileCanvasSize(t);
   if (roles && scheme && t) paintTileGround(ctx, roles, scheme, t);
   else { ctx.fillStyle = roles ? roles.fill : text === "" ? BLANK_PAPER : PAPER; ctx.fillRect(0, 0, W, H); }
-  const { cx, cy, kx, ky } = faceTransform(t);
+  const { cx, cy, kx, ky } = faceTransform(t, layout);
   ctx.save();
   ctx.translate(cx, cy);
   ctx.scale(kx, ky);
