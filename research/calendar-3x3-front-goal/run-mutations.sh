@@ -1,10 +1,11 @@
 #!/usr/bin/env bash
 # Mutation check: each FG_MUTATE value breaks one piece of FrontGoal.jl; the named test set must fail.
-# usage: run-mutations.sh [outDir]   (JULIA=path to julia). Exit 1 if a mutation is not caught by its expected test set.
+# usage: run-mutations.sh [outDir]   (JULIA=path to julia; default outDir: .scratch/mutations next to this script, gitignored).
+# Exit 1 if a mutation is not caught by its expected test set.
 set -u
 here=$(cd "$(dirname "$0")" && pwd)
 J=${JULIA:-julia}
-out=${1:-/tmp/fg-mutations}
+out=${1:-$here/.scratch/mutations}
 mkdir -p "$out"
 status=0
 check() { # mutation, expected failing test set
@@ -20,6 +21,10 @@ check() { # mutation, expected failing test set
   fi
 }
 check h_plus_one "optimum equals brute force"
+check forbid_opposite "optimum equals independent brute force"
+check short_depth "depth bound is inclusive"
+check last_found "fewest rotation tokens"
+check first_table_only "weaker heuristic gives the same optimum"
 check h_plus_one "known optima"
 check strict_sources "optimum equals brute force"
 check ignore_up "accepts() equals engine reality"
