@@ -52,6 +52,7 @@ export function browserCalendarEnv(base: string, controls: HTMLElement): Calenda
       const link = document.getElementById("print-stickers") as HTMLAnchorElement | null;
       if (link) link.href = new URL(`print.html?design=${design}`, location.href).href;
     },
+    search: () => location.search,
     replaceQuery: (search) => history.replaceState(null, "", `${location.pathname}${search}${location.hash}`),
     expose(name, value) {
       if (value === undefined) delete (window as any)[name];

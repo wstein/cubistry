@@ -168,6 +168,7 @@ test("changing the select recolors the viewer in place and writes ?scheme= to th
   assert.equal(log.configured.length, before, "no new configure on a scheme change");
   assert.match(log.query.at(-1), /scheme=monokai/);
   assert.match(log.query.at(-1), /lang=en/);
+  assert.match(log.query.at(-1), /(^\?|&)app=calendar(&|$)/, "the router strips app from the mount params; the rewritten URL must keep it");
   dock.el("calendar-scheme").value = "default";
   dock.el("calendar-scheme").fire("change");
   assert.doesNotMatch(log.query.at(-1), /scheme=/);
@@ -204,4 +205,29 @@ test("CalendarViewer.setScheme repaints the existing canvases and textures in pl
   viewer.busy = false;
   viewer.applyBody();
   assert.deepEqual(body.slice(2), [["body", "#fffdf6"], ["faces", designs["en-3-zero"].printing.length]]);
+});
+
+test("the calendar mode and the parameter inventory name scheme", async () => {
+  const { MODE_CATALOG } = await import("../src/apps/mode-catalog.ts");
+  assert.ok(MODE_CATALOG.find((m) => m.id === "calendar").params.includes("scheme"));
+  assert.match(readFileSync("tests/app-parameter-inventory.test.mjs", "utf8"), /row\(\["scheme"\], "src\/apps\/calendar\/mount\.ts", \["calendar"\]/);
+});
+
+test("the chosen scheme survives configure (a DE/EN switch): stickers and stickerless body use it, not the default", async () => {
+  const THREE = await import("three");
+  const { CalendarViewer } = await import("../src/apps/calendar/viewer.ts");
+  const painted = [], bodies = [];
+  globalThis.document = { createElement: () => ({ width: 0, height: 0, getContext: () => new Proxy({}, { set: (_t, k, v) => (k === "fillStyle" && painted.push(v), true), get: () => () => {} }) }) };
+  globalThis.matchMedia = () => ({ matches: false });
+  try {
+    const viewer = Object.assign(Object.create(CalendarViewer.prototype), {
+      presentation: new THREE.Group(), resources: [], artworkTextures: new Map(), glyphs: [], cube: null, busy: false, scheme: cal3SchemeById("dracula"),
+      appearance: { construction: "stickered", frameColor: null }, bodyStale: false,
+    });
+    const d = designs["en-3-zero"];
+    viewer.configure(d, d.printing);
+    assert.ok(painted.includes("#282a36"), "stickers painted with the Dracula ground");
+    assert.equal(painted.includes("#fffdf6"), false, "no sticker painted with the default ground");
+    assert.equal(viewer.cube.bodyColor, "#282a36", "stickerless body color is the scheme ground");
+  } finally { delete globalThis.document; delete globalThis.matchMedia; }
 });

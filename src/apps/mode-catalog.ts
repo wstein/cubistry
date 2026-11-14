@@ -34,7 +34,7 @@ export const MODE_CATALOG: readonly ModeMeta[] = [
     badge: "Date · DE / EN",
     group: "apps",
     help: "docs/CALENDAR_CUBES.md",
-    params: ["date", "lang", "design", "pad"],
+    params: ["date", "lang", "design", "pad", "scheme"],
   },
   {
     id: "playground",
