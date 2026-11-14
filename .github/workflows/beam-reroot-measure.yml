@@ -1,0 +1,190 @@
+# SPDX-License-Identifier: AGPL-3.0-or-later
+name: Beam re-root measure
+
+# Manually dispatched measurement for the Calendar7 beam: how much route length does streaming inside an edge cost when the solver is
+# re-rooted after a committed prefix (research/calendar-7x7/row1-window-chain, README section "Re-root measurement"). Research only:
+# it reproduces stored chain edges with the production solver, logs the beam, and solves each edge again from several committed
+# prefixes. No chain is produced, nothing is verified as a chain, no commits, no gitlinks, no PR comments; the output is artifacts only.
+# It cannot be dispatched until this file is on the default branch (main); the research code and the frozen inputs (print C, layout,
+# month list, stored chain 2019-01..2036-01, SHA256SUMS) are taken from research_ref (a commit SHA on the research branch).
+# Never on push or pull_request. Never while a window-chain run is queued or running (prepare refuses): heavy Julia runs go one at a time.
+# Jobs: prepare (validate inputs and the research commit, refuse when window-chain runs, build the matrix of two edges per job) and
+# measure (one job per two edges: run_reroot_measure.sh under nice, 4 threads; the script starts no re-root solve after deadline_min).
+
+on:
+  workflow_dispatch:
+    inputs:
+      research_ref:
+        description: Commit SHA (40 hex digits) on the research branch that holds measure_edges.jl, reroot_measure_lib.jl and evidence/reroot-measure
+        type: string
+        required: true
+      edges:
+        description: Edge ids of the stored chain, comma separated (1-20 ids, 2..205); the selection of the research README is 87,62,54,22,77,74,193,203,166,159
+        type: string
+        default: "87,62,54,22,77,74,193,203,166,159"
+      commits:
+        description: Commit thresholds in HTM, comma separated; a re-root solve per first beam prefix of at least that length, and one for the longest prefix
+        type: string
+        default: "1,10,30,60"
+      library:
+        description: Beam macro library (L1, L4, L5); the stored chain was produced with L5
+        type: string
+        default: L5
+      width:
+        description: Beam width (1-200)
+        type: string
+        default: "40"
+      lambda:
+        description: Beam lambda (1-10)
+        type: string
+        default: "3"
+      deadline_min:
+        description: No re-root solve starts after this many minutes since the start of a job's script (30-320)
+        type: string
+        default: "300"
+
+permissions:
+  contents: read
+  # Needed only to see whether a window-chain run is queued or running.
+  actions: read
+
+concurrency:
+  group: beam-reroot-measure
+  cancel-in-progress: false
+
+env:
+  # research_ref must lie on this branch (git merge-base --is-ancestor).
+  RESEARCH_BRANCH: research/cube-display-feasibility
+  WC: research/calendar-7x7/row1-window-chain
+
+jobs:
+  prepare:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 15
+    outputs:
+      matrix: ${{ steps.validate.outputs.matrix }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false # the repository is public; prepare only fetches the research commit, no untrusted code runs here
+      - name: Validate inputs
+        id: validate
+        env:
+          IN_REF: ${{ inputs.research_ref }}
+          IN_EDGES: ${{ inputs.edges }}
+          IN_COMMITS: ${{ inputs.commits }}
+          IN_LIBRARY: ${{ inputs.library }}
+          IN_WIDTH: ${{ inputs.width }}
+          IN_LAMBDA: ${{ inputs.lambda }}
+          IN_DEADLINE: ${{ inputs.deadline_min }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          [[ "$IN_REF" =~ ^[0-9a-f]{40}$ ]] || fail "research_ref must be a 40-digit lowercase hex commit SHA"
+          [[ "$IN_EDGES" =~ ^[0-9]{1,3}(,[0-9]{1,3}){0,19}$ ]] || fail "edges must be 1-20 edge ids separated by commas"
+          IFS=, read -r -a ids <<< "$IN_EDGES"
+          [ "$(printf '%s\n' "${ids[@]}" | sort -u | wc -l)" = "${#ids[@]}" ] || fail "edges must be distinct"
+          for i in "${ids[@]}"; do [ "$i" -ge 2 ] && [ "$i" -le 205 ] || fail "edge id $i is outside 2..205"; done
+          [[ "$IN_COMMITS" =~ ^[1-9][0-9]{0,3}(,[1-9][0-9]{0,3}){0,7}$ ]] || fail "commits must be 1-8 thresholds (HTM >= 1) separated by commas"
+          [[ "$IN_LIBRARY" =~ ^L[145]$ ]] || fail "library must be L1, L4 or L5"
+          [[ "$IN_WIDTH" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$IN_WIDTH" -le 200 ] || fail "width must be 1-200"
+          [[ "$IN_LAMBDA" =~ ^([1-9]|10)$ ]] || fail "lambda must be 1-10"
+          [[ "$IN_DEADLINE" =~ ^[1-9][0-9]{1,2}$ ]] && [ "$IN_DEADLINE" -ge 30 ] && [ "$IN_DEADLINE" -le 320 ] || fail "deadline_min must be 30-320"
+          # Two edges per job: a job of two 170-HTM edges with four re-root solves each takes about 20 minutes, far below the job limit.
+          matrix=$(printf '%s\n' "${ids[@]}" | awk 'NR%2==1{p=$0; next} {q[++n]=p","$0; p=""} END{if(p!="")q[++n]=p; printf "{\"ids\":["; for(i=1;i<=n;i++)printf "%s\"%s\"",(i>1?",":""),q[i]; printf "]}"}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+      - name: Refuse while a window-chain run is queued or running
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          n=0
+          for s in queued in_progress waiting pending requested; do
+            c=$(gh api "repos/$GITHUB_REPOSITORY/actions/workflows/window-chain.yml/runs?status=$s&per_page=1" --jq '.total_count')
+            n=$((n + c))
+          done
+          [ "$n" = 0 ] || { echo "::error::$n window-chain run(s) are queued or running; heavy runs go one at a time"; exit 1; }
+      - name: Check research commit
+        env:
+          SHA: ${{ inputs.research_ref }}
+          IN_EDGES: ${{ inputs.edges }}
+          IN_COMMITS: ${{ inputs.commits }}
+          IN_LIBRARY: ${{ inputs.library }}
+          IN_WIDTH: ${{ inputs.width }}
+          IN_LAMBDA: ${{ inputs.lambda }}
+          IN_DEADLINE: ${{ inputs.deadline_min }}
+        run: |
+          set -euo pipefail
+          fail() { echo "::error::$1"; exit 1; }
+          git fetch --no-tags origin "+refs/heads/$RESEARCH_BRANCH:refs/remotes/origin/$RESEARCH_BRANCH" || fail "cannot fetch $RESEARCH_BRANCH"
+          git fetch --no-tags origin "$SHA" || fail "commit $SHA is not fetchable from $GITHUB_REPOSITORY"
+          [ "$(git rev-parse --verify "$SHA^{commit}")" = "$SHA" ] || fail "research_ref does not resolve to itself"
+          git merge-base --is-ancestor "$SHA" "refs/remotes/origin/$RESEARCH_BRANCH" || fail "research_ref is not an ancestor of $RESEARCH_BRANCH"
+          missing=0
+          for f in "$WC/measure_edges.jl" "$WC/reroot_measure_lib.jl" "$WC/run_reroot_measure.sh" "$WC/window_chain_lib.jl" \
+                   "$WC/evidence/reroot-measure/SHA256SUMS" "$WC/evidence/reroot-measure/chain-2019-01-2036-01.moves.tsv" \
+                   research/calendar-7x7/upright-beam/beam2.jl research/calendar-7x7/global-search/search.jl; do
+            git cat-file -e "$SHA:$f" 2>/dev/null || { echo "::error::$f is missing at $SHA"; missing=1; }
+          done
+          [ "$missing" = 0 ] || fail "research commit lacks required files"
+          # The hook of the measurement must exist in the solver at research_ref (read-only; default nothing).
+          git grep -qw BEAMLOG "$SHA" -- research/calendar-7x7/upright-beam/beam2.jl || fail "beam2.jl at research_ref has no BEAMLOG hook"
+          {
+            echo "### Beam re-root measure"
+            echo "- research SHA: \`$SHA\`"
+            echo "- edges: \`$IN_EDGES\`, commits: \`$IN_COMMITS\`, library \`$IN_LIBRARY\`, width \`$IN_WIDTH\`, lambda \`$IN_LAMBDA\`, deadline \`$IN_DEADLINE\` min"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+  measure:
+    needs: [prepare]
+    runs-on: ubuntu-24.04
+    # Wall-clock deadline of a job below 345 minutes: the script starts no re-root solve after deadline_min (at most 320); the timeout
+    # in the step cuts a running solve at deadline_min + 15 (at most 335); the job limit is 340.
+    timeout-minutes: 340
+    strategy:
+      fail-fast: false
+      max-parallel: 5
+      matrix: ${{ fromJSON(needs.prepare.outputs.matrix) }}
+    env:
+      SHA: ${{ inputs.research_ref }}
+      COMMITS: ${{ inputs.commits }}
+      LIBRARY: ${{ inputs.library }}
+      WIDTH: ${{ inputs.width }}
+      LAMBDA: ${{ inputs.lambda }}
+      DEADLINE_MIN: ${{ inputs.deadline_min }}
+      IDS: ${{ matrix.ids }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          repository: ${{ github.repository }}
+          ref: ${{ inputs.research_ref }}
+          path: src
+          persist-credentials: false
+      - uses: julia-actions/setup-julia@da908477b5db94c10ffce8cfea9f2b3b9d5db687 # v3.0.3
+        with:
+          version: "1.13.3"
+      - name: Measure
+        run: |
+          set -euo pipefail
+          out="$GITHUB_WORKSPACE/out"; mkdir -p "$out"
+          julia --version; nproc; free -g
+          set +e
+          JULIA="$(command -v julia)" nice -n 10 timeout $((DEADLINE_MIN + 15))m \
+            bash "src/research/calendar-7x7/row1-window-chain/run_reroot_measure.sh" "$out" "$IDS" \
+              commits="$COMMITS" library="$LIBRARY" width="$WIDTH" lambda="$LAMBDA" deadline_s=$((DEADLINE_MIN * 60)) 2>&1 | tee "$out/run.log"
+          rc=${PIPESTATUS[0]}
+          set -e
+          [ "$rc" = 0 ] || echo "::error::measurement exited with $rc (124 = timeout, 137 = killed, probably out of memory)"
+          {
+            echo "### Edges $IDS (exit $rc)"
+            echo '```'; cat "$out/reroot.tsv" 2>/dev/null || echo "no reroot.tsv"; echo '```'
+            echo '```'; cut -f1-9,19-21 "$out/summary.tsv" 2>/dev/null || true; echo '```'
+          } >> "$GITHUB_STEP_SUMMARY"
+          [ "$rc" = 0 ]
+      - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        if: always()
+        with:
+          name: reroot-${{ strategy.job-index }}-${{ github.run_id }}
+          path: out/
+          retention-days: 90
+          if-no-files-found: error
