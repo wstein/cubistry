@@ -1,0 +1,13 @@
+print	variant	step	date	app_htm	app_rot	status	front_htm	front_rot	nodes	solve_ms	pdb_ms	root_h	route
+de-a	app	1	2027-01-02	17	0	solved	9	0	54511	20.3	810.4	6	U2 R' B' U' R2 U2 B R U
+de-a	app	2	2027-01-03	17	0	solved	9	0	148570	13.9	821.9	6	R2 U' R2 U2 R F' U F U
+de-a	app	3	2027-01-04	17	0	solved	7	1	4382	0.6	730.2	6	z' F' R F2 D2 R2 D2 L'
+de-a	own	1	2027-01-02	17	0	solved	9	0	54511	11.9	891.7	6	U2 R' B' U' R2 U2 B R U
+de-a	own	2	2027-01-03	17	0	solved	9	1	112856	23.6	698.5	5	z R2 B2 D F2 L F U B2 R
+de-a	own	3	2027-01-04	17	0	solved	7	0	9533	0.8	716.3	5	F2 R U2 L2 U2 F2 L'
+en-3-zero	app	1	2027-01-02	17	0	solved	6	0	2146	12.2	969.8	5	U B2 R' B R U'
+en-3-zero	app	2	2027-01-03	18	0	solved	7	0	22533	1.9	931.3	5	U B D B U' B2 D'
+en-3-zero	app	3	2027-01-04	17	0	solved	7	0	29805	4.4	891.0	5	B D B2 L' B L D'
+en-3-zero	own	1	2027-01-02	17	0	solved	6	0	2146	16.0	1089.0	5	U B2 R' B R U'
+en-3-zero	own	2	2027-01-03	18	0	solved	6	0	1759	0.3	1011.5	5	D B2 L' B L D'
+en-3-zero	own	3	2027-01-04	17	0	solved	6	0	3385	0.5	1062.2	5	D B' L2 D L2 D2
