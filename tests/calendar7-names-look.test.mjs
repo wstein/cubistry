@@ -246,7 +246,7 @@ test("exposure: the studio has only the light types the irradiance counts, and a
 });
 
 // ---- light per face: the face that looks at the camera is lit as before, the others get the share (names-face-light.ts) ----
-import { FRONT_FROM, FRONT_TO, NAMES_DIRECTIONAL_SHARE, faceIrradiance, faceLightChunks, frontWeight } from "../src/apps/calendar7/names-face-light.ts";
+import { FRONT_FROM, FRONT_TO, NAMES_DIRECTIONAL_SHARE, faceIrradiance, faceLightChunks, frontWeight, faceCosine, FACE_SHARE_POWER, patchFaceLight, faceLightUniform } from "../src/apps/calendar7/names-face-light.ts";
 const faceNormal = (axis, q) => new THREE.Vector3(...axis).applyQuaternion(q);
 const FACES = { up: [0, 1, 0], front: [0, 0, 1], right: [1, 0, 0], left: [-1, 0, 0] };
 const VIEWS = [[0, 0], [0.22, 0.3], [0.3, 0.5], [0.45, 0.5], [0.95, 0.5]]; // [pitch, yaw]: the studio views of the washout report
@@ -310,6 +310,26 @@ test("face light: the three.js light chunks take the face light at the three pla
   assert.ok(at > 0 && begin.indexOf("directionalLightShadows[ i ]", at) > at, "in the directional loop, before its shadow factor");
   assert.throws(() => faceLightChunks("vec3 other;", THREE.ShaderChunk.lights_fragment_end), /changed its light chunk/);
   assert.throws(() => faceLightChunks(THREE.ShaderChunk.lights_fragment_begin, "nothing"), /changed its light chunk/);
+});
+
+test("face light: a bevel belongs to the face it is nearer to (face cosine), a flat face keeps its own, the weight never exceeds the face's", () => {
+  const axisCos = [0.1, 0.43, 0.9]; // +x, +y (top), +z (front) of a cube seen at pitch 0.45
+  const near = (a, b, m) => assert.ok(Math.abs(a - b) < 1e-3, `${m}: ${a} against ${b}`);
+  near(faceCosine([0, 1, 0], axisCos), 0.43, "flat top face");
+  near(faceCosine([0, 0, 1], axisCos), 0.9, "flat front face");
+  near(faceCosine([0, -1, 0], axisCos), -0.43, "flat bottom face");
+  const at = (deg) => [0, Math.cos(deg * Math.PI / 180), Math.sin(deg * Math.PI / 180)]; // top face (0 degrees) toward the front face (90)
+  assert.ok(faceCosine(at(20), axisCos) < 0.45, "a bevel fragment nearer to the top face has the top face cosine");
+  assert.ok(faceCosine(at(70), axisCos) > 0.88, "a bevel fragment nearer to the front face has the front face cosine");
+  near(faceCosine(at(45), axisCos), (0.43 + 0.9) / 2, "the middle of the bevel is shared");
+  const shader = { vertexShader: "void main() {\n#include <defaultnormal_vertex>\n}", fragmentShader: "#include <lights_fragment_begin>\n#include <lights_fragment_end>", uniforms: {} };
+  const material = new THREE.MeshPhysicalMaterial();
+  patchFaceLight(material, faceLightUniform());
+  material.onBeforeCompile(shader);
+  assert.ok(/varying vec3 vC7Obj;/.test(shader.vertexShader) && shader.vertexShader.indexOf("#include <defaultnormal_vertex>") < shader.vertexShader.indexOf("vC7Obj = objectNormal;"), "the vertex shader passes the object normal after the normal is made");
+  assert.ok(shader.vertexShader.includes("vC7Axes = vec3( normalize( normalMatrix[ 0 ] ).z, normalize( normalMatrix[ 1 ] ).z, normalize( normalMatrix[ 2 ] ).z );"));
+  assert.ok(shader.fragmentShader.includes("min( geometryNormal.z, c7FaceCos )") && shader.fragmentShader.includes("pow( abs( vC7Obj ), vec3( 4.0 ) )") && /varying vec3 vC7Axes;/.test(shader.fragmentShader), "the fragment weight uses the lesser of fragment and face cosine, with the power of the reference");
+  assert.equal(FACE_SHARE_POWER, 4);
 });
 
 // ---- soft shoulder (names-tone.ts) ----

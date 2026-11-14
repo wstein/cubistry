@@ -25,6 +25,20 @@ const smoothstep = (a: number, b: number, x: number): number => { const t = Math
 /** W of a fragment whose normal has the cosine `d` to the camera direction. */
 export const frontWeight = (d: number): number => smoothstep(FRONT_FROM, FRONT_TO, d);
 
+/** Sharpness of the face share of a fragment: weight |n_a|^p of the body axis a (a flat face: one axis; a bevel: the face it is nearer to). */
+export const FACE_SHARE_POWER = 4;
+/**
+ * Reference of the fragment shader (`vC7Obj`, `vC7Axes`): the cosine to the camera of the body face a fragment belongs to. `n` is the
+ * interpolated object space normal, `axisCos` the cosine to the camera of the +x, +y and +z body axes. A flat face gives the cosine of
+ * its face; a bevel the cosines of its two faces weighted by |n_a|^FACE_SHARE_POWER, so a bevel belongs to the face it is nearer to. The
+ * fragment weight uses min(n . c, this cosine): a bevel that turns toward the camera does not take more light than its face (the larger
+ * bevel of the O2 radius clipped on the top face), a bevel that turns away keeps its own weight.
+ */
+export function faceCosine(n: readonly [number, number, number], axisCos: readonly [number, number, number]): number {
+  const a = n.map(x => Math.pow(Math.abs(x), FACE_SHARE_POWER)), sum = a[0] + a[1] + a[2] + 1e-6;
+  return (a[0] * Math.sign(n[0]) * axisCos[0] + a[1] * Math.sign(n[1]) * axisCos[1] + a[2] * Math.sign(n[2]) * axisCos[2]) / sum;
+}
+
 /** The uniform of the shaders: (share, target T, FRONT_FROM, FRONT_TO). Share 1 and target 0 give the studio's light on every face. */
 export type FaceLightUniform = { value: THREE.Vector4 };
 export const faceLightUniform = (): FaceLightUniform => ({ value: new THREE.Vector4(1, 0, FRONT_FROM, FRONT_TO) });
@@ -50,13 +64,19 @@ export function faceIrradiance(scene: THREE.Object3D, n: THREE.Vector3, rotation
   return base + (1 - w) * Math.max(0, faceLightTarget(scene, rotation, camera) - base);
 }
 
-const DECLARE = "uniform vec4 c7FaceLight;\n";
+const DECLARE = "uniform vec4 c7FaceLight;\nvarying vec3 vC7Obj;\nvarying vec3 vC7Axes;\n";
+const VERTEX_DECLARE = "varying vec3 vC7Obj;\nvarying vec3 vC7Axes;\n";
+const DEFAULT_NORMAL = "#include <defaultnormal_vertex>";
+/** Vertex shader: the object space normal and the cosine to the camera of the three body axes (constant per mesh; the camera looks along -z in view space). */
+const FACE_VERTEX = `\n\tvC7Obj = objectNormal;\n\tvC7Axes = vec3( normalize( normalMatrix[ 0 ] ).z, normalize( normalMatrix[ 1 ] ).z, normalize( normalMatrix[ 2 ] ).z );`;
+/** Fragment shader: the cosine of the face the fragment belongs to (reference: faceCosine). */
+const FACE_COS = `vec3 c7A = pow( abs( vC7Obj ), vec3( 4.0 ) );\n\tfloat c7FaceCos = dot( c7A, sign( vC7Obj ) * vC7Axes ) / ( c7A.x + c7A.y + c7A.z + 1e-6 );`;
 const NORMAL = "vec3 geometryNormal = normal;";
 const DIRECTIONAL = "getDirectionalLightInfo( directionalLight, directLight );";
 const INDIRECT = "RE_IndirectDiffuse( irradiance,";
 const LUMA = "vec3( 0.2126, 0.7152, 0.0722 )";
 export const FACE_LIGHT_GLSL = {
-  weight: `\n\tfloat c7W = smoothstep( c7FaceLight.z, c7FaceLight.w, geometryNormal.z );\n\tfloat c7Direct = mix( c7FaceLight.x, 1.0, c7W );\n\tfloat c7DirSum = 0.0;`,
+  weight: `\n\t${FACE_COS}\n\tfloat c7W = smoothstep( c7FaceLight.z, c7FaceLight.w, min( geometryNormal.z, c7FaceCos ) );\n\tfloat c7Direct = mix( c7FaceLight.x, 1.0, c7W );\n\tfloat c7DirSum = 0.0;`,
   direct: `\n\t\tdirectLight.color *= c7Direct;\n\t\tc7DirSum += saturate( dot( geometryNormal, directLight.direction ) ) * dot( directLight.color, ${LUMA} );`,
   indirect: `float c7Base = dot( irradiance, ${LUMA} ) + c7DirSum;\n\tirradiance += vec3( ( 1.0 - c7W ) * max( 0.0, c7FaceLight.y - c7Base ) );\n\t${INDIRECT}`,
 };
@@ -81,6 +101,7 @@ export function patchFaceLight(material: THREE.Material, uniform: FaceLightUnifo
   material.onBeforeCompile = (shader) => {
     shader.uniforms.c7FaceLight = uniform;
     const chunks = faceLightChunks();
+    shader.vertexShader = VERTEX_DECLARE + shader.vertexShader.replace(DEFAULT_NORMAL, DEFAULT_NORMAL + FACE_VERTEX);
     shader.fragmentShader = DECLARE + shader.fragmentShader.replace("#include <lights_fragment_begin>", chunks.begin).replace("#include <lights_fragment_end>", chunks.end);
   };
   material.customProgramCacheKey = () => "c7-face-light";
