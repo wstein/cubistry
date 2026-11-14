@@ -132,3 +132,11 @@ test("ref_width is an optional input with an empty default and a research_ref hi
   assert.ok(text.includes('      ref_width:\n') && /ref_width:\n(.*\n){2}\s+default: ""/.test(text));
   assert.ok(text.includes("research/cube-display-feasibility; not a PR branch commit, not a main commit"));
 });
+test("the step summary cuts the intended columns of summary.tsv (header of measure_edges.jl at the research branch)", () => {
+  const header = ["id","month","stored_htm","stored_method","new_htm","new_method","same_moves","same_end","solve_s","beam_s","iters","word0_htm","first_commit_iter","first_commit_s","iter_p_ge_10","t_p_ge_10","iter_p_ge_half","t_p_ge_half","A_final_htm","A_last_htm","A_viol","B_retract_iters","B_retract_sum_htm","B_retract_max_htm","B_retract_vs_final_htm","C_last_htm","C_viol","qtm_final","ref_root_htm","ref_wide_htm","best_ref_htm","ref_wide_width"];
+  assert.equal(header.length, 32);
+  const m = runBlock(jobBlock("measure"), "Measure").match(/cut -f(\S+) "\$out\/summary\.tsv"/);
+  assert.ok(m, "cut of summary.tsv");
+  const cols = m[1].split(",").flatMap(r => { const [a, b] = r.split("-").map(Number); return Array.from({ length: (b ?? a) - a + 1 }, (_, i) => header[a - 1 + i]); });
+  assert.deepEqual(cols, ["id","month","stored_htm","stored_method","new_htm","new_method","same_moves","same_end","solve_s","A_final_htm","A_last_htm","A_viol","ref_root_htm","ref_wide_htm","best_ref_htm","ref_wide_width"]);
+});
