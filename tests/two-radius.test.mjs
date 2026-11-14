@@ -211,3 +211,25 @@ test("a seam edge has the small radius along its length: the large rounding open
   const middle = [...rows].filter(([y]) => h[1] - Number(y) >= 2 * R - 1e-9);
   assert.ok(middle.length >= 2 && middle.every(([, z]) => Math.abs((h[2] - z) / (1 - Math.SQRT1_2) - r) < 1e-6), "the seam edge is a circle of the small radius from 2 R on");
 });
+
+// A closed hull: every edge of the mesh belongs to exactly two triangles (no T-junction, no crack where two faces meet along a box edge).
+const openEdges = (g) => {
+  const pos = g.getAttribute("position"), key = (i) => [pos.getX(i), pos.getY(i), pos.getZ(i)].map((x) => Math.round(x * 1e6)).join(",");
+  const count = new Map(); let degenerate = 0;
+  for (let t = 0; t < g.index.count; t += 3) {
+    const k = [0, 1, 2].map((j) => key(g.index.getX(t + j)));
+    if (new Set(k).size < 3) { degenerate++; continue; }
+    for (let j = 0; j < 3; j++) { const a = k[j], b = k[(j + 1) % 3], e = a < b ? a + "|" + b : b + "|" + a; count.set(e, (count.get(e) ?? 0) + 1); }
+  }
+  return { open: [...count.values()].filter((c) => c !== 2).length, edges: count.size, degenerate };
+};
+test("the hull of every body type is closed: each edge belongs to exactly two triangles, no T-junction between two faces", () => {
+  for (const [name, big, small, size] of [["3x3", 0.055, 0.033, [0.99, 0.99, 0.99]], ["7x7", 0.128, 0.077, [0.99, 0.99, 0.99]], ["names", 0.1503, 0.0902, [1.59, 1.0, 1.59]], ["names thick", 0.1503, 0.0902, [1.59, 1.59, 1.59]]]) {
+    for (const [type, outer] of [["inner", NO_OUTER_SIDES], ["face", sides("+z")], ["edge", sides("+y", "+z")], ["edge-", sides("-x", "+z")], ["corner", sides("+x", "+y", "+z")], ["corner-", sides("-x", "-y", "-z")], ["corner mixed", sides("-x", "+y", "-z")]]) {
+      for (const segments of [2, 3]) {
+        const g = createTwoRadiusBody({ size, outer, big, small, segments }), r = openEdges(g);
+        assert.equal(r.open, 0, `${name} ${type} segments ${segments}: ${r.open} of ${r.edges} edges are not shared by exactly two triangles`);
+      }
+    }
+  }
+});
