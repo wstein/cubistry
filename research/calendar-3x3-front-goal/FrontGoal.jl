@@ -15,7 +15,8 @@ module FrontGoal
 export Sticker, Print, Pose, load_print, load_pose, apply_word, accepts, Heuristic, build_heuristic,
     solve_front, SolveResult, pose_field, parse_cells, rotation_words, front_cell_index
 
-# The only mutation hook: the test runner sets FG_MUTATE to prove that tests fail for the intended reason.
+# Mutation hooks: run-mutations.sh sets FG_MUTATE (one value per run) to prove that tests fail for the intended reason.
+# Every `MUT == "..."` below is such a hook; without FG_MUTATE the code is unchanged.
 const MUT = get(ENV, "FG_MUTATE", "")
 
 const V3 = NTuple{3,Int}
@@ -469,6 +470,7 @@ function dfs!(S::Search, depth::Int, bound::Int, last_face::Int)::Bool
     depth + h > bound && return false
     if depth == bound
         h == 0 || return false
+        MUT == "no_final_check" && return true
         return matches_pose(S.h.print, S.h.cells, replay(S.pose, S.path, depth))
     end
     for m in 1:18
@@ -498,6 +500,7 @@ function solve_front(h::Heuristic, pose::Pose; maxdepth::Int = 12, node_limit::I
     pr = h.print
     cands = Tuple{String,Pose,Int}[]
     for w in (rotations == :free ? ROTWORDS : [""])
+        MUT == "one_token_rotation" && length(split(w)) > 1 && continue
         q = apply_word(pose, w)
         ci = findfirst(s -> (s.p, s.n) == (V3((0, 0, 1)), V3((0, 0, 1))), q)
         pr.image[ci] == h.cells[5] || continue
@@ -531,7 +534,7 @@ function solve_front(h::Heuristic, pose::Pose; maxdepth::Int = 12, node_limit::I
             if ok
                 w = cands[ci][1]
                 rots = isempty(w) ? 0 : length(split(w))
-                if rots < best_rot || MUT == "last_found"
+                if rots < best_rot || MUT == "last_found" || (MUT == "tie_le" && rots <= best_rot)
                     best_rot = rots
                     best_word = join(filter(!isempty, [w, join((MOVES[S.path[i]] for i in 1:bound), " ")]), " ")
                     found_bound = bound
