@@ -18,6 +18,7 @@ import {
   type State,
 } from "./model.ts";
 import { CalendarController, type CalendarPort, type CalendarRoutePlanner } from "./controller.ts";
+import { CAL3_SCHEMES, cal3SchemeById } from "./artwork.ts";
 import type { ModeInstance, MountContext } from "../registry.ts";
 
 export interface CalendarViewerLike extends CalendarPort {
@@ -25,6 +26,8 @@ export interface CalendarViewerLike extends CalendarPort {
   readonly presentedState: State | null;
   readonly animating: boolean;
   resetReferenceView(): void;
+  /** Screen color scheme by id; repaints in place. Optional: a fake stage may omit it. */
+  setScheme?(id: string | null | undefined): void;
   destroy(): void;
 }
 
@@ -53,6 +56,8 @@ export interface CalendarEnv {
   later(fn: () => void, ms: number): void;
   /** Points the print link of the host at the physical print (`de-a` or `en-3`). */
   setPrintDesign(design: string): void;
+  /** Replaces the query string of the page (`?scheme=...`); optional so a fake stage may omit it. */
+  replaceQuery?(search: string): void;
   /** Test and spec hooks (`__calendarController`, `__calendarViewer`); `undefined` removes the hook. */
   expose(name: string, value: unknown): void;
 }
@@ -64,6 +69,8 @@ export interface CalendarInstance extends ModeInstance {
 
 type Print = "de-a" | "en-3";
 const PADDING_OFF = ["0", "false", "off", "no"];
+/** The URL parameter that picks the cube color theme (`?scheme=dracula`); an unknown value is the default. */
+export const SCHEME_PARAM = "scheme";
 const IDS = ["design", "padding", "date", "live", "decrement", "increment"].map((n) => `calendar-${n}`);
 
 /** The print named by `lang`, `language` or `design` (aliases of the former page); anything else is German A. */
@@ -77,7 +84,7 @@ export function runtimeId(print: Print, padded: boolean): string {
   return padded ? "en-3-zero" : "en-3-unpadded";
 }
 
-const CONTROLS = `
+const CONTROLS = () => `
   <div class="hud-header">
     <h2 class="hud-title">Date</h2>
     <div class="hud-actions">
@@ -93,6 +100,9 @@ const CONTROLS = `
       <option value="en-3">English · 3</option>
     </select>
     <p id="calendar-layout" class="small"></p>
+    <label for="calendar-scheme">Cube color theme</label>
+    <select id="calendar-scheme">${CAL3_SCHEMES.map((s) => `<option value="${s.id}">${s.name}</option>`).join("")}</select>
+    <p class="small">Screen only: print files and the print export keep the default colors. With a theme, the S of SA/SO is tinted as a deliberate partial weekend cue (the O is shared with MO and DO); English SAT and SUN use the weekend color.</p>
     <label id="calendar-padding-label" hidden><input id="calendar-padding" type="checkbox" checked /> Leading zero</label>
     <label for="calendar-date">Inspect a date</label>
     <input type="date" id="calendar-date" min="0001-01-01" max="9999-12-31" disabled />
@@ -156,7 +166,7 @@ export async function mountCalendar(
   if (!isCurrent()) return;
 
   root.innerHTML = STAGE;
-  env.controls.innerHTML = CONTROLS;
+  env.controls.innerHTML = CONTROLS();
   const el = <T extends HTMLElement = HTMLElement>(id: string): T =>
     (env.controls.querySelector(`#${id}`) ?? root.querySelector(`#${id}`)) as T;
   const designSelect = el<HTMLSelectElement>("calendar-design"),
@@ -164,6 +174,9 @@ export async function mountCalendar(
     dateInput = el<HTMLInputElement>("calendar-date"),
     liveBtn = el<HTMLButtonElement>("calendar-live");
   designSelect.value = print;
+  const schemeSelect = el<HTMLSelectElement>("calendar-scheme");
+  let schemeId = cal3SchemeById(params.get(SCHEME_PARAM)).id;
+  schemeSelect.value = schemeId;
   const padParam = params.get("padding") ?? params.get("pad");
   if (padParam !== null) paddingBox.checked = !PADDING_OFF.includes(padParam.toLowerCase());
   const dateParam = params.get("date");
@@ -367,6 +380,19 @@ export async function mountCalendar(
     designSelect.disabled = true;
     void configure();
   });
+  listen("calendar-scheme", "change", () => {
+    schemeId = cal3SchemeById(schemeSelect.value).id;
+    schemeSelect.value = schemeId;
+    viewer?.setScheme?.(schemeId);
+    if (schemeId === "default") params.delete(SCHEME_PARAM);
+    else params.set(SCHEME_PARAM, schemeId);
+    // The page may have switched DE/EN since the URL was read: write the print that is shown.
+    const query = new URLSearchParams(params);
+    query.delete("language");
+    query.delete("design");
+    query.set("lang", currentPrint() === "de-a" ? "de" : "en");
+    env.replaceQuery?.(`?${query.toString()}`);
+  });
   listen("calendar-padding", "change", () => void update());
   listen("calendar-date", "change", inspectDate);
   listen("calendar-date", "keydown", (event) => {
@@ -438,6 +464,7 @@ export async function mountCalendar(
   }
   optimizer = env.createOptimizer();
   viewer = env.createViewer(el("calendar-viewer"));
+  viewer.setScheme?.(schemeId);
   env.expose("__calendarViewer", viewer);
   await configure();
   if (!isCurrent()) {

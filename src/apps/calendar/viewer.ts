@@ -1,5 +1,5 @@
 import * as THREE from "three";
-import { stickerArt } from "./artwork.ts";
+import { DEFAULT_CAL3_SCHEME, cal3SchemeById, paintSticker, stickerArt, type Cal3Scheme } from "./artwork.ts";
 import {
   demand,
   apply,
@@ -14,8 +14,6 @@ import {
   createStickerMaterial, configurePresentationRenderer, createPresentationStudio, bindLightingSwitches, type LightingSwitches,
   DEFAULT_APPEARANCE, validateAppearance, installAppearanceControls, type ViewerAppearance,
 } from "@cubistry/cube-viewer";
-/** Printed paper color of every Calendar face; also the stickerless body color. */
-const CALENDAR_FACE_COLOR = "#fffdf6";
 /** Existing 26-body size-3 viewer; Calendar glyphs are the default artwork. */
 export class CalendarViewer {
   readonly renderer: THREE.WebGLRenderer;
@@ -27,6 +25,16 @@ export class CalendarViewer {
   private appearanceControls: ReturnType<typeof installAppearanceControls>;
   private cube: PhysicalCubeScene | null = null;
   private artworkTextures = new Map<number, THREE.CanvasTexture>();
+  /** One entry per distinct glyph texture of the current build: repainted in place when the scheme changes. */
+  private glyphs: { canvas: HTMLCanvasElement; texture: THREE.CanvasTexture; sticker: { image: string; slot: number } }[] = [];
+  /** Chosen scheme; null is the default (a viewer built without the constructor, as in tests, has none). */
+  private scheme: Cal3Scheme | null = null;
+  private get active(): Cal3Scheme {
+    return this.scheme ?? DEFAULT_CAL3_SCHEME;
+  }
+  private printing: Design["printing"] | null = null;
+  /** The scheme changed during a turn: the stickerless body and cut-face colors follow when it ends. */
+  private bodyStale = false;
   private studio: ReturnType<typeof createPresentationStudio>;
   private lightingSwitches: LightingSwitches;
   private resources: { dispose(): void }[] = [];
@@ -91,11 +99,36 @@ export class CalendarViewer {
     for (const r of this.resources) r.dispose();
     this.resources = [];
     this.artworkTextures.clear();
+    this.glyphs = [];
+  }
+  /** Chooses the screen color scheme by id (unknown: default). Repaints the existing canvases; no texture is created. */
+  setScheme(id: string | null | undefined): void {
+    const next = cal3SchemeById(id);
+    if (next === this.active) return;
+    this.scheme = next;
+    for (const g of this.glyphs) {
+      paintSticker(g.canvas.getContext("2d")!, g.sticker, next);
+      g.texture.needsUpdate = true;
+    }
+    this.bodyStale = true;
+    this.applyBody();
+  }
+  /** Stickerless body and cut faces follow the scheme ground; only between turns. */
+  private applyBody(): void {
+    if (!this.bodyStale || this.busy || !this.cube || !this.printing) return;
+    this.cube.setBodyColor(this.active.ground);
+    this.cube.setFaceColors(this.faceColors(this.printing));
+    this.bodyStale = false;
+  }
+  private faceColors(printing: NonNullable<CalendarViewer["printing"]>): Map<number, string> {
+    return new Map(printing.map(s => [s.id, stickerArt(s, this.active).ground]));
   }
   configure(design: Pick<Design, "id" | "printing">, state: State, artwork?: ReadonlyMap<number, HTMLCanvasElement>): void {
     demand(!this.busy, "Cannot change the calendar print during a turn");
     if (artwork) demand(artwork.size === design.printing.length && design.printing.every(s => artwork.has(s.id)), "Incomplete picture artwork");
     this.clear();
+    this.printing = design.printing;
+    this.bodyStale = false;
     this.current = state;
     const plastic = createPlasticMaterial("#243d35", 0.65);
     this.resources.push(plastic);
@@ -126,19 +159,12 @@ export class CalendarViewer {
       if (maps.has(key)) continue;
       const canvas = document.createElement("canvas");
       canvas.width = canvas.height = 256;
-      const ctx = canvas.getContext("2d")!;
-      ctx.fillStyle = CALENDAR_FACE_COLOR;
-      ctx.fillRect(0, 0, 256, 256);
-      const art = stickerArt(s);
-      ctx.fillStyle = art.color;
-      ctx.font = `${art.weight} ${art.size}px "Counter Sans"`;
-      ctx.textAlign = "center";
-      ctx.textBaseline = "middle";
-      ctx.fillText(s.image, 128, 133);
+      paintSticker(canvas.getContext("2d")!, s, this.active);
       const texture = new THREE.CanvasTexture(canvas);
       texture.colorSpace = THREE.SRGBColorSpace;
       const mat = createStickerMaterial(texture);
       this.resources.push(texture, mat);
+      this.glyphs.push({ canvas, texture, sticker: s });
       maps.set(key, mat);
     }
     materials = new Map<number, THREE.Material>();
@@ -148,9 +174,9 @@ export class CalendarViewer {
     }
     }
     this.cube = new PhysicalCubeScene(this.presentation, design.printing, materials, plastic, 1,
-      createPresentationGeometry(), new Map(design.printing.map(s => [s.id, CALENDAR_FACE_COLOR])),
+      createPresentationGeometry(), this.faceColors(design.printing),
       // Explicit, so stickerless seams stay paper-colored whatever the faces do; the core keeps its default.
-      { bodyColor: CALENDAR_FACE_COLOR });
+      { bodyColor: this.active.ground });
     this.setAppearance(this.appearance);
     this.sync(state);
   }
@@ -203,6 +229,7 @@ export class CalendarViewer {
         this.sync(this.current!);
       }
       this.busy = false;
+      this.applyBody();
     }
   }
   destroy(): void {
