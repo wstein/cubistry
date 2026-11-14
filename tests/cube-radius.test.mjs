@@ -80,3 +80,29 @@ test("scene with presentationLayerProfile: every cell body has the O2 radius, ev
   near(mid.geometry.boundingBox.max.x * 2, stickerSideFor(1, stickerRadiusFor(5, 5.2)), 1e-6);
   scene.dispose?.();
 });
+
+test("planarFaceUv (stickerless only): the exterior faces take UV linear in position over the body, other looks keep Three's arc-length UV", () => {
+  const widths = thickOuterLayerWidths(5, 1.1), profile = presentationLayerProfile(widths);
+  const fr = [{ id: 1, cubie: 1, p: [0, 0, 2], n: [0, 0, 1], up: [0, 1, 0] }, { id: 2, cubie: 2, p: [-2, 2, 2], n: [0, 0, 1], up: [0, 1, 0] }];
+  const read = (planar, stickerless) => {
+    const root = new THREE.Group(), mat = createStickerMaterial(new THREE.Texture());
+    const scene = new PhysicalCubeScene(root, fr, new Map(fr.map((s) => [s.id, mat])), createPlasticMaterial(), 1, createPresentationGeometry(5, 5.2), new Map(), { layers: profile, planarFaceUv: planar });
+    scene.setConstruction(stickerless ? "stickerless" : "stickered");
+    const out = [];
+    root.traverse((o) => {
+      if (!o.isMesh || o.userData.stickerId !== undefined || !o.userData.sourceFaceStickerIds) return;
+      const g = o.geometry, pos = g.getAttribute("position"), uv = g.getAttribute("uv"), group = g.groups.find((x) => x.materialIndex === 4);
+      g.computeBoundingBox(); const size = g.boundingBox.getSize(new THREE.Vector3());
+      let worst = 0;
+      for (let i = group.start; i < group.start + group.count; i++) {
+        const v = g.index?.getX(i) ?? i;
+        worst = Math.max(worst, Math.abs(uv.getX(v) - (pos.getX(v) / size.x + 0.5)), Math.abs(uv.getY(v) - (pos.getY(v) / size.y + 0.5)));
+      }
+      out.push(worst);
+    });
+    return out;
+  };
+  for (const worst of read(true, true)) assert.ok(worst < 1e-5, `planar: uv error ${worst}`);
+  assert.ok(read(true, false).every((w) => w > 1e-3), "stickered keeps the arc-length UV");
+  assert.ok(read(false, true).every((w) => w > 1e-3), "without the option the arc-length UV stays");
+});

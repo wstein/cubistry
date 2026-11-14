@@ -73,8 +73,20 @@ export interface PictureProjection {
 }
 /** Share of a cell that the UV range of a body face covers (the rounded box is `bodyWidth` of the pitch wide). */
 const BODY_SHARE = 0.99;
+/** Size of the box of a body geometry. */
+const bodyExtent = (geometry: THREE.BufferGeometry): Vec3 => {
+  geometry.computeBoundingBox();
+  const size = geometry.boundingBox!.getSize(new THREE.Vector3());
+  return [size.x, size.y, size.z];
+};
 export interface PhysicalSceneOptions extends StickerlessBodyOptions {
   readonly layers?: LayerProfile;
+  /**
+   * Stickerless construction only: the exterior faces of the bodies take planar UV (`u = position / body extent + 0.5`) instead of
+   * Three's arc-length UV, always and not only in the projected look. A face texture is then linear in space: its pixels per
+   * unit are the same everywhere (the texture width over the body width) and a cell edge lies where the cell edge is.
+   */
+  readonly planarFaceUv?: boolean;
 }
 /** Size-neutral scene adapter. Callers validate prints, state and legal moves.
  * Textures/materials and animation deadlines stay caller-owned. */
@@ -84,6 +96,7 @@ export class PhysicalCubeScene {
   private readonly shells = new Map<number, { mesh: THREE.Mesh; stickerless: THREE.Material[]; base: THREE.BufferGeometry; key: string; extent: Vec3; image: ReadonlySet<number> }>();
   /** Projected stickerless look: body geometries with planar UV on the image faces, by body variant key (see body-artwork.ts). */
   private readonly planarBodies = new Map<string, THREE.BufferGeometry>();
+  private planarFaceUv = false;
   private construction: Construction = "stickered";
   private projecting = false;
   private readonly artwork: { id: number; surface: THREE.MeshStandardMaterial; source: THREE.MeshStandardMaterial; fallback: string; projected?: boolean }[] = [];
@@ -135,6 +148,7 @@ export class PhysicalCubeScene {
     demand(options.bodyColor == null || HEX_COLOR.test(options.bodyColor), "Invalid body color");
     this.bodyColor = options.bodyColor ?? null;
     this.miter = options.miterCutFaces === true;
+    this.planarFaceUv = options.planarFaceUv === true;
     if (this.miter) this.uvAxes = faceUvAxes(geometry.body);
     for (const [id, color] of faceColors) this.faceColorOf.set(id, color);
     for (const [id, edges] of options.faceEdgeColors ?? []) this.edgeColorOf.set(id, edges);
@@ -331,12 +345,14 @@ export class PhysicalCubeScene {
    * every other look keeps Three's arc-length UV of the body.
    */
   private updateBodyUv(): void {
-    const planar = this.projecting && this.construction === "stickerless";
+    const planar = (this.projecting || this.planarFaceUv) && this.construction === "stickerless";
     for (const shell of this.shells.values()) {
       if (!planar) { shell.mesh.geometry = shell.base; continue; }
-      const key = `${shell.key}|${shell.extent.join(",")}|${[...shell.image].sort().join("")}`; // the image faces differ between cubies of one orientation key
+      // The projected look maps the face image over the preset share of the cell; the planar face UV over the body itself.
+      const extent = this.projecting ? shell.extent : bodyExtent(shell.base);
+      const key = `${shell.key}|${extent.join(",")}|${[...shell.image].sort().join("")}`; // the image faces differ between cubies of one orientation key
       let geometry = this.planarBodies.get(key);
-      if (!geometry) { geometry = planarBodyUv(shell.base, shell.extent, shell.image); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
+      if (!geometry) { geometry = planarBodyUv(shell.base, extent, shell.image); this.planarBodies.set(key, geometry); this.geometries.push(geometry); }
       shell.mesh.geometry = geometry;
     }
   }
