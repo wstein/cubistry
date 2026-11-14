@@ -5,6 +5,7 @@ import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { validateDesign } from "../src/apps/calendar/model.ts";
 import { stickerArt, stickerSvg, CAL3_SCHEMES, CAL3_EXCLUDED, DEFAULT_CAL3_SCHEME, cal3SchemeById, paintSticker } from "../src/apps/calendar/artwork.ts";
+import { mountCalendar } from "../src/apps/calendar/mount.ts";
 import { SCHEMES } from "../src/apps/calendar7/schemes.ts";
 import { contrast } from "./calendar7-contrast.mjs";
 
@@ -93,3 +94,113 @@ test("paintSticker draws ground then glyph with the scheme tokens, on the given 
   assert.ok(calls.some((c) => c[0] === "fillText" && c[1] === "SUN"));
 });
 
+// Mount: the select, the URL parameter, the DE/EN switch (fake DOM, fake viewer; no WebGL).
+const flush = () => new Promise((r) => setImmediate(r));
+class El {
+  constructor(id) { Object.assign(this, { id, textContent: "", value: "", checked: true, hidden: false, disabled: false, dataset: {}, listeners: {} }); this.classList = { toggle() {}, contains: () => false }; }
+  setAttribute() {}
+  addEventListener(t, fn) { (this.listeners[t] ??= new Set()).add(fn); }
+  removeEventListener(t, fn) { this.listeners[t]?.delete(fn); }
+  fire(type) { for (const fn of [...(this.listeners[type] ?? [])]) fn({ type, preventDefault() {} }); }
+}
+function host() {
+  const els = new Map();
+  return {
+    html: "", classList: { toggle() {}, contains: () => false },
+    set innerHTML(h) { this.html = h; els.clear(); for (const [, id] of h.matchAll(/\bid="([^"]+)"/g)) els.set(id, new El(id)); if (els.has("calendar-speed")) els.get("calendar-speed").value = "250"; },
+    get innerHTML() { return this.html; },
+    querySelector: (s) => els.get(s.slice(1)) ?? null,
+    el: (id) => els.get(id),
+  };
+}
+async function rig(search) {
+  const stage = host(), dock = host(), log = { scheme: [], configured: [], query: [] };
+  const viewer = {
+    duration: 250, presentedState: null, animating: false,
+    configure(d, s) { log.configured.push(d.id); viewer.presentedState = s; },
+    async animate() {}, resetReferenceView() {}, destroy() {},
+    setScheme(id) { log.scheme.push(id); },
+  };
+  const env = {
+    controls: dock,
+    loadDesign: async (id) => structuredClone(JSON.parse(readFileSync("public/calendar/" + id + ".json", "utf8"))),
+    now: () => new Date(2026, 10, 14, 12).getTime(), fontsReady: async () => {},
+    createViewer: () => viewer,
+    createOptimizer: () => ({ plan: async ({ fallbackWord }) => fallbackWord, solverStatus: "none", dispose() {} }),
+    every: () => () => {}, onResume: () => () => {}, later() {}, setPrintDesign() {}, expose() {},
+    replaceQuery: (q) => log.query.push(q),
+  };
+  const inst = await mountCalendar(stage, new URLSearchParams(search), { isCurrent: () => true }, env);
+  for (let i = 0; i < 50; i++) await flush();
+  return { dock, log, inst };
+}
+
+test("the 3x3 controls offer a Cube color theme select with the default first", async () => {
+  const { dock } = await rig("lang=de&date=2026-11-14");
+  assert.match(dock.html, /<label for="calendar-scheme">Cube color theme<\/label>/);
+  const options = [...dock.html.matchAll(/<option value="([^"]+)"[^>]*>([^<]+)<\/option>/g)].map((m) => m[1]);
+  assert.deepEqual(options.filter((o) => CAL3_SCHEMES.some((s) => s.id === o)), CAL3_SCHEMES.map((s) => s.id));
+  assert.equal(dock.el("calendar-scheme").value, "default");
+});
+
+test("?scheme= selects the scheme; an unknown id is the default; a DE/EN switch keeps it", async () => {
+  const known = await rig("lang=de&date=2026-11-14&scheme=dracula");
+  assert.equal(known.dock.el("calendar-scheme").value, "dracula");
+  assert.equal(known.log.scheme.at(-1), "dracula");
+  known.dock.el("calendar-design").value = "en-3";
+  known.dock.el("calendar-design").fire("change");
+  for (let i = 0; i < 50; i++) await flush();
+  assert.equal(known.dock.el("calendar-scheme").value, "dracula");
+  assert.equal(known.log.scheme.at(-1), "dracula");
+  assert.ok(known.log.configured.includes("de-a") && known.log.configured.some((d) => d.startsWith("en-3")));
+  const unknown = await rig("lang=en&date=2026-11-14&scheme=zzz");
+  assert.equal(unknown.dock.el("calendar-scheme").value, "default");
+  assert.equal(unknown.log.scheme.at(-1), "default");
+});
+
+test("changing the select recolors the viewer in place and writes ?scheme= to the URL", async () => {
+  const { dock, log } = await rig("lang=en&date=2026-11-14");
+  const before = log.configured.length;
+  dock.el("calendar-scheme").value = "monokai";
+  dock.el("calendar-scheme").fire("change");
+  assert.equal(log.scheme.at(-1), "monokai");
+  assert.equal(log.configured.length, before, "no new configure on a scheme change");
+  assert.match(log.query.at(-1), /scheme=monokai/);
+  assert.match(log.query.at(-1), /lang=en/);
+  dock.el("calendar-scheme").value = "default";
+  dock.el("calendar-scheme").fire("change");
+  assert.doesNotMatch(log.query.at(-1), /scheme=/);
+  dock.el("calendar-design").value = "de-a";
+  dock.el("calendar-design").fire("change");
+  for (let i = 0; i < 50; i++) await flush();
+  dock.el("calendar-scheme").value = "dracula";
+  dock.el("calendar-scheme").fire("change");
+  assert.match(log.query.at(-1), /lang=de/, "the URL names the print that is shown after a DE/EN switch");
+});
+
+test("CalendarViewer.setScheme repaints the existing canvases and textures in place; the stickerless body waits for the end of a turn", async () => {
+  const { CalendarViewer } = await import("../src/apps/calendar/viewer.ts");
+  const painted = [];
+  const mk = (sticker) => ({ canvas: { getContext: () => new Proxy({}, { set: () => true, get: (_t, k) => (...a) => k === "fillText" && painted.push([sticker.image, a[0]]) }) }, texture: { needsUpdate: false }, sticker });
+  const glyphs = [mk({ image: "SUN", slot: 0 }), mk({ image: "5", slot: 7 })];
+  const textures = glyphs.map((g) => g.texture), canvases = glyphs.map((g) => g.canvas);
+  const body = [];
+  const viewer = Object.assign(Object.create(CalendarViewer.prototype), {
+    glyphs, scheme: DEFAULT_CAL3_SCHEME, busy: false, bodyStale: false, printing: designs["en-3-zero"].printing,
+    cube: { setBodyColor: (c) => body.push(["body", c]), setFaceColors: (m) => body.push(["faces", m.size]) },
+  });
+  viewer.setScheme("dracula");
+  assert.equal(painted.length, 2);
+  assert.ok(viewer.glyphs.every((g, i) => g.texture === textures[i] && g.canvas === canvases[i]), "same texture and canvas objects");
+  assert.ok(textures.every((t) => t.needsUpdate));
+  assert.deepEqual(body, [["body", "#282a36"], ["faces", designs["en-3-zero"].printing.length]]);
+  viewer.setScheme("dracula");
+  assert.equal(painted.length, 2, "same scheme: nothing");
+  viewer.busy = true;
+  viewer.setScheme("classic");
+  assert.equal(body.length, 2, "no body change during a turn");
+  assert.equal(viewer.bodyStale, true);
+  viewer.busy = false;
+  viewer.applyBody();
+  assert.deepEqual(body.slice(2), [["body", "#fffdf6"], ["faces", designs["en-3-zero"].printing.length]]);
+});
