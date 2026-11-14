@@ -13,14 +13,15 @@ The owner confirmed this reading on 2026-11-13.
 ## Inputs that exist
 
 - The chain data January 1980 to January 2036: 673 states, 672 edges, root = solved cube = January 1980 (print D), pinned by
-  SHA-256 in `public/calendar7/chain-c/` (wstein/cubistry#470, wstein/cubistry#471). The states are replayed from the root pose and the move words.
+  SHA-256 in `public/calendar7/chain-c/` (wstein/cubistry#470, wstein/cubistry#471). The states are replayed from the root pose
+  and the move words.
 - Orbit64 V2 entries for 7x7x7 in the picture model: entry 20 (canonical) and entry 21 (framed), both 118 characters
   ([FORMAT-V2.md](https://github.com/wstein/flix-orbit64/blob/main/FORMAT-V2.md), registry table). The picture facelet bridge is
   merged (wstein/flix-orbit64#15, wstein/cubacle#20). The picture model is needed because the calendar stickers are distinct.
 - Six months are best effort (1981-02, 1987-02, 1998-02, 2009-02, 2015-02, 2026-02): the cube state is the chain state, and it
   differs from the displayed month in cell (7,1). The token encodes the cube state, not the display. The composed chain
   1900-01 to 2036-01 is expected to have 14 best-effort months (13 from the backward chain plus 2026-02); UNKNOWN until the
-  root change ran.
+  root change has run.
 
 
 ## Decided (owner, 2026-11-13)
@@ -32,7 +33,8 @@ The owner confirmed this reading on 2026-11-13.
    wstein/flix-orbit64; no change to FORMAT-V2 is needed.
 5. Final root (owner had no preference, recommendation used): the backward chain to 1900-01 and the root change that belongs
    to it. The root change yields a new print' (the 1900-01 print), and that print' is the one to freeze. Print D (print C
-   relabeled to the 1980 root) is meant only where the 1980 root is meant. The 2100 forward extension is added later as an additive file part and does not move the root.
+   relabeled to the 1980 root) is meant only where the 1980 root is meant. The 2100 forward extension is added later as an
+   additive file part and does not move the root.
 
 ## Decidable now
 
@@ -56,13 +58,14 @@ The owner confirmed this reading on 2026-11-13.
 
 - Token values. The state of a month is its pose relative to the root. Changing the root is a transformation of the whole chain
   (print identities, digests), so every token and `state_sha256` changes with it.
-- Row count and range: now 1980-01 to 2036-01; the final file starts at 1900-01 after `root_change.jl` ran over all segments.
+- Row count and range: now 1980-01 to 2036-01; the final file starts at 1900-01 after `root_change.jl` has run over all segments.
 - The pins (`manifest.sha256`, `source.sha256`), the best-effort list, and the 1900-01 print', which is not frozen.
-- State of the 1900-01 backward chain (2026-11-14): computed, not committed. Window-chain run 43542652089 (success) computed
-  2019-01 back to 1900-01 on print C: 1428 edges, 1429 months, complete, 23 segment runs, width 40, lambda 3, Julia and Flix
-  tables byte-identical, 1415 exact and 13 best-effort months, no greedy edges, independent root check ACCEPT. The result is not
-  yet committed to the research branch, `root_change.jl` has not run on it, no print is frozen, and the forward chain 2036 to
-  2100 has not started. The remaining blockers: commit the evidence, run the root change, freeze the resulting 1900-01 print'.
+- The 1900-01 backward chain, as of 2026-11-14: window-chain run 43542652089 (success) computed 2019-01 back to 1900-01 on
+  print C: 1428 edges, 1429 months, complete, 23 segment runs, width 40, lambda 3, Julia and Flix tables byte-identical,
+  1415 exact and 13 best-effort months, no greedy edges, independent root check ACCEPT. At that date the result was not
+  committed to the research branch, `root_change.jl` had not run on it, and no print was frozen. The forward chain extends the
+  same print C chain. This file waits only on: committing the evidence, running the root change, freezing the resulting
+  1900-01 print'.
 
 ## Prototype evidence (not part of the repository)
 
