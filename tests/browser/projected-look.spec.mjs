@@ -92,3 +92,27 @@ test("Stickerless never writes the picture mode: from a stored per-sticker recor
   expect(after.construction).toBe("stickered");
   expect(after.pictureMode).toBe("per-sticker");
 });
+
+// The shared input rule (src/playground.css: input { width: 100% }) must not stretch the checkboxes of the appearance panel.
+async function expectInlineCheckboxes(page, names) {
+  for (const name of names) {
+    const box = page.getByRole("checkbox", { name, exact: true });
+    const check = await box.boundingBox();
+    const text = await box.locator("xpath=following-sibling::span[1]").boundingBox();
+    expect(check.width, `${name} checkbox width`).toBeLessThanOrEqual(20);
+    expect(Math.abs((check.y + check.height / 2) - (text.y + text.height / 2)), `${name} on the line of its label`).toBeLessThanOrEqual(check.height);
+    expect(text.x, `${name} label right of the box`).toBeGreaterThanOrEqual(check.x + check.width - 1);
+  }
+}
+
+test("layout: the Stickerless and Projected checkboxes are small and on the line of their label (playground)", async ({ page }) => {
+  await open(page);
+  await expectInlineCheckboxes(page, ["Stickerless", "Projected"]);
+});
+
+test("layout: the Stickerless checkbox is small and on the line of its label (picture3.html)", async ({ page }) => {
+  await page.goto("/picture3.html");
+  await expect(page.locator("#cube")).toHaveAttribute("aria-busy", "false");
+  await expect(page.getByRole("checkbox", { name: "Stickerless", exact: true })).toBeVisible(); // the panel is open on this page
+  await expectInlineCheckboxes(page, ["Stickerless"]);
+});
