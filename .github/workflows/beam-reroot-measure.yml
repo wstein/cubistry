@@ -15,7 +15,7 @@ on:
   workflow_dispatch:
     inputs:
       research_ref:
-        description: Commit SHA (40 hex digits) on the research branch that holds measure_edges.jl, reroot_measure_lib.jl and evidence/reroot-measure
+        description: Commit SHA (40 hex digits) of the research branch (research/cube-display-feasibility; not a PR branch commit, not a main commit) that holds measure_edges.jl, reroot_measure_lib.jl and evidence/reroot-measure
         type: string
         required: true
       edges:
@@ -38,8 +38,12 @@ on:
         description: Beam lambda (1-10)
         type: string
         default: "3"
+      ref_width:
+        description: Width of the wide reference beam (1-400); empty means 2 x width. Besides the free run, every edge is solved once from the root and once with this width (best_ref_htm)
+        type: string
+        default: ""
       deadline_min:
-        description: No re-root solve starts after this many minutes since the start of a job's script (30-320)
+        description: No re-root or reference solve starts after this many minutes since the start of a job's script (30-320)
         type: string
         default: "300"
 
@@ -76,6 +80,7 @@ jobs:
           IN_LIBRARY: ${{ inputs.library }}
           IN_WIDTH: ${{ inputs.width }}
           IN_LAMBDA: ${{ inputs.lambda }}
+          IN_REF_WIDTH: ${{ inputs.ref_width }}
           IN_DEADLINE: ${{ inputs.deadline_min }}
         run: |
           set -euo pipefail
@@ -89,6 +94,7 @@ jobs:
           [[ "$IN_LIBRARY" =~ ^L[145]$ ]] || fail "library must be L1, L4 or L5"
           [[ "$IN_WIDTH" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$IN_WIDTH" -le 200 ] || fail "width must be 1-200"
           [[ "$IN_LAMBDA" =~ ^([1-9]|10)$ ]] || fail "lambda must be 1-10"
+          [ -z "$IN_REF_WIDTH" ] || { [[ "$IN_REF_WIDTH" =~ ^[1-9][0-9]{0,2}$ ]] && [ "$IN_REF_WIDTH" -le 400 ]; } || fail "ref_width must be empty or 1-400"
           [[ "$IN_DEADLINE" =~ ^[1-9][0-9]{1,2}$ ]] && [ "$IN_DEADLINE" -ge 30 ] && [ "$IN_DEADLINE" -le 320 ] || fail "deadline_min must be 30-320"
           # Two edges per job: a job of two 170-HTM edges with four re-root solves each takes about 20 minutes, far below the job limit.
           matrix=$(printf '%s\n' "${ids[@]}" | awk 'NR%2==1{p=$0; next} {q[++n]=p","$0; p=""} END{if(p!="")q[++n]=p; printf "{\"ids\":["; for(i=1;i<=n;i++)printf "%s\"%s\"",(i>1?",":""),q[i]; printf "]}"}')
@@ -112,6 +118,7 @@ jobs:
           IN_LIBRARY: ${{ inputs.library }}
           IN_WIDTH: ${{ inputs.width }}
           IN_LAMBDA: ${{ inputs.lambda }}
+          IN_REF_WIDTH: ${{ inputs.ref_width }}
           IN_DEADLINE: ${{ inputs.deadline_min }}
         run: |
           set -euo pipefail
@@ -129,10 +136,12 @@ jobs:
           [ "$missing" = 0 ] || fail "research commit lacks required files"
           # The hook of the measurement must exist in the solver at research_ref (read-only; default nothing).
           git grep -qw BEAMLOG "$SHA" -- research/calendar-7x7/upright-beam/beam2.jl || fail "beam2.jl at research_ref has no BEAMLOG hook"
+          # The reference runs (ref_root_htm, ref_wide_htm) exist only in newer measure_edges.jl: an older commit would ignore ref_width.
+          git grep -qw ref_width "$SHA" -- "$WC/measure_edges.jl" || fail "measure_edges.jl at research_ref does not read ref_width (no reference runs)"
           {
             echo "### Beam re-root measure"
             echo "- research SHA: \`$SHA\`"
-            echo "- edges: \`$IN_EDGES\`, commits: \`$IN_COMMITS\`, library \`$IN_LIBRARY\`, width \`$IN_WIDTH\`, lambda \`$IN_LAMBDA\`, deadline \`$IN_DEADLINE\` min"
+            echo "- edges: \`$IN_EDGES\`, commits: \`$IN_COMMITS\`, library \`$IN_LIBRARY\`, width \`$IN_WIDTH\`, lambda \`$IN_LAMBDA\`, ref_width \`${IN_REF_WIDTH:-2 x width}\`, deadline \`$IN_DEADLINE\` min"
           } >> "$GITHUB_STEP_SUMMARY"
 
   measure:
@@ -151,6 +160,7 @@ jobs:
       LIBRARY: ${{ inputs.library }}
       WIDTH: ${{ inputs.width }}
       LAMBDA: ${{ inputs.lambda }}
+      REF_WIDTH: ${{ inputs.ref_width }}
       DEADLINE_MIN: ${{ inputs.deadline_min }}
       IDS: ${{ matrix.ids }}
     steps:
@@ -171,14 +181,14 @@ jobs:
           set +e
           JULIA="$(command -v julia)" nice -n 10 timeout $((DEADLINE_MIN + 15))m \
             bash "src/research/calendar-7x7/row1-window-chain/run_reroot_measure.sh" "$out" "$IDS" \
-              commits="$COMMITS" library="$LIBRARY" width="$WIDTH" lambda="$LAMBDA" deadline_s=$((DEADLINE_MIN * 60)) 2>&1 | tee "$out/run.log"
+              commits="$COMMITS" library="$LIBRARY" width="$WIDTH" lambda="$LAMBDA" ${REF_WIDTH:+ref_width="$REF_WIDTH"} deadline_s=$((DEADLINE_MIN * 60)) 2>&1 | tee "$out/run.log"
           rc=${PIPESTATUS[0]}
           set -e
           [ "$rc" = 0 ] || echo "::error::measurement exited with $rc (124 = timeout, 137 = killed, probably out of memory)"
           {
             echo "### Edges $IDS (exit $rc)"
             echo '```'; cat "$out/reroot.tsv" 2>/dev/null || echo "no reroot.tsv"; echo '```'
-            echo '```'; cut -f1-9,19-21 "$out/summary.tsv" 2>/dev/null || true; echo '```'
+            echo '```'; cut -f1-9,19-21,29-32 "$out/summary.tsv" 2>/dev/null || true; echo '```'
           } >> "$GITHUB_STEP_SUMMARY"
           [ "$rc" = 0 ]
       - uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
