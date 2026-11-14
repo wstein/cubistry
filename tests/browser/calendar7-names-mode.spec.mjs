@@ -354,3 +354,33 @@ test("turning the cube changes the names exposure through the render loop (no ma
   expect(Math.abs(seen.steep - seen.headOn)).toBeGreaterThan(0.05);
   expect(seen.standard).toBe(1);
 });
+
+test("the studio lights keep the intensities of a fresh viewer in the names layout and after switching back to the standard layout (the face light is in the materials, not in the lights)", async ({ page }) => {
+  await page.goto("/licenses.html");
+  const seen = await page.evaluate(async () => {
+    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
+    const { parseState } = await import("/src/apps/calendar7/graph.ts");
+    const get = async (p) => (await fetch(p)).json();
+    const names = parseState(await get("/calendar7/names/state.v1.json"));
+    const standard = parseState(await get("/calendar7/state.v1.json"));
+    const host = document.createElement("div"), panel = document.createElement("div");
+    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
+    document.body.append(host, panel);
+    const viewer = new Calendar7Viewer(host, panel);
+    const lights = () => { const l = []; viewer.scene.traverse((o) => { if (o.isLight) l.push(`${o.type} ${o.intensity.toFixed(6)}`); }); return l.sort(); };
+    const out = { fresh: lights() };
+    viewer.configure(names.printing, names.pose, "face", "names");
+    out.names = lights();
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    out.standard = lights();
+    viewer.configure(names.printing, names.pose, "face", "names");
+    viewer.configure(standard.printing, standard.pose, "face", "standard");
+    out.again = lights();
+    viewer.destroy();
+    return out;
+  });
+  expect(seen.fresh.length).toBeGreaterThanOrEqual(6);
+  expect(seen.names).toEqual(seen.fresh);
+  expect(seen.standard).toEqual(seen.fresh);
+  expect(seen.again).toEqual(seen.fresh);
+});
