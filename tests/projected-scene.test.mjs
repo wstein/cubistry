@@ -325,7 +325,7 @@ test("O2 radii, stickered projected: the window of a sticker is its own size (na
       const cellOf = (d) => widths[Math.round(s.p[d.findIndex((c) => c !== 0)] + h)];
       near(map.repeat.x, side / IMG, 1e-12, `${n} repeat x`); near(map.repeat.y, side / IMG, 1e-12, `${n} repeat y`); // one sticker size on every cell
     }
-    assert.ok(side < 0.87 && side > 0.79, "the sticker is narrower than the 0.87 share where the flat face of the inner radius requires it, never below 0.79");
+    assert.ok(side <= 0.87 && side > 0.79, "the sticker is at most the 0.87 share, narrower where the flat face of the inner radius requires it, never below 0.79");
     scene.dispose();
   }
 });

@@ -94,11 +94,11 @@ export function stickerRadiusFor(size: number = 3, edge: number = size): number 
 }
 /**
  * Side of a sticker on a cell of width `cell` (inner layers; `radius`: the radius of the edges at the sticker, the inner radius, whose flat part limits it): the preset
- * share of the cell, and never wider than the flat part of the body face less a 0.01 margin.
+ * share of the cell, and never wider than the flat part of the body face (the sticker ends where the bevel starts).
  */
 export function stickerSideFor(cell: number, radius: number): number {
   const p = PRESENTATION_PRESET, side = p.stickerWidth * cell;
-  return radius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * radius - 0.01);
+  return radius <= p.stickerRadius ? side : Math.min(side, cell - (1 - p.bodyWidth) - 2 * radius);
 }
 /** A rounded-rectangle sticker of the world size `width` x `height` with corner radius `radius` on both axes; UV spans 0..1 over its extent. */
 export function createStickerGeometry(width: number, height: number, radius: number, curveSegments: number = PRESENTATION_PRESET.stickerCurveSegments): THREE.ShapeGeometry {
