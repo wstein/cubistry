@@ -162,7 +162,7 @@ for (const layout of ["names", "standard", "names-demo", "names-any", "bogus"]) 
     await expect(page.getByRole("combobox", { name: "Cube layout", exact: true })).toHaveCount(0);
 });
 
-test("the renderer uses Linear tone mapping at the face-following exposure in the names layout only and is the shared Neutral at 1 in the standard layout, also after switching back", async ({ page }) => {
+test("the renderer uses the soft shoulder (Custom) tone mapping at the face-following exposure in the names layout only and is the shared Neutral at 1 in the standard layout, also after switching back", async ({ page }) => {
   await page.goto("/licenses.html");
   const seen = await page.evaluate(async () => {
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
@@ -191,10 +191,10 @@ test("the renderer uses Linear tone mapping at the face-following exposure in th
     viewer.destroy();
     return out;
   });
-  const NEUTRAL = 7, LINEAR = 1; // THREE.NeutralToneMapping, THREE.LinearToneMapping
-  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.1);
+  const NEUTRAL = 7, CUSTOM = 5; // THREE.NeutralToneMapping, THREE.CustomToneMapping (the soft shoulder of names-tone.ts)
+  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.03); // 1.264 against 1.217: the names light rig keeps 5% of the directional lights, so the tilt costs the front face less than before (0.1 or more)
   expect(seen.namesHeadOn).toBeCloseTo(1.217, 2);
-  expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: LINEAR, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
+  expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: CUSTOM, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
 });
 
 test("viewer wiring: names layout colors the cut faces per adjacent tile (flat colors and miter textures), the rest near-white, with thick outer layers (bodies, tiles, core, camera) and follows a scheme switch; the standard layout has none of it", async ({ page }) => {
@@ -350,7 +350,7 @@ test("turning the cube changes the names exposure through the render loop (no ma
     return out;
   });
   expect(seen.headOn).toBeCloseTo(1.217, 2);
-  expect(seen.start).toBeGreaterThan(seen.headOn + 0.1);
+  expect(seen.start).toBeGreaterThan(seen.headOn + 0.03); // see the tone mapping test: the rig makes the tilt effect small
   expect(Math.abs(seen.steep - seen.headOn)).toBeGreaterThan(0.05);
   expect(seen.standard).toBe(1);
 });
