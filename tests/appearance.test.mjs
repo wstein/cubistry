@@ -106,12 +106,12 @@ test("appearance controls apply saved construction, restore style color and rele
     controls.setDefaultColor("#243d35");
     const elements = [], visit = node => { elements.push(node); for (const child of node.children) visit(child); };
     visit(host);
-    const mode = elements.find(node => node.tagName === "select");
-    const color = elements.find(node => node.tagName === "input");
+    const mode = elements.find(node => node.tagName === "input" && node["aria-label"] === "Stickerless");
+    const color = elements.find(node => node.tagName === "input" && node.type === "color");
     const reset = elements.find(node => node.tagName === "button");
-    assert.equal(mode.value, "stickerless"); assert.equal(color.disabled, true);
+    assert.equal(mode.checked, true); assert.equal(color.disabled, true);
     assert.equal(values.at(-1).construction, "stickerless");
-    mode.value = "stickered"; mode.listeners.change();
+    mode.checked = false; mode.listeners.change();
     assert.equal(color.disabled, false); assert.equal(color.value, "#abc123");
     color.value = "#556677"; color.listeners.input();
     assert.equal(JSON.parse(data.get(key)).frameColor, "#556677");

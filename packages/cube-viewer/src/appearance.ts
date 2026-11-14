@@ -1,6 +1,6 @@
 import { demand } from "@cubistry/cube-core";
 import type { AssetManifest } from "@cubistry/cube-assets";
-import { PICTURE_MODES, PICTURE_MODE_HELP, PICTURE_MODE_LABEL, DEFAULT_PICTURE_MODE, parsePictureMode, type PictureMode } from "./picture-mode.ts";
+import { PICTURE_MODES, PROJECTED_HELP, DEFAULT_PICTURE_MODE, parsePictureMode, type PictureMode } from "./picture-mode.ts";
 export type Construction = "stickered" | "stickerless";
 export interface ViewerAppearance {
   readonly construction: Construction;
@@ -98,12 +98,10 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   viewportSection.style.display = "flex";
   popover.append(viewportSection);
 
-  const label = document.createElement("label"); label.textContent = "Construction ";
-  const mode = document.createElement("select"); mode.setAttribute("aria-label", "Cube construction");
-  for (const [id, title] of [["stickered", "Stickered"], ["stickerless", "Stickerless"]]) {
-    const option = document.createElement("option"); option.value = id; option.textContent = title; mode.append(option);
-  }
-  label.append(mode);
+  const label = document.createElement("label"); label.className = "cube-appearance-check";
+  const mode = document.createElement("input"); mode.type = "checkbox"; mode.setAttribute("aria-label", "Stickerless");
+  const modeText = document.createElement("span"); modeText.textContent = " Stickerless";
+  label.append(mode, modeText);
   const note = document.createElement("p"); note.className = "cube-appearance-hint"; note.textContent = "Artwork is kept in both.";
   // Rarely changed settings sit under a native disclosure (keyboard and screen reader support without script).
   const more = document.createElement("details"); more.className = "cube-appearance-more";
@@ -115,14 +113,12 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   const reset = document.createElement("button"); reset.type = "button"; reset.textContent = "Style default";
   moreBody.append(colorLabel, reset);
   more.append(moreSummary, moreBody);
-  // Pictures: how a picture cube maps its images. Only picture cubes (faces with whole images) show it.
+  // Projected: how a picture cube maps its images. Only picture cubes (faces with whole images) show it.
   const picturesWrap = document.createElement("div"); picturesWrap.className = "cube-appearance-pictures"; picturesWrap.style.display = "none";
-  const picturesLabel = document.createElement("label"); picturesLabel.textContent = "Pictures ";
-  const pictures = document.createElement("select"); pictures.setAttribute("aria-label", "Picture mapping");
-  for (const id of PICTURE_MODES) {
-    const option = document.createElement("option"); option.value = id; option.textContent = PICTURE_MODE_LABEL[id]; pictures.append(option);
-  }
-  picturesLabel.append(pictures);
+  const picturesLabel = document.createElement("label"); picturesLabel.className = "cube-appearance-check";
+  const pictures = document.createElement("input"); pictures.type = "checkbox"; pictures.setAttribute("aria-label", "Projected");
+  const picturesText = document.createElement("span"); picturesText.textContent = " Projected";
+  picturesLabel.append(pictures, picturesText);
   const picturesHelp = document.createElement("p"); picturesHelp.className = "cube-appearance-picture-hint";
   picturesWrap.append(picturesLabel, picturesHelp);
   viewportSection.append(label, note, picturesWrap, more);
@@ -179,17 +175,22 @@ export function installAppearanceControls(host: HTMLElement, change: (value: Vie
   };
 
   const refresh = () => {
-    mode.value = value.construction; color.value = value.frameColor ?? defaultColor;
+    mode.checked = value.construction === "stickerless"; color.value = value.frameColor ?? defaultColor;
     color.disabled = reset.disabled = value.construction === "stickerless";
+    showPictureMode(shownMode);
   };
   const update = (next: ViewerAppearance, pictureChosen = false) => {
     value = validateAppearance(next); refresh(); change(value, pictureChosen ? { pictureChosen } : undefined);
     try { localStorage.setItem(key, JSON.stringify({ version: 1, ...value })); } catch { /* Presentation remains usable. */ }
   };
-  const showPictureMode = (id: PictureMode) => { pictures.value = id; picturesHelp.textContent = PICTURE_MODE_HELP[id]; };
-  showPictureMode(DEFAULT_PICTURE_MODE);
-  pictures.addEventListener("change", () => { const id = parsePictureMode(pictures.value); if (id) update({ ...value, pictureMode: id }, true); });
-  mode.addEventListener("change", () => update({ ...value, construction: mode.value as Construction }));
+  // Stickerless is always projected: the checkbox shows it checked and disabled.
+  let shownMode: PictureMode = DEFAULT_PICTURE_MODE;
+  function showPictureMode(id: PictureMode) {
+    shownMode = id; const locked = value.construction === "stickerless";
+    pictures.checked = locked || id === "projected"; pictures.disabled = locked; picturesHelp.textContent = PROJECTED_HELP;
+  }
+  pictures.addEventListener("change", () => update({ ...value, pictureMode: pictures.checked ? "projected" : "per-sticker" }, true));
+  mode.addEventListener("change", () => update({ ...value, construction: mode.checked ? "stickerless" : "stickered" }));
   color.addEventListener("input", () => update({ ...value, frameColor: color.value }));
   reset.addEventListener("click", () => update({ ...value, frameColor: null }));
   refresh(); change(value);

@@ -32,7 +32,7 @@ function withGlobals(run) {
   }
 }
 
-test("Frame color, Style default and the lighting switches sit under a More disclosure; Construction stays outside", () => withGlobals(() => {
+test("Frame color, Style default and the lighting switches sit under a More disclosure; Stickerless stays outside", () => withGlobals(() => {
   const host = new Element("div"), controls = installAppearanceControls(host, () => {});
   const all = walk(host), more = all.find(node => node.className === "cube-appearance-more");
   assert(more, "a More container exists");
@@ -42,8 +42,8 @@ test("Frame color, Style default and the lighting switches sit under a More disc
   const inMore = walk(more);
   assert(inMore.some(node => textOf(node).includes("Frame color")), "Frame color is under More");
   assert(inMore.some(node => node.tagName === "button" && node.textContent === "Style default"), "Style default is under More");
-  const construction = all.find(node => node.tagName === "select" && node.attributes["aria-label"] === "Cube construction");
-  assert(construction && !inMore.includes(construction), "Construction is not under More");
+  const construction = all.find(node => node.tagName === "input" && node.attributes["aria-label"] === "Stickerless");
+  assert(construction && !inMore.includes(construction), "Stickerless is not under More");
   // Late additions: lighting rows (marked) go under More, other nodes (Rotation) go before it.
   const section = more.parent, rotation = new Element("label"), row = new Element("label");
   row.className = "cube-appearance-more-item";
