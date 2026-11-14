@@ -76,7 +76,7 @@ test("month stickers are inverse chips: the scheme's month color as ground with 
   }
   assert.equal(DEFAULT_CAL3_SCHEME.roles.month.ground, "#fffdf6");
   // EN months are three stickers, DE months one letter each: all month stickers (slot >= 3, not digits) use the chip.
-  for (const id of IDS) for (const s of designs[id].printing) {
+  for (const id of IDS) for (const s of designs[id].printing.filter((x) => x.image !== "")) { // blank stickers are paper: see the blank test
     const art = stickerArt(s, cal3SchemeById("dracula"));
     assert.equal(art.ground === "#ff79c6", stickerRole(s) === "month", id + " " + s.slot + ":" + s.image);
   }
@@ -85,7 +85,7 @@ test("month stickers are inverse chips: the scheme's month color as ground with 
 test("German has no weekend-tinted sticker in any scheme: every sticker is its plain weekday, day or month class", () => {
   for (const sc of CAL3_SCHEMES)
     for (const id of ["de-a", "de-a-unpadded"])
-      for (const s of designs[id].printing) {
+      for (const s of designs[id].printing.filter((x) => x.image !== "")) {
         const art = stickerArt(s, sc);
         const plainRole = /^[0-9]$/.test(s.image) ? "day" : s.slot < 3 ? "weekday" : "month";
         assert.equal(art.color, sc.roles[plainRole].ink, `${sc.id} ${id} ${s.slot}:${s.image}`);
@@ -256,4 +256,12 @@ test("Classic month chip override is pinned: ground #d9b36a, ink #3d2005", () =>
   const classic = cal3SchemeById("classic");
   assert.equal(classic.roles.month.ground, "#d9b36a");
   assert.equal(classic.roles.month.ink, "#3d2005");
+});
+
+test("unprinted (blank) stickers are plain paper in every scheme, whatever their slot (German blank tens digit sits in month-class slot 4)", () => {
+  for (const sc of CAL3_SCHEMES)
+    for (const [id, d] of Object.entries(designs))
+      for (const s of d.printing.filter((x) => x.image === "")) assert.equal(stickerArt(s, sc).ground, sc.ground, `${sc.id} ${id} sticker ${s.id} slot ${s.slot}`);
+  // The case of the owner report: the German blank center stickers (slot 4) exist in the print.
+  assert.deepEqual(designs["de-a-unpadded"].printing.filter((s) => s.image === "" && s.slot >= 3).map((s) => s.id), [30, 43]);
 });
