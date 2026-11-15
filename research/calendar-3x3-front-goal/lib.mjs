@@ -10,7 +10,7 @@ export const PRINTS = ["de-a", "de-a-unpadded", "en-3-zero", "en-3-unpadded"];
 export async function loadApp() {
   const model = await import(`${root}/src/apps/calendar/model.ts`);
   const controller = await import(`${root}/src/apps/calendar/controller.ts`);
-  const planner = await import(`${root}/src/apps/calendar/center-planner.mjs`);
+  const planner = await import(`${root}/tests/helpers/calendar-center-planner.mjs`);
   return { model, controller, planner };
 }
 

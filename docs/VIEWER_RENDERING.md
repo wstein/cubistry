@@ -43,7 +43,7 @@ The installed, pinned 3×3 provider at
 facelets and explicit center orientations in ULFRBD order, returning verified
 outer moves. It is AGPL-3.0-or-later, with retained upstream notices, and is not
 a renderer or a general immutable-print API. Cubistry's existing
-[`center-planner.mjs`](../src/apps/calendar/center-planner.mjs) maps its scoped
+[`calendar-center-planner.mjs`](../tests/helpers/calendar-center-planner.mjs) maps its scoped
 physical Calendar state into that solver request; the new presentation adapter
 consumes the full original sticker frames instead of a lossy solver projection.
 

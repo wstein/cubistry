@@ -2,7 +2,7 @@ import { test } from "node:test";
 import assert from "node:assert/strict";
 import { readFileSync } from "node:fs";
 import { CalendarController } from "../src/apps/calendar/controller.ts";
-import { createPlanner } from "../src/apps/calendar/center-planner.mjs";
+import { createPlanner } from "./helpers/calendar-center-planner.mjs";
 import {
   civilDate,
   findTarget,

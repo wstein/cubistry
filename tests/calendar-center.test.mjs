@@ -21,7 +21,7 @@ import {
   tryCenterAware,
   referencesForPlan,
   pictureRequest,
-} from "../src/apps/calendar/center-planner.mjs";
+} from "./helpers/calendar-center-planner.mjs";
 const load = (id) =>
   validateDesign(JSON.parse(readFileSync(`public/calendar/${id}.json`)));
 const settled = async (c) => {
