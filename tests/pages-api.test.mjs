@@ -100,3 +100,41 @@ test("writes are not retried", async () => {
     }
   }
 });
+
+test("zip retries transient responses and returns only the successful archive", async () => {
+  for (const first of [502, 503, 504, new TypeError("fetch failed")]) {
+    let calls = 0, cancelled = 0;
+    globalThis.fetch = async () => {
+      calls++;
+      if (calls === 1) {
+        if (first instanceof Error) throw first;
+        return new Response(new ReadableStream({ cancel: () => void cancelled++ }), { status: first });
+      }
+      return new Response(new Uint8Array([1, 2, 3]), { status: 200 });
+    };
+    const { api, delays } = client();
+    assert.deepEqual(await api.zip(123), Buffer.from([1, 2, 3]));
+    assert.equal(calls, 2);
+    assert.deepEqual(delays, [2000]);
+    assert.equal(cancelled, first instanceof Error ? 0 : 1);
+  }
+});
+test("zip stops after three transient failures with the original message", async () => {
+  const calls = mock([504, 504, 504]);
+  const { api, delays } = client();
+  await assert.rejects(api.zip(123), { message: "Site artifact download failed" });
+  assert.equal(calls.length, 3);
+  assert.deepEqual(delays, [2000, 6000]);
+});
+test("zip preserves the final network error after three attempts", async () => {
+  const calls = mock([1, 2, 3].map(() => new TypeError("fetch failed")));
+  await assert.rejects(client().api.zip(123), { message: "fetch failed" });
+  assert.equal(calls.length, 3);
+});
+test("zip does not retry non-transient statuses", async () => {
+  for (const status of [400, 404, 429, 500]) {
+    const calls = mock([status]);
+    await assert.rejects(client().api.zip(123), { message: "Site artifact download failed" });
+    assert.equal(calls.length, 1);
+  }
+});
