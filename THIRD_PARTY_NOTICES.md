@@ -72,7 +72,7 @@ The following third-party libraries and modules are bundled, linked, or distribu
   - `licenses/cubing/provenance.json`
 
 ### 3.3. PuzlWerk Solvers
-* **Components**: `@puzlwerk/solver-2x2` and `@puzlwerk/solver-3x3-picture`
+* **Components**: `@puzlwerk/solver-2x2`, `@puzlwerk/solver-3x3-picture` and `@puzlwerk/solver-3x3-front`
 * **License**: GNU Affero General Public License Version 3 (AGPL-3.0) / MIT / Apache-2.0
 * **Copyright**: © 2026 Werner Stein and PuzlWerk contributors
 * **Repository**: [https://github.com/wstein/puzlwerk](https://github.com/wstein/puzlwerk)
@@ -84,6 +84,11 @@ The following third-party libraries and modules are bundled, linked, or distribu
   - `licenses/puzlwerk/source.json`
   - `licenses/puzlwerk-picture/LICENSE`
   - `licenses/puzlwerk-picture/NOTICE`
+  - `licenses/puzlwerk-front/LICENSE`
+  - `licenses/puzlwerk-front/NOTICE`
+  - `licenses/puzlwerk-front/COPYING`
+  - `licenses/puzlwerk-front/provenance.json`
+  - `licenses/puzlwerk-front/source.json`
 
 ### 3.4. ReScript Runtime
 * **Component**: `@rescript/runtime` / ReScript standard library

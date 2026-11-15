@@ -60,6 +60,19 @@ test("production builds retain exact cubing and bundled WebAssembly dependency n
       readFileSync(join(output, "licenses/puzlwerk/LICENSE"), "utf8").length >
         100,
     );
+    const front = join(output, "licenses/puzlwerk-front");
+    const frontPin = JSON.parse(readFileSync(join(front, "source.json")));
+    assert.equal(frontPin.package, "@puzlwerk/solver-3x3-front");
+    for (const file of [
+      "LICENSE",
+      "NOTICE",
+      "COPYING",
+      "provenance.json",
+      "src/index.mjs",
+      "res/FrontSearch.res",
+      "res/FrontSearch.res.mjs",
+    ])
+      assert(readFileSync(join(front, file)).length > 100, file);
   } finally {
     rmSync(output, { recursive: true, force: true });
   }

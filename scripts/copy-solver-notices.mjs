@@ -46,3 +46,21 @@ copyFileSync(
   new URL("../puzlwerk-picture-source.json", import.meta.url),
   new URL("source.json", pictureOutput),
 );
+
+// Include the front-goal provider's complete corresponding source (ReScript sources and compiled modules).
+const frontRoot = new URL(
+  "../",
+  import.meta.resolve("@puzlwerk/solver-3x3-front"),
+);
+const frontOutput = new URL("licenses/puzlwerk-front/", output);
+mkdirSync(frontOutput, { recursive: true });
+for (const file of ["LICENSE", "NOTICE", "COPYING", "README.md", "provenance.json"])
+  copyFileSync(new URL(file, frontRoot), new URL(file, frontOutput));
+for (const directory of ["src/", "res/"])
+  cpSync(new URL(directory, frontRoot), new URL(directory, frontOutput), {
+    recursive: true,
+  });
+copyFileSync(
+  new URL("../puzlwerk-front-source.json", import.meta.url),
+  new URL("source.json", frontOutput),
+);
