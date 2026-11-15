@@ -1,3 +1,0 @@
-The bounded 3×3 picture solver and minimal mechanics closure are extracted without algorithm changes from wstein/cubelab at 08e079f3bc211777d8980f75ec6a7f61979dd2ac.
-License: AGPL-3.0-or-later. See provenance.json and LICENSE.
-The original project notice is retained as UPSTREAM-NOTICE; its unrelated 4×4 engine is not included.
