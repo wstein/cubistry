@@ -60,7 +60,7 @@ export class CalendarOptimizer {
   }
   constructor(
     createWorker: () => PlanningWorker = () =>
-      new Worker(new URL("./optimizer-worker.ts", import.meta.url), {
+      new Worker(new URL("./front-worker.ts", import.meta.url), {
         type: "module",
       }),
     timeoutMs = DEFAULT_SOLVER_TIMEOUT_MS,
