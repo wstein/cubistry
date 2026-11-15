@@ -8,7 +8,7 @@
  * plasticity or on the face (names-light.ts holds the global lights).
  *
  * The mapping (what the numbers are is measured, see tests/browser/calendar7-names-color.spec.mjs and docs/CALENDAR_7X7.md):
- * - specular: three.js `specularIntensity` 0.2 p (the shared plastic has 1);
+ * - specular: three.js `specularIntensity` 0.05 p (the shared plastic has 1);
  * - face shadows: for p > 0 the cube faces receive the shadow map at a strength (`shadow.intensity` of the key and the shadow
  *   fill, relative to the preset) of 0.3 + 0.5 p (the preset has 1). The strength never falls below 0.3 because the floor
  *   shadow shares the lights: its material opacity is raised by the same factor (`floorOpacityFactor`), and that reaches 1
@@ -36,14 +36,14 @@ export interface PlasticityParts {
 
 /** Floor of the shadow strength: the floor shadow keeps its darkness down to here. */
 export const MIN_SHADOW_STRENGTH = 0.3;
-/** Mean loss of radiance of a lit front face per unit of shadow strength (measured: 4.5% at 0.3, 7% at 0.5, 12.5% at 1 on white). */
-export const SHADOW_LOSS = 0.105;
+/** Mean loss of radiance of a lit front face per unit of shadow strength (measured at the studio lights: 4.5% at 0.3, 7% at 0.5, 12.5% at 1 on white; 0.07 is the calibration for the global light of names-light.ts: with 0.105 the front fills of the production effects were 2 to 7 levels too light). */
+export const SHADOW_LOSS = 0.07;
 /** Diffuse loss to the specular and clearcoat layers (three.js energy conservation) per unit of specularIntensity and clearcoat. */
 export const SPECULAR_LOSS = 0.03, CLEARCOAT_LOSS = 0.05;
 
 export function plasticityParts(plasticity: number): PlasticityParts {
   const p = clampPlasticity(plasticity);
-  return { specular: 0.2 * p, faceShadows: p > 0, shadowStrength: p > 0 ? MIN_SHADOW_STRENGTH + 0.5 * p : MIN_SHADOW_STRENGTH };
+  return { specular: 0.05 * p, faceShadows: p > 0, shadowStrength: p > 0 ? MIN_SHADOW_STRENGTH + 0.5 * p : MIN_SHADOW_STRENGTH };
 }
 
 /** Exposure factor that gives back the radiance the plasticity takes from a flat area. */
