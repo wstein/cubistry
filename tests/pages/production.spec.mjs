@@ -195,6 +195,11 @@ test("built project-path optimized print loads its pinned certificate and execut
 test("built Pages Workshop Timer loads its immutable certificate below the project base and settles physical zero", async ({
   page,
 }) => {
+  // Includes a real 10 s countdown and an element screenshot in software GL. CI took 20.7 s, 24.8 s
+  // and 28.3 s on three consecutive main runs and exceeded the 30 s limit on the next one
+  // (wstein/cubistry run 43682899119), so it gets the slow-test budget.
+  test.slow();
+
   const errors = [],
     requests = [],
     failures = [];
