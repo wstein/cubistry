@@ -8,6 +8,7 @@ test("provider source pins, npm lock and prepared artifact integrities agree", (
   for (const [sourceFile, archive] of [
     ["puzlwerk-source.json", "solver-2x2.tgz"],
     ["puzlwerk-picture-source.json", "solver-3x3-picture.tgz"],
+    ["puzlwerk-front-source.json", "solver-3x3-front.tgz"],
   ]) {
     const source = JSON.parse(readFileSync(sourceFile));
     const dependency = lock.packages[`node_modules/${source.package}`];

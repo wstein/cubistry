@@ -1,0 +1,9 @@
+{
+  "repository": "https://github.com/wstein/puzlwerk.git",
+  "commit": "5bee91e5b717fed41caf9f076a7d6efecb0d58da",
+  "package": "@puzlwerk/solver-3x3-front",
+  "version": "0.0.0",
+  "integrity": "sha512-3nzSVDNxA6lLXYZJYsZl5CSgbXW4pqADFfGYVHO0uzNuSG6nylVCjaV7H0secqqqE88umKR39GSMVLw0q/WPTQ==",
+  "providerPR": "https://github.com/wstein/puzlwerk/pull/59",
+  "providerPRHead": "32ed585dbddddddd7ea2d0f03008d1b089bc063b"
+}
