@@ -1,0 +1,197 @@
+<!doctype html>
+<html lang="en">
+  <head><meta name="robots" content="noindex,nofollow">
+    <link rel="icon" type="image/svg+xml" href="/cubistry/pr-preview/pr-505/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/cubistry/pr-preview/pr-505/favicon-32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/cubistry/pr-preview/pr-505/favicon-16.png" />
+    <link rel="apple-touch-icon" href="/cubistry/pr-preview/pr-505/apple-touch-icon.png" />
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="theme-color" content="#f5f3eb" />
+    <title>Cubistry · M/S Timer</title>
+    <script type="module" crossorigin src="/cubistry/pr-preview/pr-505/assets/msTimer-CEy17XrR.js"></script>
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/modulepreload-polyfill-P2Xu9kJm.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/hud-idle-CzpbQbGT.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/src-C2GP398l.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/src-B8zRujTr.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/three-NNbheffT.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/src-0vB-nTA9.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/rolldown-runtime-WkwZ5CU-.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/preload-helper-Aj-LiOVQ.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/puzlwerk-2x2-CZJvGwYt.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/playback-B14_Br8O.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/ms-source-D_Lz9urR.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/controller-CJdZsj8A.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/design-BwoC_oXh.js">
+    <link rel="modulepreload" crossorigin href="/cubistry/pr-preview/pr-505/assets/link-BlfuJMnj.js">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-505/assets/msTimer-D47nqItS.css">
+    <link rel="stylesheet" crossorigin href="/cubistry/pr-preview/pr-505/assets/style-CbhfsY04.css">
+  </head>
+  <body class="live-clock-page ms-timer-page"><aside style="padding:12px;background:#fff0b3;color:#222">Cubistry PR preview · <a href="https://github.com/wstein/cubistry/pull/505" target="_blank" rel="noopener noreferrer">PR #505</a> · <bdi>feat(calendar): plan the 3x3 calendar routes with the front-goal solver</bdi> — non-production preview · bbb231802d17</aside>
+    <main class="live-clock-page ms-timer-page">
+      <header class="floating-island">
+        <a class="brand" href="./" aria-label="Cubistry home"
+          ><span class="brand-mark">▦</span><span class="brand-text"> CUBISTRY</span></a
+        >
+        <div class="application-choice">
+          <select id="ms-timer-application" aria-label="Cube application">
+            <optgroup label="Multi-Cube Clocks & Timers (2×2)">
+              <option value="index.html?app=clock">Live H–M–S Clock</option>
+              <option value="ms-timer.html" selected>M/S Timer</option>
+            </optgroup>
+            <optgroup label="Single-Cube Applications (2×2)">
+              <option value="counter.html">Counter 0–99</option>
+              <option value="timer.html">60-Minute Timer</option>
+              <option value="five-second-timer.html">5-Second Timer</option>
+              <option value="tenth-counter.html">1/10-Second Counter 0–9</option>
+              <option value="hsm-counter.html">H/M/S Counter 00–59</option>
+              <option value="ms-counter.html">M/S Counter 00–59</option>
+              <option value="hm-one-cube.html">H/M One-Cube Counter</option>
+            </optgroup>
+            <optgroup label="Calendar & Puzzles (3×3)">
+              <option value="index.html?app=calendar">Calendar · Deutsch / English</option>
+              <option value="picture3.html">3×3 Super Picture Cube</option>
+              <option value="status.html">CI Quality Cube · Workflow monitor</option>
+            </optgroup>
+          </select>
+        </div>
+        <a class="print-stickers-link" id="print-stickers" href="print.html?design=words-pascal" target="_blank" rel="noopener">Print stickers</a>
+        <button type="button" class="island-presentation-btn" id="presentation-btn" title="Presentation Mode" aria-label="Enter presentation mode"><span class="btn-icon">⛶</span><span class="btn-text"> Presentation</span></button>
+      </header>
+      <div class="clock-heading sr-only">
+        <div>
+          <h1 id="timer-heading">M/S Timer</h1>
+          <p class="small">
+            One time, 00:00.0–59:59.0, in tenth-second steps. Three physical
+            cubes: minutes on the left, seconds in the middle, 1/10 second on
+            the right.
+          </p>
+        </div>
+      </div>
+      <div class="clock-workspace">
+        <section
+          class="clock-stage"
+          id="ms-timer-display"
+          aria-label="Minutes, seconds, and tenth-second cubes"
+          data-application="ms-timer"
+        >
+          <div id="ms-timer-scene" class="clock-viewer"></div>
+          <div class="clock-cubes sr-only" aria-hidden="true">
+            <article class="clock-card">
+              <h2>Minutes (min)</h2>
+              <div id="ms-minutes" data-unit="M" aria-busy="true"></div>
+              <p id="ms-minutes-state" class="clock-state" role="status">
+                Preparing…
+              </p>
+            </article>
+            <article class="clock-card">
+              <h2>Seconds (sec)</h2>
+              <div id="ms-seconds" data-unit="S" aria-busy="true"></div>
+              <p id="ms-seconds-state" class="clock-state" role="status">
+                Preparing…
+              </p>
+            </article>
+            <article class="clock-card">
+              <h2>1/10 Second (1/10)</h2>
+              <div id="ms-tenths" data-unit="T" aria-busy="true"></div>
+              <p id="ms-tenths-state" class="clock-state" role="status">
+                Preparing…
+              </p>
+            </article>
+          </div>
+          <aside
+            id="timer-controls"
+            class="timer-controls floating-hud"
+            aria-label="M/S Timer controls"
+          >
+            <div class="hud-header">
+              <h2 class="hud-title">Timer Controls</h2>
+              <div class="hud-actions">
+                <button type="button" class="hud-btn icon-only hud-toggle-btn" title="Minimize or expand controls">─</button>
+              </div>
+            </div>
+            <div class="hud-body">
+              <label for="timer-mode">Mode</label>
+              <select id="timer-mode" disabled>
+                <option value="countdown">Countdown</option>
+                <option value="stopwatch">Stopwatch</option>
+              </select>
+              <form id="timer-duration-form">
+                <div id="timer-duration-setting">
+                  <label for="timer-duration">Duration MM:SS.d</label>
+                  <div class="duration-actions">
+                    <input
+                      id="timer-duration"
+                      type="text"
+                      value="15:00.0"
+                      autocomplete="off"
+                      aria-describedby="timer-bounds"
+                      disabled
+                    />
+                    <button id="timer-set" type="submit" disabled>Set</button>
+                  </div>
+                </div>
+              </form>
+              <p id="timer-bounds" class="small">
+                00:00.0–59:59.0 · tenth-second steps
+              </p>
+              <output
+                id="timer-logical"
+                class="timer-time"
+                aria-label="Timer time (tenth-second resolution)"
+                aria-describedby="timer-bounds"
+                >15:00.0</output
+              >
+              <p class="small" id="timer-speed-note">Timer speed: 1× (fixed)</p>
+              <div class="timer-actions">
+                <button id="timer-start" class="primary" type="button" disabled>
+                  Start</button
+                ><button id="timer-reset" type="button" disabled>Reset</button>
+              </div>
+              <p id="status" role="status" aria-live="polite">
+                Preparing the verified fixed prints…
+              </p>
+              <p
+                id="timer-sync"
+                class="small timer-motion"
+                role="status"
+                aria-live="polite"
+                aria-atomic="true"
+              >
+                <span id="timer-motion-label"></span><br />
+                <span id="timer-effective"></span>
+              </p>
+            </div>
+          </aside>
+        </section>
+      </div>
+      <button
+        type="button"
+        id="exit-presentation-btn"
+        class="presentation-exit-btn"
+        aria-label="Exit presentation mode"
+      >
+        ✕ Exit Presentation
+      </button>
+      <p id="error" role="alert"></p>
+      <p class="small sr-only">
+        Drag the shared view to look around all three cubes. The minutes and
+        seconds cubes use print S3 of the M/S Counter with min and sec word
+        stickers; the 1/10-second cube uses the Period-1 {L, D, B} r2c1 0–9
+        sequence (L | L | B L | B L | D | B D | B L | D | L | D) with 1/10 at
+        r1c2.
+      </p>
+      <footer class="floating-glass-pill" role="contentinfo">
+        <span class="pill-brand bottom-brand"><span class="brand-mark">▦</span> CUBISTRY</span>
+        <span class="pill-brand-sep bottom-brand-sep">&middot;</span>
+        <span>&copy; 2026 Werner Stein</span>
+        <span>&middot;</span>
+        <a href="https://www.gnu.org/licenses/agpl-3.0.html" target="_blank" rel="noopener">AGPL-3.0</a>
+        <span>&middot;</span>
+        <a href="licenses.html">Licenses</a>
+        <span>&middot;</span>
+        <a href="https://github.com/wstein/cubistry/" target="_blank" rel="noopener">GitHub ↗</a>
+      </footer>
+    </main>
+  </body>
+</html>

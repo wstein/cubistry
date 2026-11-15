@@ -1,0 +1,12 @@
+Cubistry sticker artwork
+
+Created by Werner Stein with AI assistance (Claude, Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+This sticker artwork (digits, H/S/M symbols and the arrangement of the glyphs) is
+art data, not AGPL program code. The Cubistry program code remains under
+AGPL-3.0-or-later (see the LICENSE file of the repository).
+
+Font-derived outlines, where used, additionally retain the SIL Open Font License
+in the included OFL.txt.

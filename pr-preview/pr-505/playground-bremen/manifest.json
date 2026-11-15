@@ -1,0 +1,23 @@
+{
+  "design": "bremen",
+  "faces": {
+    "F": {
+      "sha256": "e29bf6eccc6446b0344e84d6c4cda43f98184f1ad77125d4f3237433a08d8ce6"
+    },
+    "B": {
+      "sha256": "bcc7949a835028c2694462badecdbb15f26c55bb66367ce606e131eb0a0592f6"
+    },
+    "R": {
+      "sha256": "dc066910c6b18096c470a9f3cbb650ee8b721a4a9c3fc3abbb391d37ef1c0ce8"
+    },
+    "L": {
+      "sha256": "b70d53b08970b2c633bc01882e4be112f8ee18e0bc6c8a28781a0f59149e857b"
+    },
+    "U": {
+      "sha256": "41574484ea463a1aaa1db9d359070ff69de0f91908c2ea8da4b642e4e7e0bf2d"
+    },
+    "D": {
+      "sha256": "3aed332cab485eef7802ff8c6840ad1acbecaba04d5e589f3ca80d0b02cd7bd1"
+    }
+  }
+}

@@ -1,0 +1,101 @@
+{
+  "design": "pastel-garden-friends",
+  "images": [
+    {
+      "id": "F_0_0",
+      "sha256": "77d7e9a430e19b4122ff1f77b9208346cf7fb8d97f09b8c5dd0315f42813628d"
+    },
+    {
+      "id": "F_0_1",
+      "sha256": "698764d01b513fb8e792008c61dc4d50365ea32d0ddef7747b243ed1db06f1ab"
+    },
+    {
+      "id": "F_1_0",
+      "sha256": "5faa59b68ea87a10ebf3a8a2ca20072a9213e474a5ddfe600f33d1cc59693a90"
+    },
+    {
+      "id": "F_1_1",
+      "sha256": "d7563dfc69a575ae6dbbc695d421c311419c418dc967152d772b2e109c98402b"
+    },
+    {
+      "id": "B_0_0",
+      "sha256": "3ad4063ea01234d1048f27711eeb0c4a17d49f64fd13b174564d555dc8f3846b"
+    },
+    {
+      "id": "B_0_1",
+      "sha256": "5d615fbaaaf604ed12765f828b5b5e47600bb0520c8a9b2af821f626c1d79775"
+    },
+    {
+      "id": "B_1_0",
+      "sha256": "ddb60ea5ec8ece30a8d611384175c45f0eac976d06f084763880fbc5f74fdea6"
+    },
+    {
+      "id": "B_1_1",
+      "sha256": "df1c8ff67452507a0b3ac3244c1cf5f939dd8f69163b1037d39d40c6ee6ebc00"
+    },
+    {
+      "id": "R_0_0",
+      "sha256": "3cbb0bb8106476d74205737dd7c7419e6e492b8805971f68aa575ff9e9fb6db2"
+    },
+    {
+      "id": "R_0_1",
+      "sha256": "bd2c00a51cfc69516ec6392d6300af82e5d8e799130a1f0c63d5bb0259988a55"
+    },
+    {
+      "id": "R_1_0",
+      "sha256": "418e2cf1cefe3d9885d21b9cf0d9865429f1ffc6f9989fdba9cc596935491866"
+    },
+    {
+      "id": "R_1_1",
+      "sha256": "cc08d4f800965eba73c656577710d9af79507ded43cccd020e7457f54009223e"
+    },
+    {
+      "id": "L_0_0",
+      "sha256": "5da95a6079417358720164b47472d6a9dba05392f2be370655c0413250c7f112"
+    },
+    {
+      "id": "L_0_1",
+      "sha256": "48360e8d0c88177f8f2df0ffa3d5f52533530aba37c8cfcdd49f9f575c66568f"
+    },
+    {
+      "id": "L_1_0",
+      "sha256": "115502c932d106a8d92e0fd9bdd31e27a7cbe2b8a16392f5b8752dcc51e1e9c0"
+    },
+    {
+      "id": "L_1_1",
+      "sha256": "50543d413f7e75fae07744f01d5b3a8801f21d5d63e643a93e902412559e547b"
+    },
+    {
+      "id": "U_0_0",
+      "sha256": "dca32b34253934bd2c5e0716090077a4db8f7c450c2a91c3ca4829aefe09f546"
+    },
+    {
+      "id": "U_0_1",
+      "sha256": "6bb749050a95f5dd6a8bdda677d0bf738d7d5f3366a24902e5bd77d2371c74e9"
+    },
+    {
+      "id": "U_1_0",
+      "sha256": "4bcf5b9287169fb2074ad775831a53043e4b2da032028930a9f8962958d66501"
+    },
+    {
+      "id": "U_1_1",
+      "sha256": "bdec5d0177f9528ee918cfe188e8c58bb63231302ace4706130f590d1d2f09df"
+    },
+    {
+      "id": "D_0_0",
+      "sha256": "8e13166747e71cfa903efd847187946354b8fc55e4a347894a64993b26bce08e"
+    },
+    {
+      "id": "D_0_1",
+      "sha256": "9a844396906f85589c7fa7d8190788ff2b36c31e75920df310947130097b8cd9"
+    },
+    {
+      "id": "D_1_0",
+      "sha256": "df13c4bf5c1488c88f28ab4c0931d1ae01ddc0f8b6c4b49134738fce24f3adaa"
+    },
+    {
+      "id": "D_1_1",
+      "sha256": "7820be3cb0b69b429208887ceeea1496f05cc6ad7d6af733132c9ec1ed9f8b81"
+    }
+  ]
+}

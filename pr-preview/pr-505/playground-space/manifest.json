@@ -1,0 +1,23 @@
+{
+  "design": "space",
+  "faces": {
+    "F": {
+      "sha256": "8281b4762dbb82e6507a52d4b8fded2177c47f7a4859bd08677e21c9fb8ddd54"
+    },
+    "B": {
+      "sha256": "e4704100439f087fb7fe6b583ac0bc6ddb246762701e17859d2d105c491ae3b1"
+    },
+    "R": {
+      "sha256": "9d1d8462a5e6ee69ec3bdce7212d3025f8882326a41561e3b0ebe48ff253daf9"
+    },
+    "L": {
+      "sha256": "a75f28e219815064e02b85952f98b46f3341a6568c06ee58ed690bec651568f0"
+    },
+    "U": {
+      "sha256": "26687692ec61ae898d1c9157b2bc6badfffc9be9b2332046d0949445297b537f"
+    },
+    "D": {
+      "sha256": "7b1f89b136a98f2db993cc22649e7d32f2501e7e6d63514ed5eef17d21aa21c9"
+    }
+  }
+}
