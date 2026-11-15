@@ -323,6 +323,12 @@ test("selecting today refreshes Live and Inspecting status without moving sticke
 });
 // Box of .calendar-controls clipped by its scrolling container .shell-dock (null when nothing is visible).
 async function visibleControlsBox(page) {
+  // The dock only clips in-flow descendants: positioned controls would escape it.
+  const inDock = await page.locator(".calendar-controls").evaluate((e) => ({
+    position: getComputedStyle(e).position,
+    contained: !!e.closest(".shell-dock"),
+  }));
+  expect(inDock).toEqual({ position: "static", contained: true });
   const controls = await page.locator(".calendar-controls").boundingBox();
   const dock = await page.locator(".shell-dock").boundingBox();
   const x = Math.max(controls.x, dock.x),
