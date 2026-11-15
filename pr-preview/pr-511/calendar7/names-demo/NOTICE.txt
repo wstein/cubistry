@@ -1,0 +1,9 @@
+Names (demo, beam chain, print window-2029-12, May 2026 - Jun 2027)
+DEMO of a non-final print for the owner, not meant for main. Window May 2026 to June 2027 (14 months, 13 edges): 6 stored greedy edges (May to Nov 2026), then the 7 beam edges Dec 2026 to Jun 2027.
+Status: DEMO, research candidate, not certified, not for release. No shortest-route, global-print or build-certification claim.
+Created by Werner Stein with AI assistance (Codex and Claude, OpenAI and Anthropic). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+Source: research/calendar-7x7/row1-window-chain evidence window-2029-12 and beam-chain-2026-06 on feat/cal7-beam-chain-2026-06 (PR 411, head 4cab1524cc3220c4b8d2a35474a54da325217f40).
+Regenerate with scripts/export-calendar7-names-demo.mjs. The shipped files public/calendar7/names/*, state.v1.json, graph.v1.json and displays.v1.json are not changed by this folder.

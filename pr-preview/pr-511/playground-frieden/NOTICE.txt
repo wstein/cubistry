@@ -1,0 +1,17 @@
+Frieden picture-cube artwork
+KI-generierte Illustrationen, erstellt mit OpenAI. Auswahl und Zusammenstellung: Werner Stein, 2026.
+Copyright (c) 2026 Werner Stein. Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+SPDX-License-Identifier: CC-BY-SA-4.0
+
+These six whole-face raster illustrations (two women at a cafe table, a rowing boat on a lake at sunset, a wren on a blossoming fence, a sleeping dog by a rainy window, a shepherd with sheep and a dog, and a bench under a tree) are a work separate from the
+Cubistry program code, which stays under AGPL-3.0-or-later. The images are
+licensed under CC BY-SA 4.0; the AGPL copyleft does not cover them.
+
+The WebP files are lossy copies of the six original PNG files (the larger two are
+scaled to 1024 px). The playground cuts each face into the N by N stickers a cube of
+size N needs when it loads them, so no pre-cut tiles are stored. To re-pin the faces
+after a change, run: node scripts/build-playground-theme.mjs frieden
+
+Source repository: https://github.com/wstein/cubistry
+License: https://creativecommons.org/licenses/by-sa/4.0/

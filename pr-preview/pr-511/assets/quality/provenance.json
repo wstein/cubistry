@@ -1,0 +1,362 @@
+{
+  "generator": "scripts/export-quality-art.py",
+  "fontToolsVersion": "4.61.1",
+  "font": {
+    "family": "Noto Sans",
+    "weight": 800,
+    "package": "@fontsource/noto-sans@5.2.10",
+    "path": "public/fonts/noto-sans-latin-800.woff2",
+    "sha256": "a5650ea2e07952bc6cd44f67cea720697ac9fdc9e35f33e76ccc5004370c21a6",
+    "license": "SIL-OFL-1.1",
+    "licensePath": "public/fonts/OFL.txt"
+  },
+  "dimensions": [
+    256,
+    256
+  ],
+  "safeArea": 14,
+  "stickers": {
+    "quality-build-open": {
+      "category": "BUILD",
+      "stateWord": "OFFEN",
+      "stateColor": "#56616a",
+      "categoryInkBounds": [
+        86.294,
+        29.008,
+        170.48999999999998,
+        49.28
+      ],
+      "stateInkBounds": [
+        80.69,
+        206.25,
+        174.37999999999997,
+        228.3
+      ]
+    },
+    "quality-build-running": {
+      "category": "BUILD",
+      "stateWord": "L\u00c4UFT",
+      "stateColor": "#145a91",
+      "categoryInkBounds": [
+        86.294,
+        29.008,
+        170.48999999999998,
+        49.28
+      ],
+      "stateInkBounds": [
+        83.0,
+        200.28,
+        174.76999999999998,
+        228.3
+      ]
+    },
+    "quality-build-ok": {
+      "category": "BUILD",
+      "stateWord": "OK",
+      "stateColor": "#187044",
+      "categoryInkBounds": [
+        86.294,
+        29.008,
+        170.48999999999998,
+        49.28
+      ],
+      "stateInkBounds": [
+        107.555,
+        206.25,
+        150.035,
+        228.3
+      ]
+    },
+    "quality-build-error": {
+      "category": "BUILD",
+      "stateWord": "FEHLER",
+      "stateColor": "#b12c2c",
+      "categoryInkBounds": [
+        86.294,
+        29.008,
+        170.48999999999998,
+        49.28
+      ],
+      "stateInkBounds": [
+        75.71,
+        206.58,
+        183.01999999999998,
+        228.0
+      ]
+    },
+    "quality-build-blocked": {
+      "category": "BUILD",
+      "stateWord": "BLOCKIERT",
+      "stateColor": "#855600",
+      "categoryInkBounds": [
+        86.294,
+        29.008,
+        170.48999999999998,
+        49.28
+      ],
+      "stateInkBounds": [
+        49.584,
+        206.975,
+        208.12699999999998,
+        228.29
+      ]
+    },
+    "quality-test-open": {
+      "category": "TEST",
+      "stateWord": "OFFEN",
+      "stateColor": "#56616a",
+      "categoryInkBounds": [
+        96.61200000000001,
+        28.727999999999998,
+        159.388,
+        49.28
+      ],
+      "stateInkBounds": [
+        80.69,
+        206.25,
+        174.37999999999997,
+        228.3
+      ]
+    },
+    "quality-test-running": {
+      "category": "TEST",
+      "stateWord": "L\u00c4UFT",
+      "stateColor": "#145a91",
+      "categoryInkBounds": [
+        96.61200000000001,
+        28.727999999999998,
+        159.388,
+        49.28
+      ],
+      "stateInkBounds": [
+        83.0,
+        200.28,
+        174.76999999999998,
+        228.3
+      ]
+    },
+    "quality-test-ok": {
+      "category": "TEST",
+      "stateWord": "OK",
+      "stateColor": "#187044",
+      "categoryInkBounds": [
+        96.61200000000001,
+        28.727999999999998,
+        159.388,
+        49.28
+      ],
+      "stateInkBounds": [
+        107.555,
+        206.25,
+        150.035,
+        228.3
+      ]
+    },
+    "quality-test-error": {
+      "category": "TEST",
+      "stateWord": "FEHLER",
+      "stateColor": "#b12c2c",
+      "categoryInkBounds": [
+        96.61200000000001,
+        28.727999999999998,
+        159.388,
+        49.28
+      ],
+      "stateInkBounds": [
+        75.71,
+        206.58,
+        183.01999999999998,
+        228.0
+      ]
+    },
+    "quality-test-blocked": {
+      "category": "TEST",
+      "stateWord": "BLOCKIERT",
+      "stateColor": "#855600",
+      "categoryInkBounds": [
+        96.61200000000001,
+        28.727999999999998,
+        159.388,
+        49.28
+      ],
+      "stateInkBounds": [
+        49.584,
+        206.975,
+        208.12699999999998,
+        228.29
+      ]
+    },
+    "quality-analyze-open": {
+      "category": "ANALYZE",
+      "stateWord": "OFFEN",
+      "stateColor": "#56616a",
+      "categoryInkBounds": [
+        63.586,
+        28.924,
+        190.902,
+        49.0
+      ],
+      "stateInkBounds": [
+        80.69,
+        206.25,
+        174.37999999999997,
+        228.3
+      ]
+    },
+    "quality-analyze-running": {
+      "category": "ANALYZE",
+      "stateWord": "L\u00c4UFT",
+      "stateColor": "#145a91",
+      "categoryInkBounds": [
+        63.586,
+        28.924,
+        190.902,
+        49.0
+      ],
+      "stateInkBounds": [
+        83.0,
+        200.28,
+        174.76999999999998,
+        228.3
+      ]
+    },
+    "quality-analyze-ok": {
+      "category": "ANALYZE",
+      "stateWord": "OK",
+      "stateColor": "#187044",
+      "categoryInkBounds": [
+        63.586,
+        28.924,
+        190.902,
+        49.0
+      ],
+      "stateInkBounds": [
+        107.555,
+        206.25,
+        150.035,
+        228.3
+      ]
+    },
+    "quality-analyze-error": {
+      "category": "ANALYZE",
+      "stateWord": "FEHLER",
+      "stateColor": "#b12c2c",
+      "categoryInkBounds": [
+        63.586,
+        28.924,
+        190.902,
+        49.0
+      ],
+      "stateInkBounds": [
+        75.71,
+        206.58,
+        183.01999999999998,
+        228.0
+      ]
+    },
+    "quality-analyze-blocked": {
+      "category": "ANALYZE",
+      "stateWord": "BLOCKIERT",
+      "stateColor": "#855600",
+      "categoryInkBounds": [
+        63.586,
+        28.924,
+        190.902,
+        49.0
+      ],
+      "stateInkBounds": [
+        49.584,
+        206.975,
+        208.12699999999998,
+        228.29
+      ]
+    },
+    "quality-review-open": {
+      "category": "REVIEW",
+      "stateWord": "OFFEN",
+      "stateColor": "#56616a",
+      "categoryInkBounds": [
+        76.256,
+        29.008,
+        181.816,
+        49.0
+      ],
+      "stateInkBounds": [
+        80.69,
+        206.25,
+        174.37999999999997,
+        228.3
+      ]
+    },
+    "quality-review-running": {
+      "category": "REVIEW",
+      "stateWord": "L\u00c4UFT",
+      "stateColor": "#145a91",
+      "categoryInkBounds": [
+        76.256,
+        29.008,
+        181.816,
+        49.0
+      ],
+      "stateInkBounds": [
+        83.0,
+        200.28,
+        174.76999999999998,
+        228.3
+      ]
+    },
+    "quality-review-ok": {
+      "category": "REVIEW",
+      "stateWord": "OK",
+      "stateColor": "#187044",
+      "categoryInkBounds": [
+        76.256,
+        29.008,
+        181.816,
+        49.0
+      ],
+      "stateInkBounds": [
+        107.555,
+        206.25,
+        150.035,
+        228.3
+      ]
+    },
+    "quality-review-error": {
+      "category": "REVIEW",
+      "stateWord": "FEHLER",
+      "stateColor": "#b12c2c",
+      "categoryInkBounds": [
+        76.256,
+        29.008,
+        181.816,
+        49.0
+      ],
+      "stateInkBounds": [
+        75.71,
+        206.58,
+        183.01999999999998,
+        228.0
+      ]
+    },
+    "quality-review-blocked": {
+      "category": "REVIEW",
+      "stateWord": "BLOCKIERT",
+      "stateColor": "#855600",
+      "categoryInkBounds": [
+        76.256,
+        29.008,
+        181.816,
+        49.0
+      ],
+      "stateInkBounds": [
+        49.584,
+        206.975,
+        208.12699999999998,
+        228.29
+      ]
+    }
+  },
+  "icons": "Uniform vector strokes; running is a circular arrow, never a platform emoji.",
+  "language": "German physical state words are intentional user-specified print data."
+}

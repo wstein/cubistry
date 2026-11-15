@@ -1,0 +1,86 @@
+{
+  "repository": "https://github.com/wstein/cubelab",
+  "revision": "07e64c7f5b7a735ae12ce6cbd9c58647b8744776",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    {
+      "source": "src/Solver/Optimal2x2Solver.res",
+      "path": "res/upstream/Optimal2x2Solver.res",
+      "sha256": "96ccf14d0da4f2cd98e6dad99a886b68f9d3625375219bec79d2d9ec92718a92",
+      "importedSha256": "c659dbcd529a424148bdd46278581aad20755c7ca77dc9e205d8214c40c68846"
+    },
+    {
+      "source": "src/Solver/Canonical2x2.res",
+      "path": "res/upstream/Canonical2x2.res",
+      "sha256": "938b5ed7dfe85f906c18bd84c081cc448f1f61cbad3c92e7daa6e7ba8908dae8",
+      "importedSha256": "03dfbda158651f67088466aa335fb4ff4eb892c68a7a6c7235eba5039573a5a8"
+    },
+    {
+      "source": "src/Solver/Optimal2x2Table.res",
+      "path": "res/upstream/Optimal2x2Table.res",
+      "sha256": "16ae80d4c15abd6f68b5341c75b32291f562bb0c446292dbeb8d94e561f2ac1c",
+      "importedSha256": "16ae80d4c15abd6f68b5341c75b32291f562bb0c446292dbeb8d94e561f2ac1c"
+    },
+    {
+      "source": "src/Move/MoveTypes.res",
+      "path": "res/upstream/MoveTypes.res",
+      "sha256": "205ae6e11990965c606d92b41232ecf045a1378bd1339bba145bc9a565d2689f",
+      "importedSha256": "205ae6e11990965c606d92b41232ecf045a1378bd1339bba145bc9a565d2689f"
+    },
+    {
+      "source": "src/Move/MoveParser.res",
+      "path": "res/upstream/MoveParser.res",
+      "sha256": "afdf83899123c21ca688c6a2405b70b57ef828e7a442508c6cdee1d62c860337",
+      "importedSha256": "afdf83899123c21ca688c6a2405b70b57ef828e7a442508c6cdee1d62c860337"
+    },
+    {
+      "source": "src/Move/MoveExecutor.res",
+      "path": "res/upstream/MoveExecutor.res",
+      "sha256": "5cdf024059fac11fddff6fb65d21bd86a18e3718039252b3749c4dfd95d6d262",
+      "importedSha256": "5cdf024059fac11fddff6fb65d21bd86a18e3718039252b3749c4dfd95d6d262"
+    },
+    {
+      "source": "src/Move/MoveNormalizer.res",
+      "path": "res/upstream/MoveNormalizer.res",
+      "sha256": "db1509ece5e404cba166cf635daa367756be665d23f47093949f80174e6390eb",
+      "importedSha256": "db1509ece5e404cba166cf635daa367756be665d23f47093949f80174e6390eb"
+    },
+    {
+      "source": "src/State/StateTypes.res",
+      "path": "res/upstream/StateTypes.res",
+      "sha256": "4eabd092fdd4405a686b25b9e982eec06853f022728d5061a2c3f713c065dd7e",
+      "importedSha256": "4eabd092fdd4405a686b25b9e982eec06853f022728d5061a2c3f713c065dd7e"
+    },
+    {
+      "source": "src/State/StateParity.res",
+      "path": "res/upstream/StateParity.res",
+      "sha256": "89229de6a6fd4fba7516484cb2a8a167fc2917c9b42cc70e722ea82a423b1792",
+      "importedSha256": "89229de6a6fd4fba7516484cb2a8a167fc2917c9b42cc70e722ea82a423b1792"
+    },
+    {
+      "source": "src/State/PieceReducer.res",
+      "path": "res/upstream/PieceReducer.res",
+      "sha256": "5b450e6245dcbe73bd713ae4008c6b9b7815f2e87b8d3c6ecd1fc58a631edc31",
+      "importedSha256": "5b450e6245dcbe73bd713ae4008c6b9b7815f2e87b8d3c6ecd1fc58a631edc31"
+    },
+    {
+      "source": "public/solver/optimal-2x2.v2.bin",
+      "path": "assets/optimal-2x2.v2.bin",
+      "sha256": "3b7f10a07d2e13b54044e9073b46f39544640fb6adf8e903ed84f8c3199dae5a",
+      "importedSha256": "3b7f10a07d2e13b54044e9073b46f39544640fb6adf8e903ed84f8c3199dae5a"
+    },
+    {
+      "source": "LICENSE",
+      "path": "LICENSE",
+      "sha256": "801aef05fae8e878ae0901cd8b66f8b4884876b284f9366466d3967470904f6c",
+      "importedSha256": "801aef05fae8e878ae0901cd8b66f8b4884876b284f9366466d3967470904f6c"
+    },
+    {
+      "source": "NOTICE",
+      "path": "NOTICE",
+      "sha256": "e70c5c6ed2629d25b87941aec18640001670187df1ac74e6523b2eddbe9d3646",
+      "importedSha256": "e70c5c6ed2629d25b87941aec18640001670187df1ac74e6523b2eddbe9d3646"
+    }
+  ],
+  "formatting": "Pinned ReScript formatter only; no algorithm changes. Upstream and imported hashes recorded separately."
+}
