@@ -79,13 +79,28 @@ export class GitHub {
     return matches[0];
   }
   async zip(id) {
-    const response = await fetch(
-      `https://api.github.com/repos/${REPOSITORY}/actions/artifacts/${id}/zip`,
-      {
-        headers: { Authorization: `Bearer ${this.token}` },
-        signal: AbortSignal.timeout(30000),
-      },
-    );
+    let response;
+    for (let attempt = 1; ; attempt++) {
+      try {
+        response = await fetch(
+          `https://api.github.com/repos/${REPOSITORY}/actions/artifacts/${id}/zip`,
+          {
+            headers: { Authorization: `Bearer ${this.token}` },
+            signal: AbortSignal.timeout(30000),
+          },
+        );
+      } catch (error) {
+        if (attempt >= RETRY_ATTEMPTS) throw error;
+        await this.sleep(RETRY_DELAYS_MS[attempt - 1]);
+        continue;
+      }
+      if (TRANSIENT_STATUS.has(response.status) && attempt < RETRY_ATTEMPTS) {
+        await response.body?.cancel();
+        await this.sleep(RETRY_DELAYS_MS[attempt - 1]);
+        continue;
+      }
+      break;
+    }
     if (!response.ok) throw Error("Site artifact download failed");
     const reader = response.body.getReader(),
       parts = [];
