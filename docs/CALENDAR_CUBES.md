@@ -64,18 +64,18 @@ their inverse routes, including upright centers and every nonblank glyph.
 The scoped calendar engine models all 26 bodies and 54 immutable sticker frames.
 It supports only legal outer face turns and whole-cube rotations. The existing
 size-2 core/viewer contracts remain unchanged. The initial date is installed by
-replaying its source route during setup. Subsequent changes use a bounded, worker-based direct relative solver from the
-actual physical pose. The inverse actual source route followed by the new setup
+replaying its source route during setup. Subsequent changes use a worker-based front-goal solver from the
+actual physical pose (see "Route planning" below). The inverse actual source route followed by the new setup
 route remains a checked fallback, not the default optimization strategy. Every
 selected move is replayed and the full endpoint is checked before committing.
 Identical visible dates may retain their existing full pose and source route.
 
-These are validated feasible paths, not shortest date transitions. The earlier
-unconnected optimizer caused 40–85-turn setup detours. The connected solver
-reduces the October 28 → 29, 2026 examples from 79 to 19 HTM for German A and
-77 to 17 HTM for English 3, preserving both prints. Some transitions can still
-require more than 20 moves, particularly visible-center orientation repairs.
-The UI identifies optimized routes and verified fallback routes honestly. No
+These are validated feasible paths. The front-goal solver finds a shortest route in half-turn
+metric (HTM) for the visible front alone, with a free final whole-cube rotation; hidden cubies and
+hidden center orientations are left free. In a measured year (2027, four prints, 1,460 +1 day
+transitions; agent measurement, not committed) the median route was 8 HTM and the maximum 11 HTM;
+about half of the routes end with one to three whole-cube rotation tokens, which are counted
+apart from HTM. The UI identifies optimized routes and verified fallback routes honestly. No
 five-move bound from the HSM counter is claimed for a 3×3. A busy controller keeps
 one active turn and only the latest pending date. Changing the date during
 motion finishes the current legal turn, abandons the remaining obsolete route,
@@ -112,37 +112,38 @@ when selected; the page does not start competing background solver jobs merely
 to populate idle estimates. These are exact counts for the selected playback
 route, not shortest-path claims.
 
-The controller also accepts an optional asynchronous route provider. Prepared
+## Route planning
+
+The controller accepts an optional asynchronous route provider. Prepared
 plans and estimates are bound to the exact source pose and retained reference
 word. Only strictly shorter routes that replay to the required upright face are
-accepted; invalid or failed solver output uses the checked baseline route. A
-noncanonical endpoint retains its actual source-to-pose path rather than being
-replaced by a canonical setup. Optimized endpoints usually keep noncanonical
-hidden center orientations, so this retained reference, and with it the inverse
-reference plus setup fallback, grows by roughly each executed route's length per
-committed date change. In a local 40-day chain of +1 days, the fallback grew from
-79 to 1,012 turns for German A and from 77 to 759 for English 3 while the
-optimized routes stayed at 11–41 turns. The fallback remains legal and checked,
-but after a long session it can be hundreds of turns; bounding it is open work.
-The default application connects this provider to the pinned Research
-[transition optimizer](../src/apps/calendar/transition/provenance.json). It has
-a search of at most six solver attempts (all three solver frames, both
-directions). The attempt count decides the route; a 5-second wall-clock guard,
-checked only before each attempt, stops the search on a very slow machine. The
-hard 8-second worker deadline covers cold startup, the direct search and the
-center portfolio, so on a very slow machine, where cold startup plus attempts
-exceed 5 seconds, the guard can still cut the search short. The route is then
-less optimized than after a full search, never longer than the direct route.
-Timeout, worker errors, invalid results, or a candidate that is not strictly
-shorter preserve the checked fallback. A single worker handles one solve and one
-replaceable pending request; no unbounded queue of solver jobs is retained.
-Browser restoration from the back/forward cache preserves the provider. The
-solver is `cubing@0.66.1`; production builds use ES worker chunks with
-module-relative asset paths. Shared solver code is isolated in a vendor chunk,
-while nested search entry points stay separate from the calendar worker message
-handler. The bundler-aware search entry URL is used directly. Production browser
-regressions exercise both prints from a static build under the deployment base
-path.
+accepted; invalid or failed solver output uses the checked baseline route.
+
+The provider is the front-goal solver `@puzlwerk/solver-3x3-front`, pinned in
+`puzlwerk-front-source.json` and prepared by `scripts/prepare-puzlwerk.mjs --front`.
+`src/apps/calendar/front-goal.ts` builds the goal from the print (per front cell, the
+stickers that show the cell's image and can lie there upright), normalizes the pose so the
+centers are home, and maps the route back with the final rotation appended as x/y/z tokens.
+`front-planner.ts` runs one solve with a table build budget of 3,000 ms, a search budget of
+4,000 ms and 5,000,000 nodes; `front-worker.ts` runs it in one worker. `CalendarOptimizer`
+keeps one active solve and one replaceable pending request, enforces the 8-second deadline
+and cancels by terminating the worker. A solver answer other than `ok` returns the baseline
+word, and `data-solver-status` shows the solver status. The controller replays every route with
+`apply` and `matches` before it plays; the verified baseline is the only fallback. The
+cubing.js planner is not part of the calendar runtime; it remains only as a test oracle under
+`tests/helpers/calendar-center-planner.mjs`, and Picture 3×3 still uses cubing.js.
+
+**Reference growth (known limitation).** The front goal leaves hidden cubies free, so the
+endpoint is noncanonical and the old exact reference compaction does not apply. The installed
+`compactReference` of `CalendarOptimizer` is an identity function: the executed route is
+appended to the retained source-to-pose word, which therefore grows by about 9 tokens per
+committed date change (measured over 200 consecutive days: German A 224, 500, 954 and 1,863
+tokens after 20, 50, 100 and 200 clicks; English 3-zero 173, 391, 744 and 1,451). Only the
+failure path is affected, where the baseline is the inverse reference plus the setup route. A
+review measured 100 clicks followed by a blocked worker: reference 941 tokens, baseline 899 HTM
+and 84 rotations, about four minutes of animation. Bounding the reference needs a full-state
+solver (open owner question) or a cap on the failure path. Production browser regressions
+exercise both prints from a static build under the deployment base path.
 
 ## Original artwork
 

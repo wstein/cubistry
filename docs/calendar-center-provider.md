@@ -1,4 +1,19 @@
-# Bounded center-aware calendar planning
+# Calendar route planning
+
+The 3×3 calendar plans every route with the front-goal solver `@puzlwerk/solver-3x3-front`
+(pin: `puzlwerk-front-source.json`), described in [CALENDAR_CUBES.md](CALENDAR_CUBES.md#route-planning):
+goal from the print stickers, free final whole-cube rotation, one worker, table budget 3,000 ms,
+search budget 4,000 ms, 5,000,000 nodes, 8,000 ms deadline, cancel by terminating the worker,
+every route replayed by the controller, the verified baseline as the only fallback. The
+reference word is not compacted and grows by about 9 tokens per committed date change; this
+only matters on the failure path (see CALENDAR_CUBES.md).
+
+## Former center-aware planner (test oracle only)
+
+The rest of this page describes the earlier planner (cubing.js transition optimizer, center
+portfolio and exact reference compaction). It no longer runs in the app. Its code is kept as an
+oracle in `tests/helpers/calendar-center-planner.mjs` and is used by the center tests and the
+`research/calendar-3x3-front-goal` comparison.
 
 The calendar first finds its existing checked direct route, then attempts a strictly
 shorter center-aware route using the private PuzlWerk picture solver. Source and

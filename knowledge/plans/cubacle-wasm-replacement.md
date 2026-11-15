@@ -15,9 +15,10 @@ and the written gate criteria.
 
 ## Context (verified from the repository)
 
-- Cubing.js 0.66.1, with its bundled twips WebAssembly solver, runs only in the
+- Cubing.js 0.66.1, with its bundled twips WebAssembly solver, ran in the
   Calendar (3×3 optimizer, center planner, transition planner) and the Picture
-  3×3 solver worker. Counters, timers and clocks use stored, verified sequences
+  3×3 solver worker. Status 2026-11-15: the Calendar moved to the front-goal solver
+  in wstein/cubistry#505; the Picture 3×3 solver worker remains. Counters, timers and clocks use stored, verified sequences
   and `@puzlwerk/solver-2x2`.
 - The Calendar vendor bundles are about 1.2 MB each (two copies in `dist/`).
 - The [source audit](../../docs/FRAMEWORK_SOURCE_AUDIT.md) records for
