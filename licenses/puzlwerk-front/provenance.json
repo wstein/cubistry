@@ -1,0 +1,60 @@
+{
+  "repository": "https://github.com/wstein/cubacle",
+  "revision": "8b4aafea3fd2719af84d1e3548009eff5e7733b5",
+  "branch": "feat/wasm-front-goal-export (local, unpushed when recorded)",
+  "baseRevision": "0216da533c39bd64cfe96a2f10210ec04be668b1",
+  "baseBranch": "develop",
+  "license": "AGPL-3.0-or-later",
+  "files": [
+    {
+      "source": "src/engines/three/cubie.rs",
+      "sha256": "f5d57d7fde5a08c3d6aac943f9e00fd23b7ea0f5e53399f137ccc6b2eb59018a",
+      "portedTo": "res/FrontSearch.res (set_from_facelet, verify), tools/front-model.mjs (CORNER_FACELET, EDGE_FACELET, turn tables)"
+    },
+    {
+      "source": "src/engines/three/partial/front.rs",
+      "sha256": "4f0d32406dad0ccb646fbf1af20412b38af2d5bb59d26a595cd31451b1ecb488",
+      "portedTo": "res/FrontSearch.res, src/index.mjs (limits, answer)"
+    },
+    {
+      "source": "src/engines/three/partial/goal.rs",
+      "sha256": "c4f7060ec20929c78ccc379aa4274e551c66be185bd57d0d0c8e0cd5551f2ac9",
+      "portedTo": "res/FrontGoal.res"
+    },
+    {
+      "source": "src/engines/three/partial/model.rs",
+      "sha256": "c74342cf61f132d45f88a6ad2eb3cedc1a4db790a426ba97ba77d5ae10f9d21b",
+      "portedTo": "res/FrontSearch.res, res/FrontTables.res (turn tables, twist step)"
+    },
+    {
+      "source": "src/engines/three/partial/groups.rs",
+      "sha256": "44e741f2d87ecc1b04bf1a1edc158eca627f127f7ea799fe71cc820253d131c4",
+      "portedTo": "res/FrontTables.res"
+    },
+    {
+      "source": "src/engines/three/partial/ida.rs",
+      "sha256": "58f85debf51130d7f07491a27c991e49ce33fcc817bdd90036c7c9f4aebdbc09",
+      "portedTo": "res/FrontSearch.res"
+    },
+    {
+      "source": "src/engines/three/partial/twist.rs",
+      "sha256": "4dd94408a71e41f4b75043c5e9f11df357d602cf7bc322e89ce0b55c67de954e",
+      "portedTo": "res/FrontTables.res"
+    },
+    {
+      "source": "src/engines/three/partial/exact.rs",
+      "sha256": "6537977ebbf9557c37479924f395248ce5d790e70716e22039cc784932922499",
+      "portedTo": "res/FrontSearch.res"
+    },
+    {
+      "source": "src/engines/three/partial/gate.rs",
+      "sha256": "5f5aba1675145789427b487f50f6fbf81f4bb38c7b401e0d128f7c91ec144710",
+      "portedTo": "res/FrontTables.res"
+    },
+    {
+      "source": "crates/wasm/src/front.rs",
+      "sha256": "fbeea1f7e71ec8f11aa7e2980fb099350081642ba3a81c1baae9a5abedd0d122",
+      "portedTo": "src/index.mjs (text interface)"
+    }
+  ]
+}
