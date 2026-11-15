@@ -251,3 +251,35 @@ test("changing a date during motion finishes one turn then replans from that exa
     JSON.stringify(result, null, 2),
   );
 });
+for (const design of ["de-a", "en-3"])
+  test(`front-goal worker on ${design}: counters and status reflect the verified route`, async ({
+    page,
+  }) => {
+    await ready(page);
+    if (design !== "de-a") await page.selectOption("#calendar-design", design);
+    await expect(page.locator("#calendar-design")).toBeEnabled();
+    for (const iso of ["2026-10-29", "2026-11-02"]) {
+      await pick(page, iso);
+      await expect(page.locator("#calendar-route")).toHaveText(
+        "Optimized physical route",
+        { timeout: 15000 },
+      );
+      const moves = page.locator("#calendar-moves");
+      await expect(moves).toHaveAttribute("data-route", "optimized");
+      await expect(moves).toHaveAttribute("data-solver-status", "solved");
+      const state = await page.evaluate(async () => {
+        const { matches } = await import("/src/apps/calendar/model.ts");
+        const c = window.__calendarController;
+        return {
+          total: c.progress.total,
+          valid: matches(c.physicalState, c.current.cells),
+        };
+      });
+      expect(state.valid).toBe(true);
+      expect(state.total.htm).toBeGreaterThan(0);
+      expect(state.total.htm).toBeLessThanOrEqual(14);
+      await expect(moves).toHaveText(
+        `${state.total.htm} / ${state.total.htm} HTM · ${state.total.rotations} / ${state.total.rotations} cube rotations`,
+      );
+    }
+  });
