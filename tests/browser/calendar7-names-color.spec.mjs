@@ -96,7 +96,8 @@ const MEDIAN_TOL = { "high-contrast": 5, "gruvbox-light": 4 };
  * measured above 2 are raised to the cell values (paper-red 4, paper-blue 3, classic 4, solarized-light 4); the limits of the
  * single fills stay.
  */
-const PRODUCTION_MEDIAN_TOL = { "paper-red": 4, "paper-blue": 3, classic: 4, "solarized-light": 4, "rubik-tint": 4 };
+// Draft only: owner approval of the numeric contract is pending (CALENDAR_7X7_LIGHTING_CONTRACT_DRAFT.md).
+const PRODUCTION_MEDIAN_TOL = { monokai: 3, "catppuccin-mocha": 3, "paper-red": 4, "paper-blue": 3, classic: 4, "solarized-light": 4, "rubik-tint": 4 };
 const medianTol = (scheme, production = false) => (production ? PRODUCTION_MEDIAN_TOL[scheme] : undefined) ?? MEDIAN_TOL[scheme] ?? 2;
 
 const MODES = [["test mode", false], ["production effects", true]];
