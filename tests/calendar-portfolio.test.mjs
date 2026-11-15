@@ -6,7 +6,7 @@ import {
   tryCenterPortfolio,
   tryCenterAware,
   referencesForPlan,
-} from "../src/apps/calendar/center-planner.mjs";
+} from "./helpers/calendar-center-planner.mjs";
 import { CalendarOptimizer } from "../src/apps/calendar/optimizer.ts";
 import {
   apply,

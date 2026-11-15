@@ -1,9 +1,9 @@
-import providerPin from "../../../puzlwerk-picture-source.json" with { type: "json" };
+import providerPin from "../../puzlwerk-picture-source.json" with { type: "json" };
 import {
   solvePicture3x3,
   centerKernelReference,
 } from "@puzlwerk/solver-3x3-picture";
-import * as G from "./transition/geometry.mjs";
+import * as G from "../../src/apps/calendar/transition/geometry.mjs";
 import {
   apply,
   matches,
@@ -11,9 +11,9 @@ import {
   simplify,
   inverse,
   sameState,
-} from "./model.ts";
-import { createTransitionOptimizer } from "./transition/planner.mjs";
-import corrections from "./transition/center-corrections.json" with { type: "json" };
+} from "../../src/apps/calendar/model.ts";
+import { createTransitionOptimizer } from "../../src/apps/calendar/transition/planner.mjs";
+import corrections from "../../src/apps/calendar/transition/center-corrections.json" with { type: "json" };
 /** Node limit of one center-aware search attempt; the portfolio runs at most two attempts. */
 export const CENTER_SEARCH_MAX_NODES = 1000000;
 const order = ["U", "L", "F", "R", "B", "D"],

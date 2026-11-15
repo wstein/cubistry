@@ -28,7 +28,7 @@ A changed target terminates obsolete planning immediately. Playback interruption
 still finishes its current legal turn before replanning from the committed pose.
 The German A printing and month lettering are unchanged.
 
-The Node benchmark factory is `src/apps/calendar/center-planner.mjs:createPlanner`.
+The Node benchmark factory is `tests/helpers/calendar-center-planner.mjs:createPlanner` (test oracle only; the app uses the front-goal solver).
 Use `options.backend: "direct"` for the same reference policy without center
 search, or the default center-aware backend. Its `metadata` pins the dependency;
 `lastDiagnostics` reports attempt/status, chosen/direct lengths and timings.

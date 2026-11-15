@@ -5,7 +5,7 @@ import { createHash } from "node:crypto";
 import {
   createPlanner,
   referencesForPlan,
-} from "../src/apps/calendar/center-planner.mjs";
+} from "./helpers/calendar-center-planner.mjs";
 import {
   apply,
   validateDesign,
