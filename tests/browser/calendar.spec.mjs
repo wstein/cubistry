@@ -323,12 +323,6 @@ test("selecting today refreshes Live and Inspecting status without moving sticke
 });
 // Box of .calendar-controls clipped by its scrolling container .shell-dock (null when nothing is visible).
 async function visibleControlsBox(page) {
-  // The dock only clips in-flow descendants: positioned controls would escape it.
-  const inDock = await page.locator(".calendar-controls").evaluate((e) => ({
-    position: getComputedStyle(e).position,
-    contained: !!e.closest(".shell-dock"),
-  }));
-  expect(inDock).toEqual({ position: "static", contained: true });
   const controls = await page.locator(".calendar-controls").boundingBox();
   const dock = await page.locator(".shell-dock").boundingBox();
   const x = Math.max(controls.x, dock.x),
@@ -338,6 +332,25 @@ async function visibleControlsBox(page) {
   return right > x && bottom > y
     ? { x, y, width: right - x, height: bottom - y }
     : null;
+}
+// Hit test independent of CSS positioning: no point of a 5x5 grid inside the canvas may hit the controls.
+async function controlsOverCanvas(page) {
+  return page.evaluate(() => {
+    const canvas = document.querySelector("#calendar-viewer canvas");
+    const r = canvas.getBoundingClientRect();
+    const hits = [];
+    for (const u of [0.1, 0.3, 0.5, 0.7, 0.9]) {
+      for (const v of [0.1, 0.3, 0.5, 0.7, 0.9]) {
+        const x = r.x + r.width * u, y = r.y + r.height * v;
+        if (x < 0 || y < 0 || x >= innerWidth || y >= innerHeight) continue;
+        const e = document.elementFromPoint(x, y);
+        if (e && e.closest(".calendar-controls, .shell-dock, .shell-controls")) {
+          hits.push([Math.round(x), Math.round(y), e.tagName]);
+        }
+      }
+    }
+    return hits;
+  });
 }
 test.describe("high-density calendar framing", () => {
   test.use({ deviceScaleFactor: 2 });
@@ -422,6 +435,7 @@ test.describe("high-density calendar framing", () => {
             controls.y + controls.height <= canvas.y ||
             canvas.y + canvas.height <= controls.y,
         ).toBe(true);
+        expect(await controlsOverCanvas(page)).toEqual([]);
         expect(
           await page.locator("html").evaluate((e) => e.scrollWidth),
         ).toBeLessThanOrEqual(viewport.width);
