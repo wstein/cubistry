@@ -50,9 +50,9 @@ import type { LoadedFont } from "./fonts.ts";
 import { drawFontSticker } from "./font-art.ts";
 import { MoveTween } from "./tween.ts";
 import { namesExposure } from "./names-exposure.ts";
-import { NAMES_DIRECTIONAL_SHARE, faceLightUniform, patchFaceLight, updateFaceLight } from "./names-face-light.ts";
+import { NamesLighting } from "./names-light.ts";
 import { NAMES_TONE_MAPPING, installNamesToneMapping } from "./names-tone.ts";
-import { DEFAULT_PLASTICITY, clampPlasticity, floorOpacityFactor, plasticityGain, plasticityParts } from "./names-plasticity.ts";
+import { DEFAULT_PLASTICITY, NAMES_CLEARCOAT, NAMES_ROUGHNESS, clampPlasticity, floorOpacityFactor, plasticityGain, plasticityParts } from "./names-plasticity.ts";
 
 /**
  * The presentation geometry with a lighter body: 218 bodies at the preset's three bevel segments are 588 triangles each
@@ -166,9 +166,8 @@ export class Calendar7Viewer implements StageView {
   /** Reused every sync: frames are rewritten in place, so a move allocates no frame objects. */
   private frames: { id: number; cubie: number; p: number[]; n: number[]; up: number[] }[] = [];
   private readonly tween = new MoveTween();
-  /** The uniform of the face light of the names layout materials and the share it was set to. */
-  private readonly faceLight = faceLightUniform();
-  private directionalShare = NAMES_DIRECTIONAL_SHARE;
+  /** The global light rig of the names layout on the studio lights (names-light.ts); rebuilt with the studio. */
+  private lighting!: NamesLighting;
   private dirty = true;
   private destroyed = false;
   private readonly lastQuaternion = new THREE.Quaternion();
@@ -187,6 +186,7 @@ export class Calendar7Viewer implements StageView {
     host.append(this.renderer.domElement);
     this.host = host;
     this.studio = createPresentationStudio(this.scene, this.extent, this.extent, host, cubePresentationRadius(this.extent));
+    this.lighting = new NamesLighting(this.scene);
     this.resize = new ResizeObserver(() => {
       const w = host.clientWidth;
       const h = host.clientHeight;
@@ -244,10 +244,11 @@ export class Calendar7Viewer implements StageView {
       for (const m of [].concat((o as THREE.Mesh).material as never) as THREE.Material[]) {
         if (!(m as THREE.MeshPhysicalMaterial).isMeshPhysicalMaterial) continue;
         (m as THREE.MeshPhysicalMaterial).specularIntensity = parts.specular;
-        (m as THREE.MeshPhysicalMaterial).clearcoat = parts.clearcoat;
+        (m as THREE.MeshPhysicalMaterial).clearcoat = NAMES_CLEARCOAT;
+        (m as THREE.MeshPhysicalMaterial).roughness = NAMES_ROUGHNESS; // one material for every face
       }
     });
-    if (names && this.plastic) { this.plastic.specularIntensity = parts.specular; this.plastic.clearcoat = parts.clearcoat; }
+    if (names && this.plastic) { this.plastic.specularIntensity = parts.specular; this.plastic.clearcoat = NAMES_CLEARCOAT; this.plastic.roughness = NAMES_ROUGHNESS; }
     // The lights' shadow strength (the preset's value times `strength`) and the floor opacity that keeps the cube shadow's darkness.
     const strength = names ? parts.shadowStrength : 1;
     this.scene.traverse((o) => {
@@ -258,16 +259,8 @@ export class Calendar7Viewer implements StageView {
     floor.opacity = ((floor.userData.c7OpacityBase ??= floor.opacity) as number) * floorOpacityFactor(strength);
   }
 
-  /** Share of the directional lights that the faces which do not look at the camera keep in the names layout (1: the studio's light on every face; a test hook, default `NAMES_DIRECTIONAL_SHARE`). */
-  setDirectionalShare(share: number): void {
-    this.directionalShare = share;
-    this.syncExposure();
-    this.dirty = true;
-  }
-
-  /** The names layout follows the face that looks at the camera (names-exposure.ts, names-face-light.ts); the standard layout keeps the shared value. */
+  /** The names layout follows the faces that look at the camera with one global exposure (names-exposure.ts); the standard layout keeps the shared value. */
   syncExposure(): void {
-    updateFaceLight(this.faceLight, this.scene, this.presentation.quaternion, this.camera, this.layout === "names", this.directionalShare);
     this.renderer.toneMappingExposure = this.layout === "names" ? namesExposure(this.scene, this.presentation.quaternion, this.camera) * plasticityGain(this.plasticity, this.renderer.shadowMap.enabled) : STANDARD_EXPOSURE;
   }
 
@@ -401,8 +394,10 @@ export class Calendar7Viewer implements StageView {
     const extent = halfEdgeOf(layout);
     if (extent === this.extent) return;
     this.extent = extent;
+    this.lighting.dispose();
     this.studio.dispose();
     this.studio = createPresentationStudio(this.scene, extent, extent, this.host, cubePresentationRadius(extent));
+    this.lighting = new NamesLighting(this.scene);
     fitPresentationCamera(this.camera, cubePresentationRadius(extent), ZOOM);
   }
 
@@ -426,8 +421,9 @@ export class Calendar7Viewer implements StageView {
     this.scheme = layout === "names" ? withBannerStyle(this.baseScheme, this.bannerStyle) : this.baseScheme;
     this.fitExtent(layout);
     // The names layout: its colors are the scheme tokens (geometry.ts), so it has the soft shoulder tone mapping at its own exposure
-    // (the studio lights are never changed: the faces that do not look at the camera are lit less in their materials, names-face-light.ts); otherwise the shared tone mapping and exposure 1.
+    // and one global light rig for every face (names-light.ts: key, hemisphere and ambient light and a raking light, no light or material per face); otherwise the studio's lights, the shared tone mapping and exposure 1.
     installNamesToneMapping();
+    this.lighting.apply(layout === "names");
     this.renderer.toneMapping = layout === "names" ? NAMES_TONE_MAPPING : this.standardToneMapping;
     this.syncExposure();
     this.clear();
@@ -499,10 +495,6 @@ export class Calendar7Viewer implements StageView {
     // The scene hides the sticker meshes and gives each cubie face the label texture (the cut faces take bodyColor: the day fill when stickerless).
     this.cube.setConstruction("stickerless");
     this.applyPlasticity();
-    if (layout === "names") this.presentation.traverse((o) => { // the face light of the names layout: only these materials know it
-      if (!(o as THREE.Mesh).isMesh) return;
-      for (const m of [].concat((o as THREE.Mesh).material as never) as THREE.Material[]) patchFaceLight(m, this.faceLight);
-    });
     this.cube.sync(this.frames as unknown as readonly PhysicalStickerFrame[]);
     this.presentation.traverse((o) => {
       if (o.userData.stickerId !== undefined && this.wrongIds.has(o.userData.stickerId - 1)) this.wrongMeshes.push(o);
@@ -578,6 +570,7 @@ export class Calendar7Viewer implements StageView {
     this.renderer.setAnimationLoop(null);
     this.resize.disconnect();
     this.rotation.dispose();
+    this.lighting.dispose();
     this.studio.dispose();
     this.clear();
     this.renderer.dispose();

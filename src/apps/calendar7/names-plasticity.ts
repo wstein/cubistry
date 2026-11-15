@@ -1,12 +1,14 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
 /**
  * Plasticity of the names layout: one number in [0, 1] between the flat look that renders every token exactly (0: no specular,
- * no clearcoat, faces without shadows) and the depth of a glossy plastic cube. Plasticity never shifts the mean color of a flat
+ * faces without shadows) and the depth of a glossy plastic cube. Plasticity never shifts the mean color of a flat
  * area: the shading it adds lowers the mean radiance by a modeled amount, which `plasticityGain` gives back as exposure.
+ * Every cube material of the names layout has the same roughness (`NAMES_ROUGHNESS`) and clearcoat (`NAMES_CLEARCOAT`, not 0: a
+ * clearcoat of exactly 0 changes the shader program and crashed headless Chromium in the measurement); neither depends on the
+ * plasticity or on the face (names-light.ts holds the global lights).
  *
  * The mapping (what the numbers are is measured, see tests/browser/calendar7-names-color.spec.mjs and docs/CALENDAR_7X7.md):
  * - specular: three.js `specularIntensity` 0.2 p (the shared plastic has 1);
- * - clearcoat: 0.06 p (the shared plastic has 0.18);
  * - face shadows: for p > 0 the cube faces receive the shadow map at a strength (`shadow.intensity` of the key and the shadow
  *   fill, relative to the preset) of 0.3 + 0.5 p (the preset has 1). The strength never falls below 0.3 because the floor
  *   shadow shares the lights: its material opacity is raised by the same factor (`floorOpacityFactor`), and that reaches 1
@@ -15,6 +17,8 @@
  * of p: it shifts colors by up to 47 of 255.
  */
 export const DEFAULT_PLASTICITY = 0.6;
+/** Roughness and clearcoat of every cube material of the names layout (owner decision 2026-11-15; the shared plastic has 0.55 and 0.18). */
+export const NAMES_ROUGHNESS = 0.65, NAMES_CLEARCOAT = 0.01;
 
 /** Clamps to [0, 1] (also ±Infinity); NaN, as from garbage text, gives the default. */
 export const clampPlasticity = (p: number): number => (Number.isNaN(p) ? DEFAULT_PLASTICITY : Math.min(1, Math.max(0, p)));
@@ -24,7 +28,6 @@ export const parsePlasticity = (text: string | null | undefined): number => (tex
 
 export interface PlasticityParts {
   readonly specular: number;
-  readonly clearcoat: number;
   /** Faces receive the shadow map. */
   readonly faceShadows: boolean;
   /** Shadow strength of the lights relative to the preset (1). */
@@ -40,7 +43,7 @@ export const SPECULAR_LOSS = 0.03, CLEARCOAT_LOSS = 0.05;
 
 export function plasticityParts(plasticity: number): PlasticityParts {
   const p = clampPlasticity(plasticity);
-  return { specular: 0.2 * p, clearcoat: 0.06 * p, faceShadows: p > 0, shadowStrength: p > 0 ? MIN_SHADOW_STRENGTH + 0.5 * p : MIN_SHADOW_STRENGTH };
+  return { specular: 0.2 * p, faceShadows: p > 0, shadowStrength: p > 0 ? MIN_SHADOW_STRENGTH + 0.5 * p : MIN_SHADOW_STRENGTH };
 }
 
 /** Exposure factor that gives back the radiance the plasticity takes from a flat area. */
@@ -48,7 +51,7 @@ export function plasticityParts(plasticity: number): PlasticityParts {
 export function plasticityGain(plasticity: number, shadowMap = true): number {
   const parts = plasticityParts(plasticity);
   const shadow = parts.faceShadows && shadowMap ? 1 - SHADOW_LOSS * parts.shadowStrength : 1;
-  return 1 / (shadow * (1 - SPECULAR_LOSS * parts.specular - CLEARCOAT_LOSS * parts.clearcoat));
+  return 1 / (shadow * (1 - SPECULAR_LOSS * parts.specular - CLEARCOAT_LOSS * NAMES_CLEARCOAT));
 }
 
 /** Opacity factor of the floor shadow material that keeps its darkness when the lights' shadow strength is `strength`. */

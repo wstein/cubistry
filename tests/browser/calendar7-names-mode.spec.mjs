@@ -182,7 +182,7 @@ test("the renderer uses the soft shoulder (Custom) tone mapping at the face-foll
     viewer.configure(names.printing, names.pose, "face", "names");
     out.names = viewer.renderer.toneMappingExposure;
     out.namesMap = viewer.renderer.toneMapping;
-    viewer.presentation.rotation.set(0, 0, 0); // head on: pi / front face irradiance of the studio lights = 1.217
+    viewer.presentation.rotation.set(0, 0, 0); // head on: pi / front face irradiance of the global rig (names-light.ts) = 0.789
     viewer.syncExposure();
     out.namesHeadOn = viewer.renderer.toneMappingExposure;
     viewer.configure(standard.printing, standard.pose, "face", "standard");
@@ -192,8 +192,8 @@ test("the renderer uses the soft shoulder (Custom) tone mapping at the face-foll
     return out;
   });
   const NEUTRAL = 7, CUSTOM = 5; // THREE.NeutralToneMapping, THREE.CustomToneMapping (the soft shoulder of names-tone.ts)
-  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.1);
-  expect(seen.namesHeadOn).toBeCloseTo(1.217, 2);
+  expect(seen.names, "the turned start view lights the front face less than head on").toBeGreaterThan(seen.namesHeadOn + 0.03);
+  expect(seen.namesHeadOn).toBeCloseTo(0.789, 2);
   expect({ ...seen, names: 0, namesHeadOn: 0 }).toEqual({ fresh: 1, freshMap: NEUTRAL, standard: 1, standardMap: NEUTRAL, names: 0, namesMap: CUSTOM, namesHeadOn: 0, back: 1, backMap: NEUTRAL });
 });
 
@@ -249,8 +249,8 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
   // the preset's shadow strength (key 1, shadow fill 0.55, floor opacity 0.3); the names layout has its own, plasticity 0 is flat.
   expect(seen.std.shade).toEqual({ recv: [true], spec: [1], coat: [0.12, 0.18], shadowLights: [1, 0.55, "floor", 0.3] });
   expect(seen.back.shade).toEqual(seen.std.shade); // switching back restores it
-  expect(seen.red.shade).toEqual({ recv: [true], spec: [0.12], coat: [0.036], shadowLights: [0.6, 0.33, "floor", 0.5] }); // the default plasticity 0.6
-  expect(seen.flat.shade).toEqual({ recv: [false], spec: [0], coat: [0], shadowLights: [0.3, 0.165, "floor", 1] });
+  expect(seen.red.shade).toEqual({ recv: [true], spec: [0.12], coat: [0.01], shadowLights: [0.6, 0.33, "floor", 0.5] }); // the default plasticity 0.6
+  expect(seen.flat.shade).toEqual({ recv: [false], spec: [0], coat: [0.01], shadowLights: [0.3, 0.165, "floor", 1] });
   expect(seen.half.shade.recv).toEqual([true]);
   expect(seen.half.shade.spec[0]).toBeGreaterThan(seen.red.shade.spec[0]);
   expect(Object.keys(seen.std.cut)).toEqual(["ffffff"]); // standard: one body color, the raw day fill
@@ -349,13 +349,13 @@ test("turning the cube changes the names exposure through the render loop (no ma
     viewer.destroy();
     return out;
   });
-  expect(seen.headOn).toBeCloseTo(1.217, 2);
-  expect(seen.start).toBeGreaterThan(seen.headOn + 0.1);
+  expect(seen.headOn).toBeCloseTo(0.789, 2); // the global rig (names-light.ts); the studio's own lights gave 1.217
+  expect(seen.start).toBeGreaterThan(seen.headOn + 0.03);
   expect(Math.abs(seen.steep - seen.headOn)).toBeGreaterThan(0.05);
   expect(seen.standard).toBe(1);
 });
 
-test("the studio lights keep the intensities of a fresh viewer in the names layout and after switching back to the standard layout (the face light is in the materials, not in the lights)", async ({ page }) => {
+test("only the names layout has the global rig and its material: the standard layout keeps the studio's lights and the shared plastic", async ({ page }) => {
   await page.goto("/licenses.html");
   const seen = await page.evaluate(async () => {
     const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
@@ -367,51 +367,29 @@ test("the studio lights keep the intensities of a fresh viewer in the names layo
     host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
     document.body.append(host, panel);
     const viewer = new Calendar7Viewer(host, panel);
-    const lights = () => { const l = []; viewer.scene.traverse((o) => { if (o.isLight) l.push(`${o.type} ${o.intensity.toFixed(6)}`); }); return l.sort(); };
-    const out = { fresh: lights() };
-    viewer.configure(names.printing, names.pose, "face", "names");
-    out.names = lights();
-    viewer.configure(standard.printing, standard.pose, "face", "standard");
-    out.standard = lights();
-    viewer.configure(names.printing, names.pose, "face", "names");
-    viewer.configure(standard.printing, standard.pose, "face", "standard");
-    out.again = lights();
-    viewer.destroy();
-    return out;
-  });
-  expect(seen.fresh.length).toBeGreaterThanOrEqual(6);
-  expect(seen.names).toEqual(seen.fresh);
-  expect(seen.standard).toEqual(seen.fresh);
-  expect(seen.again).toEqual(seen.fresh);
-});
-
-test("only the names layout carries the face light: its materials are patched and the uniform is on; the standard layout has neither", async ({ page }) => {
-  await page.goto("/licenses.html");
-  const seen = await page.evaluate(async () => {
-    const { Calendar7Viewer } = await import("/src/apps/calendar7/viewer.ts");
-    const { parseState } = await import("/src/apps/calendar7/graph.ts");
-    const get = async (p) => (await fetch(p)).json();
-    const names = parseState(await get("/calendar7/names/state.v1.json"));
-    const standard = parseState(await get("/calendar7/state.v1.json"));
-    const host = document.createElement("div"), panel = document.createElement("div");
-    host.style.cssText = "position:fixed;left:0;top:0;width:200px;height:200px";
-    document.body.append(host, panel);
-    const viewer = new Calendar7Viewer(host, panel);
-    const count = () => { let patched = 0, total = 0; viewer.presentation.traverse((o) => { if (!o.isMesh) return; for (const m of [].concat(o.material)) { total++; if (m.userData.c7FaceLight) patched++; } }); return { patched, total }; };
+    const state = () => {
+      const lights = []; viewer.scene.traverse((o) => { if (o.isLight && o.visible) lights.push(o); });
+      const dirs = lights.filter((o) => o.isDirectionalLight), key = dirs.find((o) => o.castShadow);
+      const mats = new Set(); let shaders = 0;
+      viewer.presentation.traverse((o) => { if (!o.isMesh) return; for (const m of [].concat(o.material)) if (m.isMeshPhysicalMaterial) { mats.add(m.roughness + "/" + m.clearcoat); if (m.onBeforeCompile.toString().length > 40) shaders++; } });
+      return { directionals: dirs.length, keyIntensity: key.intensity, ambient: lights.find((o) => o.isAmbientLight).intensity, hemisphere: lights.find((o) => o.isHemisphereLight).intensity, raking: dirs.some((o) => o.name === "names-raking-light"), materials: [...mats].sort(), patchedShaders: shaders };
+    };
     const out = {};
     viewer.configure(names.printing, names.pose, "face", "names");
-    viewer.syncExposure();
-    out.names = { ...count(), uniform: viewer.faceLight.value.toArray().slice(0, 2) };
+    out.names = state();
     viewer.configure(standard.printing, standard.pose, "face", "standard");
-    viewer.syncExposure();
-    out.standard = { ...count(), uniform: viewer.faceLight.value.toArray().slice(0, 2) };
+    out.standard = state();
+    viewer.configure(names.printing, names.pose, "face", "names");
+    out.again = state();
     viewer.destroy();
     return out;
   });
-  expect(seen.names.total).toBeGreaterThan(100);
-  expect(seen.names.patched).toBe(seen.names.total); // every material of the cube
-  expect(seen.names.uniform[0]).toBeCloseTo(0.08, 6); // the share, and the target irradiance (the second value) is set
-  expect(seen.names.uniform[1]).toBeGreaterThan(0.5);
-  expect(seen.standard.patched).toBe(0);
-  expect(seen.standard.uniform).toEqual([1, 0]); // the studio's light on every face
+  expect(seen.names).toEqual({ directionals: 5, keyIntensity: 2.4, ambient: 0.8, hemisphere: 0, raking: true, materials: ["0.65/0.01"], patchedShaders: 0 }); // one material, one rig, no shader patch
+  expect(seen.standard.raking).toBe(false);
+  expect(seen.standard.directionals).toBe(4);
+  expect(seen.standard.keyIntensity).toBeCloseTo(2.8, 6); // the studio's own light
+  expect(seen.standard.ambient).toBeCloseTo(0.3, 6);
+  expect(seen.standard.hemisphere).toBeCloseTo(0.65, 6);
+  expect(seen.standard.materials.every((m) => m !== "0.65/0.01")).toBe(true);
+  expect(seen.again).toEqual(seen.names);
 });
