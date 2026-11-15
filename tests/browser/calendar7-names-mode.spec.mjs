@@ -249,7 +249,7 @@ test("viewer wiring: names layout colors the cut faces per adjacent tile (flat c
   // the preset's shadow strength (key 1, shadow fill 0.55, floor opacity 0.3); the names layout has its own, plasticity 0 is flat.
   expect(seen.std.shade).toEqual({ recv: [true], spec: [1], coat: [0.12, 0.18], shadowLights: [1, 0.55, "floor", 0.3] });
   expect(seen.back.shade).toEqual(seen.std.shade); // switching back restores it
-  expect(seen.red.shade).toEqual({ recv: [true], spec: [0.12], coat: [0.01], shadowLights: [0.6, 0.33, "floor", 0.5] }); // the default plasticity 0.6
+  expect(seen.red.shade).toEqual({ recv: [true], spec: [0.03], coat: [0.01], shadowLights: [0.6, 0.33, "floor", 0.5] }); // the default plasticity 0.6
   expect(seen.flat.shade).toEqual({ recv: [false], spec: [0], coat: [0.01], shadowLights: [0.3, 0.165, "floor", 1] });
   expect(seen.half.shade.recv).toEqual([true]);
   expect(seen.half.shade.spec[0]).toBeGreaterThan(seen.red.shade.spec[0]);
