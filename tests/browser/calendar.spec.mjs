@@ -321,6 +321,18 @@ test("selecting today refreshes Live and Inspecting status without moving sticke
   );
   expect(await physical(page)).toEqual(before);
 });
+// Box of .calendar-controls clipped by its scrolling container .shell-dock (null when nothing is visible).
+async function visibleControlsBox(page) {
+  const controls = await page.locator(".calendar-controls").boundingBox();
+  const dock = await page.locator(".shell-dock").boundingBox();
+  const x = Math.max(controls.x, dock.x),
+    y = Math.max(controls.y, dock.y),
+    right = Math.min(controls.x + controls.width, dock.x + dock.width),
+    bottom = Math.min(controls.y + controls.height, dock.y + dock.height);
+  return right > x && bottom > y
+    ? { x, y, width: right - x, height: bottom - y }
+    : null;
+}
 test.describe("high-density calendar framing", () => {
   test.use({ deviceScaleFactor: 2 });
   test("German and English cubes stay inside the viewport and clear of date controls", async ({
@@ -384,7 +396,7 @@ test.describe("high-density calendar framing", () => {
         await expect(page.locator("#calendar-viewer canvas")).toHaveCount(1);
         const host = await page.locator("#calendar-viewer").boundingBox(),
           canvas = await page.locator("#calendar-viewer canvas").boundingBox(),
-          controls = await page.locator(".calendar-controls").boundingBox();
+          controls = await visibleControlsBox(page);
         expect(Math.abs(canvas.width - host.width)).toBeLessThan(1);
         expect(Math.abs(canvas.height - host.height)).toBeLessThan(1);
         expect(canvas.x).toBeGreaterThanOrEqual(host.x);
@@ -396,8 +408,10 @@ test.describe("high-density calendar framing", () => {
           host.y + host.height + 1,
         );
         // The host docks the controls beside the stage (wide) or below it (phone); the page put them above it.
+        // The dock scrolls, so only the part of the controls inside the dock is visible: no overlap with that part.
         expect(
-          canvas.x + canvas.width <= controls.x ||
+          controls === null ||
+            canvas.x + canvas.width <= controls.x ||
             controls.x + controls.width <= canvas.x ||
             controls.y + controls.height <= canvas.y ||
             canvas.y + canvas.height <= controls.y,
