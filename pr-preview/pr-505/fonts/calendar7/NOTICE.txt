@@ -1,0 +1,4 @@
+SPDX-License-Identifier: CC-BY-SA-4.0
+Created by Werner Stein with AI assistance (Codex, OpenAI). Licensed under CC BY-SA 4.0 (https://creativecommons.org/licenses/by-sa/4.0/). Attribution: Werner Stein, Cubistry.
+
+Original unmodified font files retain OFL-1.1; copyright and reserved names appear in each accompanying OFL file.

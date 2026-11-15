@@ -1,0 +1,1619 @@
+{
+  "schema": "cubistry.counter-design",
+  "version": 2,
+  "puzzle": "2x2x2",
+  "legacyWitnessSHA256": "035afedfd5221b54171ca1f0b2bc0fdb986cbfc9cf4512fa30aa55705fccf985",
+  "assets": {
+    "schema": "cubistry.assets",
+    "version": 1,
+    "fonts": [
+      {
+        "id": "label-font",
+        "url": "/fonts/noto-sans-latin-600.woff2",
+        "sha256": "79e274470d1c5a0118eb325e2ea6f2eb2a449336d7fde1a4f20a2f32fe1119ed",
+        "family": "Counter Sans",
+        "weight": 600,
+        "format": "woff2",
+        "license": "SIL-OFL-1.1"
+      }
+    ],
+    "materials": [
+      {
+        "id": "sticker",
+        "color": "#ffffff",
+        "roughness": 0.7
+      },
+      {
+        "id": "plastic",
+        "color": "#202329",
+        "roughness": 0.45
+      }
+    ],
+    "documents": [
+      {
+        "id": "counter-title",
+        "text": "BREAK\nMINUTES",
+        "fontId": "label-font",
+        "color": "#202c36",
+        "background": "#fffdf6",
+        "width": 512,
+        "height": 256,
+        "fontSize": 52,
+        "minFontSize": 10,
+        "lineHeight": 64
+      }
+    ],
+    "images": [
+      {
+        "id": "blank",
+        "kind": "color",
+        "color": "#fffdf6"
+      },
+      {
+        "id": "title-left",
+        "kind": "text",
+        "documentId": "counter-title",
+        "crop": [
+          0,
+          0,
+          256,
+          256
+        ]
+      },
+      {
+        "id": "title-right",
+        "kind": "text",
+        "documentId": "counter-title",
+        "crop": [
+          256,
+          0,
+          256,
+          256
+        ]
+      },
+      {
+        "id": "0",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/0.svg",
+        "sha256": "37544a1a78c5ea2c8aa1bcfcd60e98b161c20b8bc5bf3eaf0ada4f71f071d8da"
+      },
+      {
+        "id": "1",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/1.svg",
+        "sha256": "ee1744cdf5c3b4e415fcd50ba467ba6ec588ade83246cd3f452ac5844f76e2bb"
+      },
+      {
+        "id": "2",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/2.svg",
+        "sha256": "c22c22463f3f48cbbd15bbc36191fba85ff5d2ca534e0a12c604ee8c77792a11"
+      },
+      {
+        "id": "3",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/3.svg",
+        "sha256": "b32f97b2431d137da0b6a04e48ff99be6fcf9e7ce5056a4a6c875afbb4e5945c"
+      },
+      {
+        "id": "4",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/4.svg",
+        "sha256": "52bc617d868c7ff6aa52d5155c4063e84084828ee5c553ed9ec5097c0c9fe7d9"
+      },
+      {
+        "id": "5",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/5.svg",
+        "sha256": "fec17ef01fb8b3eedab4373688c608f28cefd8b3cfcc211a26fc102e5005ee37"
+      },
+      {
+        "id": "6",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/6.svg",
+        "sha256": "8a36d11f0f4e13bc040126225a842b2d9470663ab1a1ce7d48ceba230f9916c8"
+      },
+      {
+        "id": "7",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/7.svg",
+        "sha256": "101528ab5feb32016abcb9a0b0dff54b34544291355f7b574fc9acabf384eea9"
+      },
+      {
+        "id": "8",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/8.svg",
+        "sha256": "d785fe0321ec225d90e8df8c7f495103c29534185b325d85644f1046ebeb0b38"
+      },
+      {
+        "id": "9",
+        "kind": "image",
+        "format": "svg",
+        "url": "/assets/digits/9.svg",
+        "sha256": "61c83610b6fbfc4cc05831e2183bab8ea77bf0faeb73cd03622f18ccc0874684"
+      }
+    ]
+  },
+  "prints": {
+    "padded": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "counter-padded-v2",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    },
+    "unpadded": {
+      "schema": "cubistry.print",
+      "version": 1,
+      "id": "counter-unpadded-v2",
+      "topology": {
+        "kind": "cube",
+        "size": 2
+      },
+      "cubies": [
+        {
+          "id": 0,
+          "position": [
+            -1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 1,
+          "position": [
+            -1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 2,
+          "position": [
+            -1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 3,
+          "position": [
+            -1,
+            1,
+            1
+          ]
+        },
+        {
+          "id": 4,
+          "position": [
+            1,
+            -1,
+            -1
+          ]
+        },
+        {
+          "id": 5,
+          "position": [
+            1,
+            -1,
+            1
+          ]
+        },
+        {
+          "id": 6,
+          "position": [
+            1,
+            1,
+            -1
+          ]
+        },
+        {
+          "id": 7,
+          "position": [
+            1,
+            1,
+            1
+          ]
+        }
+      ],
+      "stickers": [
+        {
+          "id": 0,
+          "cubie": 0,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 1,
+          "cubie": 0,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "blank",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0,
+            1,
+            2,
+            3
+          ]
+        },
+        {
+          "id": 2,
+          "cubie": 0,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 3,
+          "cubie": 1,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-left",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 4,
+          "cubie": 1,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 5,
+          "cubie": 1,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 6,
+          "cubie": 2,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 7,
+          "cubie": 2,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 8,
+          "cubie": 2,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 9,
+          "cubie": 3,
+          "normal": [
+            -1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 10,
+          "cubie": 3,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 11,
+          "cubie": 3,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 12,
+          "cubie": 4,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 13,
+          "cubie": 4,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "0",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 14,
+          "cubie": 4,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "1",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 15,
+          "cubie": 5,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "title-right",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 16,
+          "cubie": 5,
+          "normal": [
+            0,
+            -1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "2",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 17,
+          "cubie": 5,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            0,
+            1,
+            0
+          ],
+          "assetId": "3",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 18,
+          "cubie": 6,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            1
+          ],
+          "assetId": "4",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 19,
+          "cubie": 6,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "5",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 20,
+          "cubie": 6,
+          "normal": [
+            0,
+            0,
+            -1
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "6",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 21,
+          "cubie": 7,
+          "normal": [
+            1,
+            0,
+            0
+          ],
+          "up": [
+            0,
+            -1,
+            0
+          ],
+          "assetId": "7",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 22,
+          "cubie": 7,
+          "normal": [
+            0,
+            1,
+            0
+          ],
+          "up": [
+            0,
+            0,
+            -1
+          ],
+          "assetId": "8",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        },
+        {
+          "id": 23,
+          "cubie": 7,
+          "normal": [
+            0,
+            0,
+            1
+          ],
+          "up": [
+            -1,
+            0,
+            0
+          ],
+          "assetId": "9",
+          "materialId": "sticker",
+          "equivalentQuarterTurns": [
+            0
+          ]
+        }
+      ]
+    }
+  },
+  "witnesses": [
+    {
+      "value": 0,
+      "word": "U L F' L' U F' R U L' U'"
+    },
+    {
+      "value": 1,
+      "word": "F R' F U' R' F2 L F2 L2"
+    },
+    {
+      "value": 2,
+      "word": "L U R F2 R U' F' U L U'"
+    },
+    {
+      "value": 3,
+      "word": "U' F2 L F2 U' R' F U L"
+    },
+    {
+      "value": 4,
+      "word": "U' R F' U2 F2 R U' F' L' U'"
+    },
+    {
+      "value": 5,
+      "word": "U' L F' U' R2 U2 R' F' L U'"
+    },
+    {
+      "value": 6,
+      "word": "L F2 U' R2 U' F' U' F' L U'"
+    },
+    {
+      "value": 7,
+      "word": "R2 F U2 R' U F' U2 R2 L'"
+    },
+    {
+      "value": 8,
+      "word": "L F' U' R U' L F2 U'"
+    },
+    {
+      "value": 9,
+      "word": "R U R2 F' R' F2 R2 U L' U'"
+    },
+    {
+      "value": 10,
+      "word": "U' L2 F2 U F U' R U'"
+    },
+    {
+      "value": 11,
+      "word": "U R2 L2 F' U F' L U' F U'"
+    },
+    {
+      "value": 12,
+      "word": "F R' F2 U F U2 R L2 F' U'"
+    },
+    {
+      "value": 13,
+      "word": "L F U R2 U' L2 F U2 F L"
+    },
+    {
+      "value": 14,
+      "word": "L F' U' R U L F2 U F U2"
+    },
+    {
+      "value": 15,
+      "word": "R2 U' L2 U F' U' F' R2 U'"
+    },
+    {
+      "value": 16,
+      "word": "F R' F2 R2 F' R2 U' R L2 F'"
+    },
+    {
+      "value": 17,
+      "word": "U2 L2 U L2 F' U' R F2 U'"
+    },
+    {
+      "value": 18,
+      "word": "F U L' F R2 U2 F U' F L2"
+    },
+    {
+      "value": 19,
+      "word": "F' R2 F' R2 U F2 U2 R' L2 F'"
+    },
+    {
+      "value": 20,
+      "word": "U2 F U' F2 R U' L U2 L' U"
+    },
+    {
+      "value": 21,
+      "word": "F' L F2 U' F' U2 R2 L' F U"
+    },
+    {
+      "value": 22,
+      "word": "F2 U F2 L' U2 R L2 F2 U'"
+    },
+    {
+      "value": 23,
+      "word": "F2 L F2 R' F R' U F' L2 U2"
+    },
+    {
+      "value": 24,
+      "word": "F' U' R2 U' R' F U2 L F2 U'"
+    },
+    {
+      "value": 25,
+      "word": "F' R' F R2 F' L2 F' R2 U' L'"
+    },
+    {
+      "value": 26,
+      "word": "F R' U' F2 U' R F2 L F2 U'"
+    },
+    {
+      "value": 27,
+      "word": "R' U' R' L2 U R2 U F' U F'"
+    },
+    {
+      "value": 28,
+      "word": "F' R' U F' R2 F2 L2 U' F'"
+    },
+    {
+      "value": 29,
+      "word": "U R2 U' L U2 F2 R L2 F' U'"
+    },
+    {
+      "value": 30,
+      "word": "U' F2 R F2 U' L F' U' R'"
+    },
+    {
+      "value": 31,
+      "word": "U2 R' U' R2 U2 F' U' L F U'"
+    },
+    {
+      "value": 32,
+      "word": "U' R2 U R2 F' U' L2 F R U2"
+    },
+    {
+      "value": 33,
+      "word": "U2 L U R U' F' U R' L' U2"
+    },
+    {
+      "value": 34,
+      "word": "L F2 U' R2 F' U2 F U2 L' U2"
+    },
+    {
+      "value": 35,
+      "word": "R2 U R2 U L2 F2 L' F2 L' U'"
+    },
+    {
+      "value": 36,
+      "word": "L F U' F U' R2 F2 L' U'"
+    },
+    {
+      "value": 37,
+      "word": "R2 F2 R' F U' R' L2 U' F'"
+    },
+    {
+      "value": 38,
+      "word": "U2 L F' U' R U F' U L' U2"
+    },
+    {
+      "value": 39,
+      "word": "U' L2 U2 F2 R U' R2 U"
+    },
+    {
+      "value": 40,
+      "word": "L2 U2 F L U' R F' L2 F"
+    },
+    {
+      "value": 41,
+      "word": "R2 U2 L2 F U' L2 U R F2 U2"
+    },
+    {
+      "value": 42,
+      "word": "F2 U R2 L U L U' F U'"
+    },
+    {
+      "value": 43,
+      "word": "R2 U2 F' U' R U F' L U'"
+    },
+    {
+      "value": 44,
+      "word": "U' F' L U R' F2 U2 R' U' L'"
+    },
+    {
+      "value": 45,
+      "word": "F U L' F2 U R U F2 R' U'"
+    },
+    {
+      "value": 46,
+      "word": "U L2 F' U F2 U R' F L U"
+    },
+    {
+      "value": 47,
+      "word": "L' F L2 U2 L' U F2 U' R' U"
+    },
+    {
+      "value": 48,
+      "word": "R' U' R2 F2 U L2 U' F R2 U2"
+    },
+    {
+      "value": 49,
+      "word": "L' F L F2 L U' F2 R' U"
+    },
+    {
+      "value": 50,
+      "word": "F2 L F' U' L U2 R L'"
+    },
+    {
+      "value": 51,
+      "word": "L2 U R2 U' F U F L2 U"
+    },
+    {
+      "value": 52,
+      "word": "L' F' U R2 F2 L U' L2 U' L'"
+    },
+    {
+      "value": 53,
+      "word": "F' R' F R' F2 U F2 U2 L U'"
+    },
+    {
+      "value": 54,
+      "word": "L2 F' U' L' F2 R F' L' F' U'"
+    },
+    {
+      "value": 55,
+      "word": "F2 U' F2 L' U2 R L2 F2 U'"
+    },
+    {
+      "value": 56,
+      "word": "R F' U2 R U' F U2 F' L U'"
+    },
+    {
+      "value": 57,
+      "word": "R' F' R2 F' U F2 U2 L U' R"
+    },
+    {
+      "value": 58,
+      "word": "F L' U L2 U2 F' R' U L"
+    },
+    {
+      "value": 59,
+      "word": "L F2 L U F' U2 L2 U' R' U"
+    },
+    {
+      "value": 60,
+      "word": "U R F2 R F2 U2 L' U' L2 U'"
+    },
+    {
+      "value": 61,
+      "word": "F2 L F2 U2 L' F' L U' R2 F"
+    },
+    {
+      "value": 62,
+      "word": "U F2 U L' U2 R U2 L2 F2 U'"
+    },
+    {
+      "value": 63,
+      "word": "L' U' F R U2 R2 F' L' U"
+    },
+    {
+      "value": 64,
+      "word": "F' U' R U' F U2 F' L F2 U'"
+    },
+    {
+      "value": 65,
+      "word": "F2 L' F' U R2 F2 L' U R U2"
+    },
+    {
+      "value": 66,
+      "word": "F' R' F' R' U R' F2 L2 U' F'"
+    },
+    {
+      "value": 67,
+      "word": "U F' R' F' R2 U F' L F' U'"
+    },
+    {
+      "value": 68,
+      "word": "U' L2 F2 L F' U R' U L"
+    },
+    {
+      "value": 69,
+      "word": "L' F2 R F' U L' F R2 F' U2"
+    },
+    {
+      "value": 70,
+      "word": "L2 F' U2 L U' F U2 R L2"
+    },
+    {
+      "value": 71,
+      "word": "U' F2 R' F L F2 R' F U'"
+    },
+    {
+      "value": 72,
+      "word": "R' L' F2 U F L F2 R2 F"
+    },
+    {
+      "value": 73,
+      "word": "L2 F2 L F' U R2 L U F"
+    },
+    {
+      "value": 74,
+      "word": "R' F R' U R2 L' F2 U2 F' U'"
+    },
+    {
+      "value": 75,
+      "word": "L' F2 R F' U L' F R2 F U2"
+    },
+    {
+      "value": 76,
+      "word": "F' L2 U F2 U R' L' U' F U2"
+    },
+    {
+      "value": 77,
+      "word": "R U2 F2 L2 F' L U' R' F L2"
+    },
+    {
+      "value": 78,
+      "word": "L2 U' R L2 F' R' F2 R' F"
+    },
+    {
+      "value": 79,
+      "word": "L' F2 U F R' U2 R2 U' L"
+    },
+    {
+      "value": 80,
+      "word": "L' F' R2 F' U' F2 R F' L"
+    },
+    {
+      "value": 81,
+      "word": "F' U' R F' L2 U2 F' U F' R2"
+    },
+    {
+      "value": 82,
+      "word": "F L U' F L2 F2 R2 U F"
+    },
+    {
+      "value": 83,
+      "word": "F2 L2 U2 R' U' R2 L2 F2"
+    },
+    {
+      "value": 84,
+      "word": "F' U2 F' U' R' F2 R' U2 L U'"
+    },
+    {
+      "value": 85,
+      "word": "F' R U' R2 U2 F L U' R'"
+    },
+    {
+      "value": 86,
+      "word": "U F' U' R U F' L F' U'"
+    },
+    {
+      "value": 87,
+      "word": "L' U' R F' U F2 U R L"
+    },
+    {
+      "value": 88,
+      "word": "L2 F' U R' U2 F2 R F' L' U2"
+    },
+    {
+      "value": 89,
+      "word": "R U2 F U' F2 L F' R2 U'"
+    },
+    {
+      "value": 90,
+      "word": "U' F U L' U' R F2 U2 R2 U'"
+    },
+    {
+      "value": 91,
+      "word": "R' U F R2 U L' F2 U2 F' U'"
+    },
+    {
+      "value": 92,
+      "word": "R' L2 U' L2 F R2 F' R2 F2"
+    },
+    {
+      "value": 93,
+      "word": "F L' U R2 F2 L F2 U L2 U'"
+    },
+    {
+      "value": 94,
+      "word": "R F' R' F2 R' U F2 L U'"
+    },
+    {
+      "value": 95,
+      "word": "R U' L' F R2 F' R2 F2 L U"
+    },
+    {
+      "value": 96,
+      "word": "R2 L2 U' L2 F R2 F R2 F2"
+    },
+    {
+      "value": 97,
+      "word": "R2 F' L U R2 U L U2 L' F2"
+    },
+    {
+      "value": 98,
+      "word": "F' R U F' U2 R U2 L F' U'"
+    },
+    {
+      "value": 99,
+      "word": "F L2 U R U2 L2 U L' F2 U'"
+    }
+  ]
+}
