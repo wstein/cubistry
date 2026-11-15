@@ -122,15 +122,18 @@ test("preemption finishes only the active turn, rejects busy input, records comp
   assert.equal(c.snapshot.history.at(-1).source, "Scramble 7/1");
   assert.ok(!fullGoal(design, c.snapshot.state));
 });
-test("Solve preempts an old path and replays from the actual committed source", async () => {
-  const { c, pending, design } = fixture({ gate: true });
+async function solveReplays(factory) {
+  const { c, pending, design } = fixture({ gate: true, factory });
   c.scramble(0, 20);
   const active = pending.shift();
   c.solve();
   active.resolve();
-  for (let i = 0; i < 200 && c.snapshot.solverStatus !== "Verified"; i++) {
+  // The solver load hashes the table on the thread pool, so its duration is
+  // wall time, not a number of event-loop turns: wait on the condition.
+  const deadline = Date.now() + 30_000;
+  while (c.snapshot.solverStatus !== "Verified" && Date.now() < deadline) {
     while (pending.length) pending.shift().resolve();
-    await tick();
+    await new Promise((r) => setTimeout(r, 1));
   }
   assert.equal(c.snapshot.solverStatus, "Verified");
   assert.ok(fullGoal(design, c.snapshot.state));
@@ -139,7 +142,14 @@ test("Solve preempts an old path and replays from the actual committed source", 
     c.snapshot.history.filter((e) => e.source === "Scramble 0/20").length,
     1,
   );
-});
+}
+test("Solve preempts an old path and replays from the actual committed source", () =>
+  solveReplays(prepareTestSolver));
+test("Solve replays when the solver load takes real time (150 ms)", () =>
+  solveReplays(async (print) => {
+    await new Promise((r) => setTimeout(r, 150));
+    return prepareTestSolver(print);
+  }));
 test("stale asynchronous solver load cannot animate after cancel, manual mutation or new design", async () => {
   for (const action of ["manual", "design", "cancel"]) {
     let resolve;
