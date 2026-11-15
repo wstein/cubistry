@@ -138,5 +138,5 @@ test("the Pages spec sets the same hook to a finite deadline below its busy wait
   assert.equal(solverTimeoutMs(deadline), deadline, "deadline is accepted");
   assert.ok(deadline > 8000, "deadline exceeds the default");
   assert.ok(deadline < busy, "deadline stays below the busy wait");
-  assert.match(spec, /toBeLessThanOrEqual\(\s*moves,?\s*\)/);
+  assert.match(spec, /toBeLessThanOrEqual\(\s*MOVE_CAP,?\s*\)/);
 });
