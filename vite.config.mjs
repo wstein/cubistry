@@ -5,7 +5,12 @@ export default defineConfig({
   base: process.env.VITE_BASE_PATH || "/",
   // Keep module-relative provider assets available in development and builds.
   optimizeDeps: {
-    exclude: ["@puzlwerk/solver-2x2", "@puzlwerk/solver-3x3-picture", "cubing"],
+    exclude: [
+      "@puzlwerk/solver-2x2",
+      "@puzlwerk/solver-3x3-front",
+      "@puzlwerk/solver-3x3-picture",
+      "cubing",
+    ],
   },
   assetsInclude: ["**/*.bin"],
   plugins: [solverAcceptancePlugin()],

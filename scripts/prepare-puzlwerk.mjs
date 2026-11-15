@@ -16,13 +16,27 @@ import { createHash } from "node:crypto";
 // This affects only this bootstrap process and its temporary provider build.
 process.umask(0o022);
 const root = fileURLToPath(new URL("../", import.meta.url));
-const picture = process.argv.includes("--picture");
-const sourceFile = picture
-  ? "puzlwerk-picture-source.json"
-  : "puzlwerk-source.json";
-const expectedPackage = picture
-  ? "@puzlwerk/solver-3x3-picture"
-  : "@puzlwerk/solver-2x2";
+const providers = {
+  "--picture": {
+    sourceFile: "puzlwerk-picture-source.json",
+    expectedPackage: "@puzlwerk/solver-3x3-picture",
+    tarball: "solver-3x3-picture.tgz",
+  },
+  "--front": {
+    sourceFile: "puzlwerk-front-source.json",
+    expectedPackage: "@puzlwerk/solver-3x3-front",
+    tarball: "solver-3x3-front.tgz",
+  },
+};
+const selected = Object.keys(providers).filter((flag) =>
+  process.argv.includes(flag),
+);
+if (selected.length > 1) throw new Error("Select at most one provider flag");
+const { sourceFile, expectedPackage, tarball } = providers[selected[0]] ?? {
+  sourceFile: "puzlwerk-source.json",
+  expectedPackage: "@puzlwerk/solver-2x2",
+  tarball: "solver-2x2.tgz",
+};
 const source = JSON.parse(readFileSync(join(root, sourceFile), "utf8"));
 if (
   source.repository !== "https://github.com/wstein/puzlwerk.git" ||
@@ -30,11 +44,7 @@ if (
   source.package !== expectedPackage
 )
   throw new Error("Unsupported provider source pin");
-const output = join(
-  root,
-  ".puzlwerk-dependency",
-  picture ? "solver-3x3-picture.tgz" : "solver-2x2.tgz",
-);
+const output = join(root, ".puzlwerk-dependency", tarball);
 const integrity = (bytes) =>
   "sha512-" + createHash("sha512").update(bytes).digest("base64");
 const expected = source.integrity;

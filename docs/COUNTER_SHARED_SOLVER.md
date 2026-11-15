@@ -43,6 +43,12 @@ merged in the consumer base. This is still not a registry release. The reviewed
 provider tree produces the same verified package bytes as its pre-merge source.
 Never silently follow a mutable branch name or use another scope.
 
+The third provider package, `@puzlwerk/solver-3x3-front` (front-goal solver for the
+3x3 calendar), is pinned in `puzlwerk-front-source.json` and prepared with
+`node scripts/prepare-puzlwerk.mjs --front` (also part of `prepare:solver`). The pin is
+the merge commit of wstein/puzlwerk#59 on provider main; its tree equals the reviewed
+PR head `32ed585d`. The adapter is `src/apps/calendar/front-goal.ts`.
+
 ## Physical contract and HTM
 
 The thin `src/adapters/puzlwerk-2x2.ts` boundary consumes the existing complete
