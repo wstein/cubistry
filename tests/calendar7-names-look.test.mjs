@@ -245,97 +245,6 @@ test("exposure: the studio has only the light types the irradiance counts, and a
   assert.equal(namesExposure(scene, new THREE.Quaternion(), cam), 1);
 });
 
-// ---- light per face: the face that looks at the camera is lit as before, the others get the share (names-face-light.ts) ----
-import { FRONT_FROM, FRONT_TO, NAMES_DIRECTIONAL_SHARE, faceIrradiance, faceLightChunks, frontWeight, faceCosine, FACE_SHARE_POWER, patchFaceLight, faceLightUniform } from "../src/apps/calendar7/names-face-light.ts";
-const faceNormal = (axis, q) => new THREE.Vector3(...axis).applyQuaternion(q);
-const FACES = { up: [0, 1, 0], front: [0, 0, 1], right: [1, 0, 0], left: [-1, 0, 0] };
-const VIEWS = [[0, 0], [0.22, 0.3], [0.3, 0.5], [0.45, 0.5], [0.95, 0.5]]; // [pitch, yaw]: the studio views of the washout report
-
-test("face light: the weight is 1 for a face that looks at the camera, the share at grazing and below, and rises smoothly in between", () => {
-  assert.equal(NAMES_DIRECTIONAL_SHARE, 0.08);
-  assert.equal(frontWeight(1), 1);
-  assert.equal(frontWeight(FRONT_TO), 1);
-  assert.equal(frontWeight(0.8), 1);
-  assert.equal(frontWeight(FRONT_FROM), 0);
-  for (const d of [0, 0.2, -0.5, -1]) assert.equal(frontWeight(d), 0, String(d));
-  let prev = 0;
-  for (let d = FRONT_FROM; d <= FRONT_TO; d += 0.005) { const w = frontWeight(d); assert.ok(w >= prev - 1e-12 && w <= 1, String(d)); assert.ok(w - prev < 0.06, `no step at ${d}`); prev = w; }
-  assert.ok(FRONT_TO <= 0.8 && FRONT_TO > 0.6, "a face within 37 degrees of the camera is front: the start view and its turned views");
-  assert.ok(FRONT_TO - FRONT_FROM >= 0.25, "a wide range: a turn changes the light slowly");
-});
-
-test("face light: the face that looks at the camera has exactly the studio's irradiance, the other faces about that of the front face at the least (0.97) and at most 1.15 times it", () => {
-  const scene = studioScene(), cam = camera();
-  for (const [p, y] of VIEWS.slice(0, 4)) {
-    const q = turned(y, p), mainFront = irradiance(scene, faceNormal(FACES.front, q));
-    assert.ok(Math.abs(faceIrradiance(scene, faceNormal(FACES.front, q), q, cam) - mainFront) < 1e-9, `front at pitch ${p}`);
-    for (const k of ["up", "right"]) {
-      const n = faceNormal(FACES[k], q), now = faceIrradiance(scene, n, q, cam);
-      if (n.z < 0.2) continue; // looks away from the camera
-      assert.ok(now <= 1.15 * mainFront && now >= 0.97 * mainFront, `${k} at pitch ${p}: ${now} against the front's ${mainFront}`);
-    }
-  }
-  // Steep view: the top face is the face that looks at the camera and keeps the studio's light; the front face is lit like the others.
-  const q = turned(0.5, 0.95), top = faceNormal(FACES.up, q);
-  assert.equal(frontWeight(top.z), 1);
-  assert.ok(Math.abs(faceIrradiance(scene, top, q, cam) - irradiance(scene, top)) < 1e-9);
-  assert.ok(frontWeight(faceNormal(FACES.front, q).z) < 0.5, "the front face is not the face that looks at the camera there");
-});
-
-test("face light: the irradiance of every face is continuous while the cube turns about y and about x (no step, no pop)", () => {
-  const scene = studioScene(), cam = camera(), step = (rot, from, to, face) => {
-    let worst = 0, prev = null;
-    for (let a = from; a <= to + 1e-9; a += 0.01) {
-      const q = rot(a), n = faceNormal(FACES[face], q);
-      if (n.z < 0.1) { prev = null; continue; }
-      const v = faceIrradiance(scene, n, q, cam);
-      if (prev !== null) worst = Math.max(worst, Math.abs(v - prev));
-      prev = v;
-    }
-    return worst;
-  };
-  // Largest change per 0.01 rad of turn of the irradiance a face gets (the studio's own change is up to 0.1 for the front face at a pitch);
-  // a hard switch between front and not front changes it by 1 or more.
-  for (const face of Object.keys(FACES)) for (const [name, rot, from, to] of [["yaw", (a) => turned(a, 0.3), -1.3, 1.3], ["pitch", (a) => turned(0.3, a), -1.3, 1.3]]) {
-    const worst = step(rot, from, to, face);
-    assert.ok(worst < 0.25, `${face} ${name}: largest step of 0.01 rad ${worst}`);
-  }
-});
-
-test("face light: the three.js light chunks take the face light at the three places, and a changed chunk is refused", () => {
-  const { begin, end } = faceLightChunks();
-  assert.ok(begin.includes("c7Direct = mix( c7FaceLight.x, 1.0, c7W )") && begin.includes("directLight.color *= c7Direct;") && begin.includes("c7DirSum"));
-  assert.ok(end.includes("irradiance += vec3( ( 1.0 - c7W ) * max( 0.0, c7FaceLight.y - c7Base ) );") && end.indexOf("c7Base") < end.indexOf("RE_IndirectDiffuse( irradiance,"));
-  const at = begin.indexOf("directLight.color *= c7Direct;");
-  assert.ok(at > 0 && begin.indexOf("directionalLightShadows[ i ]", at) > at, "in the directional loop, before its shadow factor");
-  assert.throws(() => faceLightChunks("vec3 other;", THREE.ShaderChunk.lights_fragment_end), /changed its light chunk/);
-  assert.throws(() => faceLightChunks(THREE.ShaderChunk.lights_fragment_begin, "nothing"), /changed its light chunk/);
-});
-
-test("face light: a bevel belongs to the face it is nearer to (face cosine), a flat face keeps its own, the weight never exceeds the face's", () => {
-  const axisCos = [0.1, 0.43, 0.9]; // +x, +y (top), +z (front) of a cube seen at pitch 0.45
-  const near = (a, b, m) => assert.ok(Math.abs(a - b) < 1e-3, `${m}: ${a} against ${b}`);
-  near(faceCosine([0, 1, 0], axisCos), 0.43, "flat top face");
-  near(faceCosine([0, 0, 1], axisCos), 0.9, "flat front face");
-  near(faceCosine([0, -1, 0], axisCos), -0.43, "flat bottom face");
-  const at = (deg) => [0, Math.cos(deg * Math.PI / 180), Math.sin(deg * Math.PI / 180)]; // top face (0 degrees) toward the front face (90)
-  assert.ok(faceCosine(at(20), axisCos) < 0.45, "a bevel fragment nearer to the top face has the top face cosine");
-  assert.ok(faceCosine(at(70), axisCos) > 0.88, "a bevel fragment nearer to the front face has the front face cosine");
-  near(faceCosine(at(45), axisCos), (0.43 + 0.9) / 2, "the middle of the bevel is shared");
-  const shader = { vertexShader: "void main() {\n#include <defaultnormal_vertex>\n}", fragmentShader: "#include <lights_fragment_begin>\n#include <lights_fragment_end>", uniforms: {} };
-  const material = new THREE.MeshPhysicalMaterial();
-  patchFaceLight(material, faceLightUniform());
-  material.onBeforeCompile(shader);
-  assert.ok(/varying vec3 vC7Obj;/.test(shader.vertexShader) && shader.vertexShader.indexOf("#include <defaultnormal_vertex>") < shader.vertexShader.indexOf("vC7Obj = objectNormal;"), "the vertex shader passes the object normal after the normal is made");
-  assert.ok(shader.vertexShader.includes("vC7Axes = vec3( normalize( normalMatrix[ 0 ] ).z, normalize( normalMatrix[ 1 ] ).z, normalize( normalMatrix[ 2 ] ).z );"));
-  assert.ok(shader.fragmentShader.includes("min( geometryNormal.z, c7FaceCos )") && shader.fragmentShader.includes("pow( abs( vC7Obj ), vec3( 4.0 ) )") && /varying vec3 vC7Axes;/.test(shader.fragmentShader), "the fragment weight uses the lesser of fragment and face cosine, with the power of the reference");
-  assert.equal(FACE_SHARE_POWER, 4);
-  // a three.js without the include of the vertex shader is refused (the fragment chunks are guarded the same way)
-  const other = new THREE.MeshPhysicalMaterial();
-  patchFaceLight(other, faceLightUniform());
-  assert.throws(() => other.onBeforeCompile({ vertexShader: "void main() {}", fragmentShader: shader.fragmentShader, uniforms: {} }), /changed its vertex shader/);
-});
-
 // ---- soft shoulder (names-tone.ts) ----
 import { SHOULDER_GLSL, SHOULDER_START, installNamesToneMapping, shoulder } from "../src/apps/calendar7/names-tone.ts";
 test("shoulder: identity up to 0.9 (front tokens unchanged), continuous, rising and below 1 for 1.3; white renders within 4 of 255", () => {
@@ -361,17 +270,17 @@ test("shoulder: the shader chunk of three.js carries the same start, and the ins
 // ---- plasticity of the names layout (names-plasticity.ts) ----
 import { DEFAULT_PLASTICITY, MIN_SHADOW_STRENGTH, clampPlasticity, floorOpacityFactor, parsePlasticity, plasticityGain, plasticityParts } from "../src/apps/calendar7/names-plasticity.ts";
 test("plasticity: 0 is the flat look, the parts grow with it, the default is in range, parsing and clamping", () => {
-  assert.deepEqual(plasticityParts(0), { specular: 0, clearcoat: 0, faceShadows: false, shadowStrength: MIN_SHADOW_STRENGTH });
-  assert.equal(plasticityGain(0), 1);
+  assert.deepEqual(plasticityParts(0), { specular: 0, faceShadows: false, shadowStrength: MIN_SHADOW_STRENGTH });
+  assert.ok(Math.abs(plasticityGain(0) - 1) < 1e-3 && plasticityGain(0) === plasticityGain(0, false), "at 0 only the clearcoat of 0.01 (0.05 % of the diffuse light) is given back");
   let prev = plasticityParts(0.01);
   for (const p of [0.1, 0.25, 0.5, 0.75, 1]) {
     const now = plasticityParts(p);
-    assert.ok(now.faceShadows && now.specular > prev.specular && now.clearcoat > prev.clearcoat && now.shadowStrength > prev.shadowStrength, String(p));
+    assert.ok(now.faceShadows && now.specular > prev.specular && now.shadowStrength > prev.shadowStrength, String(p));
     prev = now;
   }
   const full = plasticityParts(1);
   // Never past the shared plastic (specular 1, clearcoat 0.18, shadows 1): the old look is the comparison, not the top of the range.
-  assert.ok(full.specular <= 0.3 && full.clearcoat <= 0.1 && full.shadowStrength <= 0.85 && full.shadowStrength >= MIN_SHADOW_STRENGTH);
+  assert.ok(full.specular <= 0.3 && full.shadowStrength <= 0.85 && full.shadowStrength >= MIN_SHADOW_STRENGTH);
   assert.equal(DEFAULT_PLASTICITY, 0.6); // owner decision 2026-11-11
   assert.equal(clampPlasticity(-3), 0); assert.equal(clampPlasticity(7), 1); assert.equal(clampPlasticity(Number.NaN), DEFAULT_PLASTICITY);
   assert.equal(parsePlasticity(null), DEFAULT_PLASTICITY); assert.equal(parsePlasticity(""), DEFAULT_PLASTICITY); assert.equal(parsePlasticity("0.6"), 0.6); assert.equal(parsePlasticity("x"), DEFAULT_PLASTICITY);
@@ -380,7 +289,7 @@ test("plasticity: 0 is the flat look, the parts grow with it, the default is in 
   assert.equal(clampPlasticity(Infinity), 1); assert.equal(clampPlasticity(-Infinity), 0);
   assert.equal(floorOpacityFactor(MIN_SHADOW_STRENGTH) * 0.3, 1); // the floor shadow material reaches opacity 1 at the minimum strength: its darkness is kept
 });
-test("plasticity: the exposure gain gives back what shadows, specular and clearcoat take; without a shadow map only the specular part", () => {
+test("plasticity: the exposure gain gives back what shadows, specular and clearcoat take; without a shadow map only the specular and the clearcoat part", () => {
   for (const p of [0.1, 0.25, 0.5, 1]) {
     assert.ok(plasticityGain(p) > plasticityGain(p, false) && plasticityGain(p, false) > 1, String(p));
     assert.ok(plasticityGain(p) > 1.02 && plasticityGain(p) < 1.12, `${p}: ${plasticityGain(p)}`);

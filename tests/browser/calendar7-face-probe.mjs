@@ -2,7 +2,7 @@
 // Real Calendar7 page probe (names layout): turns the cube of the running app to a view, renders it by hand and measures, per
 // visible face, the share of clipped fill pixels (all channels >= 253 of the light, non-ink pixels) and the largest channel
 // difference of the tile fills (most common color of the central 70% of each tile) from their scheme tokens. Shared by
-// calendar7-names-faces.spec.mjs and the screenshot / table probes of the PR.
+// calendar7-names-global-light.spec.mjs and the screenshot / table probes of the PR.
 
 /** Opens the app page, waits for idle and returns nothing; `scheme`, `year`, `month` select the print. */
 export async function openApp(page, { scheme, year = 2027, month = 2, production = true }) {
@@ -100,53 +100,4 @@ export function measureFaces(page, { pitch, rotY, png = false, quick = false }) 
     for (const f of Object.keys(deltas)) { if (!faces[f]) continue; const d = deltas[f].sort((a, b) => a - b); faces[f].washedTiles = washed[f].list ?? []; faces[f].washedShare = washed[f].tiles ? washed[f].washed / washed[f].tiles : null; faces[f].coloredTiles = washed[f].tiles; faces[f].tiles = d.length; faces[f].delta = d.length ? d[d.length - 1] : 0; faces[f].medianDelta = d.length ? d[d.length >> 1] : 0; faces[f].p90 = d.length ? d[Math.floor(d.length * 0.9)] : 0; }
     return { exposure: v.renderer.toneMappingExposure, toneMapping: v.renderer.toneMapping, faces, png: png ? cv.toDataURL("image/png") : undefined };
   }, { pitch, rotY, png, quick });
-}
-
-/**
- * The face that looks at the camera, rendered as the names layout does and with the studio's light on every face (what the layout
- * rendered before the face light): the largest difference of a pixel in the central 70% of its tiles, the mean over its pixels and
- * the share of pixels that differ by more than 7 of 255. The face that looks at the camera must be lit as before (W = 1).
- */
-export function cameraFaceDiff(page, { pitch, rotY }) {
-  return page.evaluate(async ({ pitch, rotY }) => {
-    const v = window.__c7viewer, Vector3 = v.camera.position.constructor, e = v.extent;
-    v.presentation.rotation.set(pitch, rotY, 0);
-    v.presentation.updateMatrixWorld(true);
-    const grab = () => {
-      v.syncExposure(); v.renderer.render(v.scene, v.camera);
-      const cv = v.renderer.domElement, c = document.createElement("canvas"); c.width = cv.width; c.height = cv.height;
-      const x = c.getContext("2d", { willReadFrequently: true }); x.drawImage(cv, 0, 0); return x;
-    };
-    const share = v.directionalShare;
-    const a = grab(); v.setDirectionalShare(1); const b = grab(); v.setDirectionalShare(share);
-    const toCam = v.camera.position.clone().normalize(), q = v.presentation.quaternion;
-    const FACES = { up: [[0, 1, 0], [[-1, 1, -1], [1, 1, -1], [1, 1, 1], [-1, 1, 1]]], front: [[0, 0, 1], [[-1, 1, 1], [1, 1, 1], [1, -1, 1], [-1, -1, 1]]], right: [[1, 0, 0], [[1, 1, 1], [1, 1, -1], [1, -1, -1], [1, -1, 1]]], left: [[-1, 0, 0], [[-1, 1, -1], [-1, 1, 1], [-1, -1, 1], [-1, -1, -1]]] };
-    let best = null;
-    for (const [f, [n, c]] of Object.entries(FACES)) { const d = new Vector3(...n).applyQuaternion(q).dot(toCam); if (!best || d > best.d) best = { f, d, c }; }
-    const cv = v.renderer.domElement;
-    const proj = (p) => { const w = v.presentation.localToWorld(new Vector3(...p)); w.project(v.camera); return [(w.x * 0.5 + 0.5) * cv.width, (1 - (w.y * 0.5 + 0.5)) * cv.height]; };
-    const LOCAL = [[1, 0, 0], [-1, 0, 0], [0, 1, 0], [0, -1, 0], [0, 0, 1], [0, 0, -1]], N = FACES[best.f][0];
-    let n = 0, sum = 0, max = 0, over = 0;
-    v.presentation.traverse((o) => { // the central 70% of every tile of that face (the bevels between the tiles are not the face)
-      const ids = o.userData.sourceFaceStickerIds;
-      if (!ids || !Array.isArray(o.material)) return;
-      for (let fi = 0; fi < 6; fi++) {
-        if (ids[fi] == null) continue;
-        o.geometry.computeBoundingBox();
-        const m = v.presentation.matrixWorld.clone().invert().multiply(o.matrixWorld), bb = o.geometry.boundingBox.clone().applyMatrix4(m);
-        const nn = new Vector3(...LOCAL[fi]).transformDirection(m).toArray().map(Math.round);
-        if (!nn.every((x, k) => x === N[k])) continue;
-        const ax = [0, 1, 2].filter((k) => N[k] === 0), pl = N.findIndex((x) => x !== 0), plane = N[pl] > 0 ? bb.max.getComponent(pl) : bb.min.getComponent(pl);
-        const lo = [bb.min.getComponent(ax[0]), bb.min.getComponent(ax[1])], hi = [bb.max.getComponent(ax[0]), bb.max.getComponent(ax[1])];
-        for (let i = 0.15; i < 0.86; i += 0.1) for (let j = 0.15; j < 0.86; j += 0.1) {
-          const p = [0, 0, 0]; p[pl] = plane; p[ax[0]] = lo[0] + (hi[0] - lo[0]) * i; p[ax[1]] = lo[1] + (hi[1] - lo[1]) * j;
-          const [x, y] = proj(p).map(Math.round);
-          const A = a.getImageData(x, y, 1, 1).data, B = b.getImageData(x, y, 1, 1).data;
-          const d = [0, 1, 2].map((k) => Math.abs(A[k] - B[k])), mm = Math.max(...d);
-          n++; sum += (d[0] + d[1] + d[2]) / 3; max = Math.max(max, mm); if (mm > 7) over++;
-        }
-      }
-    });
-    return { face: best.f, cosine: +best.d.toFixed(3), n, meanAbs: +(sum / n).toFixed(2), maxAbs: max, shareOver7: +(over / n).toFixed(4) };
-  }, { pitch, rotY });
 }

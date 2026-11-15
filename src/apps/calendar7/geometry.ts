@@ -185,8 +185,9 @@ export const halfEdgeOf = (layout: Layout): number => (layout === "names" ? NAME
  * - the exposure follows the face that looks at the camera (names-exposure.ts): the inverse of the radiance a white diffuse
  *   surface gets there, 1.217 head on at the shared presentation lights;
  * - the shared plastic (specular 1, clearcoat 0.18) adds about 1.3% linear white to every color (#e0282c rendered #e1373a), so
- *   the names layout has its own shading: plasticity (names-plasticity.ts, default 0.6) scales specular, clearcoat and face
- *   shadows from none (0, flat and exact) up, and the exposure gives back what the shading takes. The standard layout keeps
+ *   the names layout has its own shading: plasticity (names-plasticity.ts, default 0.6) scales specular and face
+ *   shadows from none up (every cube material has roughness 0.65 and clearcoat 0.01 at any plasticity), the lights are one global rig
+ *   (names-light.ts), and the exposure gives back what the shading takes. The standard layout keeps
  *   its gloss.
  */
 export const STANDARD_EXPOSURE = 1;
