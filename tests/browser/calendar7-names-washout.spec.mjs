@@ -1,5 +1,5 @@
 // SPDX-License-Identifier: AGPL-3.0-or-later
-// Draft numeric contract: docs/CALENDAR_7X7_LIGHTING_CONTRACT_DRAFT.md; owner approval pending.
+// Owner-approved numeric contract: docs/CALENDAR_7X7_LIGHTING_CONTRACT.md.
 import { test, expect } from "@playwright/test";
 import { measureFaces, openApp } from "./calendar7-face-probe.mjs";
 
