@@ -19,6 +19,8 @@ export const STANDARD_BODY_WIDTH = 0.99;
  * 0.6 / 0.736 = 0.815, giving 4x4 1.096 (1.10) and 5x5 1.196 (1.20). N = 3 (1.0, unchanged from 2026-11-10) and N = 6 are ESTIMATES,
  * not measured: the 6x6 overhang is linear between 5x5 and 7x7 (0.488, scaled 1.40). To be replaced when the 3x3 and the 6x6
  * are measured. Before: N = 2, 3, 4: 1.0; N = 5: 1.1; N = 6: 1.3 (estimates).
+ * The general standard values are defined in wstein/puzlwerk (`standardLayerWidths`, branch feat/standard-layer-widths); this table
+ * stays with the same values until Cubistry switches to `@puzlwerk/viewer`.
  * This is the one table; change a value here only.
  */
 export const OUTER_LAYER_WIDTH: Readonly<Record<number, number>> = Object.freeze({ 2: 1, 3: 1, 4: 1.1, 5: 1.2, 6: 1.4, 7: 1.6 });
