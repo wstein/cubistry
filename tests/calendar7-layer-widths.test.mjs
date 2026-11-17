@@ -28,8 +28,20 @@ const F = 1.6;
 const PAPER_RED = SCHEMES.find((s) => s.id === "paper-red");
 
 // ---- the table, the edge and the gap ----
-test("outer layer widths: the one table (N = 2, 3, 4: 1; N = 5: 1.1; N = 6: 1.3; N = 7: 1.6, owner decision 2026-11-11) and the widths [f, 1, ..., 1, f]", () => {
-  assert.deepEqual({ ...OUTER_LAYER_WIDTH }, { 2: 1, 3: 1, 4: 1, 5: 1.1, 6: 1.3, 7: 1.6 });
+// Owner caliper measurements 2026-11-17 (mm assumed, inner / outer layer): the table keeps the shape of the measured overhangs (factor - 1),
+// compressed so that the 7x7 stays at 1.6 (scale 0.6 / 0.736); the 6x6 is not measured (linear between 5x5 and 7x7), the 3x3 is not measured (1).
+const MEASURED = { 4: [[14.5, 15.6], [13.1, 15.2]], 5: [[10.6, 13.5], [11.1, 13.4]], 7: [[7.2, 12.5]] };
+const overhang = (n) => MEASURED[n].reduce((sum, [i, o]) => sum + o / i - 1, 0) / MEASURED[n].length;
+test("outer layer widths: the table follows the measured overhangs (scale 0.6 / 0.736); 6x6 interpolated; non-decreasing in N", () => {
+  const scale = 0.6 / overhang(7);
+  near(scale, 0.815, 0.001, "scale");
+  for (const n of [4, 5, 7]) near(OUTER_LAYER_WIDTH[n], 1 + scale * overhang(n), 0.01, `N = ${n}`);
+  near(OUTER_LAYER_WIDTH[6], 1 + scale * (overhang(5) + overhang(7)) / 2, 0.01, "N = 6 (mean overhang of 5x5 and 7x7)");
+  for (let n = 3; n <= 7; n++) assert.ok(OUTER_LAYER_WIDTH[n] >= OUTER_LAYER_WIDTH[n - 1], `N = ${n} not thinner than N - 1`);
+  assert.equal(OUTER_LAYER_WIDTH[7], 1.6);
+});
+test("outer layer widths: the one table (N = 2, 3: 1; N = 4: 1.1; N = 5: 1.2; N = 6: 1.4; N = 7: 1.6, owner decision 2026-11-17) and the widths [f, 1, ..., 1, f]", () => {
+  assert.deepEqual({ ...OUTER_LAYER_WIDTH }, { 2: 1, 3: 1, 4: 1.1, 5: 1.2, 6: 1.4, 7: 1.6 });
   for (let n = 2; n <= 7; n++) assert.deepEqual(layerWidthsFor(n), thickOuterLayerWidths(n, outerLayerWidth(n)), `N = ${n}`);
   assert.deepEqual(layerWidthsFor(7), [1.6, 1, 1, 1, 1, 1, 1.6]);
   assert.deepEqual(layerWidthsFor(3), [1, 1, 1]);
