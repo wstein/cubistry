@@ -5,6 +5,7 @@ import test from "node:test";
 import assert from "node:assert/strict";
 import * as THREE from "three";
 import { RoundedBoxGeometry } from "three/addons/geometries/RoundedBoxGeometry.js";
+import { OUTER_LAYER_WIDTH } from "../src/apps/calendar7/geometry.ts";
 import { faceUvAxes } from "../packages/cube-viewer/src/cut-faces.ts";
 import {
   PRESENTATION_PRESET as P, bodyRadiusFor, innerRadiusFor, stickerRadiusFor, stickerSideFor, createStickerGeometry, createPresentationGeometry,
@@ -15,7 +16,7 @@ import {
 const roundedProfile = (widths) => ({ widths, body: (cell) => new RoundedBoxGeometry(cell[0] - 0.01, cell[1] - 0.01, cell[2] - 0.01, 3, 0.055 * layerEdge(widths) / 3) });
 const near = (a, b, eps = 1e-9, what = "") => assert.ok(Math.abs(a - b) <= eps, `${what}: ${a} != ${b}`);
 const UNIFORM = { 2: 0.03, 3: 0.055, 4: 0.055 * 4 / 3, 5: 0.055 * 5 / 3, 6: 0.055 * 6 / 3, 7: 0.055 * 7 / 3 };
-const PROFILE = { 5: 1.1, 7: 1.6 }; // OUTER_LAYER_WIDTH of Calendar7
+const PROFILE = Object.fromEntries([4, 5, 6, 7].map((n) => [n, OUTER_LAYER_WIDTH[n]])); // the shipped table of Calendar7 (owner decision 2026-11-17: 1.1, 1.2, 1.4, 1.6)
 
 test("body radius per N: 2x2 and 3x3 unchanged, larger cubes keep the 3x3 millimeter radius (uniform pitch)", () => {
   for (const [n, r] of Object.entries(UNIFORM)) near(bodyRadiusFor(Number(n)), r, 1e-12, `N=${n}`);
@@ -25,12 +26,15 @@ test("body radius per N: 2x2 and 3x3 unchanged, larger cubes keep the 3x3 millim
   for (const n of [3, 4, 5, 6, 7]) near(bodyRadiusFor(n) / n, P.bodyRadius / 3, 1e-12, `share of edge, N=${n}`);
 });
 
-test("body radius with a layer profile follows the edge (sum of the widths): 0.095 on 5x5 (f 1.1), 0.150 on 7x7 (f 1.6)", () => {
+test("body radius with a layer profile follows the edge (sum of the widths): 0.099 on 5x5 (f 1.2), 0.150 on 7x7 (f 1.6)", () => {
   for (const [n, f] of Object.entries(PROFILE)) {
     const edge = layerEdge(thickOuterLayerWidths(Number(n), f));
     near(bodyRadiusFor(Number(n), edge), 0.055 * edge / 3, 1e-12, `N=${n}`);
   }
-  near(bodyRadiusFor(5, 5.2), 0.0953, 1e-4);
+  const edgeOf = (n) => layerEdge(thickOuterLayerWidths(n, PROFILE[n]));
+  near(bodyRadiusFor(4, edgeOf(4)), 0.0770, 1e-4); // edge 4.2
+  near(bodyRadiusFor(5, edgeOf(5)), 0.0990, 1e-4); // edge 5.4
+  near(bodyRadiusFor(6, edgeOf(6)), 0.1247, 1e-4); // edge 6.8
   near(bodyRadiusFor(7, 8.2), 0.1503, 1e-4);
 });
 
@@ -46,7 +50,7 @@ test("createPresentationGeometry: the reference body has the per-N radius of the
 });
 
 test("the sticker stays on the flat part of its body for every N and every layer-profile cell", () => {
-  for (const [n, f] of [[2, 1], [3, 1], [4, 1], [5, 1.1], [6, 1.3], [7, 1.6], [7, 1]]) {
+  for (const [n, f] of [[2, 1], [3, 1], ...Object.entries(PROFILE).map(([n, f]) => [Number(n), f]), [7, 1]]) {
     const r = innerRadiusFor(n, layerEdge(thickOuterLayerWidths(n, f)));
     for (const cell of [1, f]) assert.ok(stickerSideFor(cell, r) <= cell - (1 - P.bodyWidth) - 2 * r + 1e-12, `N=${n} cell ${cell}`);
   }
