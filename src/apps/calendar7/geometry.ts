@@ -11,11 +11,17 @@ export const STANDARD_BODY_WIDTH = 0.99;
 
 /**
  * Width of the two outer layers of an N-cube relative to an inner layer (1): real big cubes have thicker outer layers
- * (the corners must keep contact at 45 degree turns). Estimates, to be replaced by caliper measurements of real cubes:
- * N = 2, 3, 4: 1.0 (owner decision 2026-11-10); N = 5: 1.1, N = 6: 1.3 and N = 7: 1.6 (owner decision 2026-11-11).
+ * (the corners must keep contact at 45 degree turns). Owner decision 2026-11-17, from the owner measurements of the same day
+ * (mm assumed, inner / outer layer, factor): 4x4 A 14.5 / 15.6 (1.076), 4x4 B 13.1 / 15.2 (1.160), 5x5 A 10.6 / 13.5 (1.274),
+ * 5x5 B 11.1 / 13.4 (1.207), 7x7 7.2 / 12.5 (1.736). The real factors are not taken over in full (the inner to outer ratio stays
+ * balanced): the 7x7 stays at 1.6 (owner decisions 2026-11-11 and 2026-11-17) and the smaller sizes follow the shape of the
+ * measurements, compressed: overhang (factor - 1) per size 4x4 0.118, 5x5 0.240, 7x7 0.736 (mean of the measured cubes), scale
+ * 0.6 / 0.736 = 0.815, giving 4x4 1.096 (1.10) and 5x5 1.196 (1.20). N = 3 (1.0, unchanged from 2026-11-10) and N = 6 are ESTIMATES,
+ * not measured: the 6x6 overhang is linear between 5x5 and 7x7 (0.488, scaled 1.40). To be replaced when the 3x3 and the 6x6
+ * are measured. Before: N = 2, 3, 4: 1.0; N = 5: 1.1; N = 6: 1.3 (estimates).
  * This is the one table; change a value here only.
  */
-export const OUTER_LAYER_WIDTH: Readonly<Record<number, number>> = Object.freeze({ 2: 1, 3: 1, 4: 1, 5: 1.1, 6: 1.3, 7: 1.6 });
+export const OUTER_LAYER_WIDTH: Readonly<Record<number, number>> = Object.freeze({ 2: 1, 3: 1, 4: 1.1, 5: 1.2, 6: 1.4, 7: 1.6 });
 /**
  * Local look at another outer layer factor of the 7x7: the URL parameter `outer` (for example `?outer=1.8`, from 1.2 to 2.4) replaces
  * the table value of N = 7 for this page load; without it, and outside a browser, the table is used. The names layout derives
