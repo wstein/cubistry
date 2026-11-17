@@ -114,14 +114,14 @@ sticker offset are unchanged. The 3x3 and callers that omit a size keep the
 0.055-unit bevel on the cube edges. A cube larger than 3x3 keeps the millimeter
 bevel radius of the 3x3 at the same cube edge (owner decision 2026-11-14):
 `bodyRadiusFor(N, edge)` = 0.055 * edge / 3, with `edge` = N, or the sum of the
-layer widths with a profile (5x5 0.092 or 0.095 with f 1.1, 7x7 0.128 or 0.150
+layer widths with a profile (5x5 0.092 or 0.099 with f 1.2, 7x7 0.128 or 0.150
 with f 1.6).
 
 Two radii (owner decision 2026-11-14, `createTwoRadiusBody`). The shell
 clearance stays 0.01 in every format. The 12 cube edges keep the radius above
-(2x2 0.03, 3x3 0.055, 5x5 0.092 or 0.095, 7x7 0.128 or 0.150); every other cubie
-edge has `innerRadiusShare` = 0.6 times it (0.018, 0.033, 0.055 or 0.057,
-0.077 or 0.090; the second value with the f profile edges 5.2 and 8.2). An edge
+(2x2 0.03, 3x3 0.055, 5x5 0.092 or 0.099, 7x7 0.128 or 0.150); every other cubie
+edge has `innerRadiusShare` = 0.6 times it (0.018, 0.033, 0.055 or 0.059,
+0.077 or 0.090; the second value with the f profile edges 5.4 and 8.2). An edge
 is large only where two exterior faces of the cube meet; the rounding of an
 exterior face along its other borders is small. The exterior layers are wider by
 the extension e = (1 - 0.6) * radius (`outerExtensionFor`) so that the flat face
