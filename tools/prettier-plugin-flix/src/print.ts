@@ -308,8 +308,8 @@ export class Printer {
         const open = children[i] as TerminalNode;
         const close = children[j] as TerminalNode;
         const inner = children.slice(i + 1, j);
-        const ot = ttype(open);
-        const braces = ot === L.LBRACE || ot === L.HASH_LBRACE || ot === L.HASH_BAR;
+        const openType = ttype(open);
+        const braces = openType === L.LBRACE || openType === L.HASH_LBRACE || openType === L.HASH_BAR;
         const pad = braces && !NO_PAD.has(parentKind);
         const comments = this.takeClosingComments(close);
         const openDoc = this.tok(open);
@@ -323,13 +323,13 @@ export class Printer {
 
         const ruleKids = inner.filter((n) => !isTerm(n));
         const isMembers =
-            ot === L.LBRACE &&
+            openType === L.LBRACE &&
             ruleKids.length > 0 &&
             ruleKids.every((n) => MEMBERS.has(kind(n))) &&
             inner.every((n) => !isTerm(n) || ttype(n) === L.COMMA);
         const sourceMultiline = open.symbol.line !== close.symbol.line;
 
-        if (isMembers || (parentKind === "StructDeclaration" && ot === L.LBRACE)) {
+        if (isMembers || (parentKind === "StructDeclaration" && openType === L.LBRACE)) {
             const structSplit = parentKind === "StructDeclaration" ? this.splitOn(inner, L.COMMA) : null;
             const entries = structSplit ? structSplit.items.filter((x) => x.length > 0) : ruleKids.map((n) => [n]);
             const trailingComma = parentKind === "StructDeclaration" && isTerm(inner[inner.length - 1]);
@@ -379,7 +379,7 @@ export class Printer {
         }
         list.push(...tail);
         const forceBreak =
-            pad && ot === L.LBRACE && this.flat === 0 && inner.length > 0 && !!firstTerm(inner[0]) &&
+            pad && openType === L.LBRACE && this.flat === 0 && inner.length > 0 && !!firstTerm(inner[0]) &&
             firstTerm(inner[0])!.symbol.line > open.symbol.line;
         return group([openDoc, indent([flatSline, list]), flatSline, closeDoc], { shouldBreak: forceBreak || comments.length > 0 });
     }

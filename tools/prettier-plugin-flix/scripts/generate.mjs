@@ -6,7 +6,7 @@
  * syntax and antlr-ng's TypeScript target ignores `options { superClass }`
  * (docs/DEFECTS.md D11). This closes both gaps without forking the grammar:
  *
- *   1. Pre-process a TypeScript-flavoured copy of the grammars into build/.
+ *   1. Pre-process a TypeScript-flavored copy of the grammars into build/.
  *   2. Run antlr-ng over the copy.
  *   3. Patch the generated lexer to extend FlixLexerBase.
  *
@@ -55,7 +55,7 @@ execFileSync(
     { cwd: pkg, stdio: "inherit" },
 );
 
-// antlr-ng honours `options { superClass }` in the class declaration but never emits
+// antlr-ng honors `options { superClass }` in the class declaration but never emits
 // an import for it, so the base class is unresolved. Supply the import (and re-parent
 // defensively, in case a future version drops the superClass handling).
 const lexerFile = join(out, "FlixLexer.ts");
